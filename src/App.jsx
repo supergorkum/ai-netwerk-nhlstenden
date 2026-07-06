@@ -30,6 +30,46 @@ import {
   INIT_EVENEMENTEN, INIT_LINKJES, INIT_INSPIRATIES
 } from './initialData'
 
+const PAGINA_LABELS = {
+  '/': 'Start', '/themas': "Thema's", '/netwerk': 'Netwerk',
+  '/fundament': 'Fundament', '/initiatieven': 'Initiatieven',
+  '/pilots': 'Pilots', '/evenementen': 'Evenementen',
+  '/documentatie': 'Documentatie', '/video': "Video's",
+  '/linkjes': 'Bronnen', '/meld': 'Vraag of idee',
+  '/over': 'Over', '/beheer': 'Beheer',
+  '/geletterdheid': 'AI & Geletterdheid', '/beleid': 'Beleid',
+  '/governance': 'AI-Governance', '/kader': 'Kader',
+  '/agentic-ai': 'Agentic AI', '/dashboard': 'Dashboard',
+}
+
+function PageTracker() {
+  const location = useLocation()
+  useEffect(() => {
+    if (location.pathname === '/beheer') return
+    const nu = new Date()
+    const bezoek = {
+      pad: location.pathname,
+      label: PAGINA_LABELS[location.pathname] || location.pathname,
+      datum: nu.toLocaleDateString('nl-NL', { day: 'numeric', month: 'short', year: 'numeric' }),
+      uur: nu.getHours(),
+      tijdstip: nu.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' }),
+      ts: Date.now(),
+    }
+    fetch('/.netlify/functions/storage?key=analytics-bezoeken')
+      .then(r => r.json())
+      .then(data => {
+        const bestaand = Array.isArray(data.value) ? data.value : []
+        fetch('/.netlify/functions/storage', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ key: 'analytics-bezoeken', value: [...bestaand, bezoek].slice(-500) }),
+        }).catch(() => {})
+      })
+      .catch(() => {})
+  }, [location.pathname])
+  return null
+}
+
 const INIT_ROADMAP = [
   {
     id: 1, titel: 'AI & Geletterdheid basistraining voor alle medewerkers',
@@ -329,5 +369,6 @@ function AppInner() {
 }
 
 export default function App() {
-  return <BrowserRouter><AppInner /></BrowserRouter>
+  return <BrowserRouter>
+      <PageTracker /><AppInner /></BrowserRouter>
 }
