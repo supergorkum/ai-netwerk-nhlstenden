@@ -138,6 +138,59 @@ export const initiatieven = [
   { id: 24, naam: 'Studie-uitval AI-dashboard', omschrijving: 'Verkennend initiatief voor een AI-systeem dat op basis van studiegegevens vroegtijdige uitval voorspelt. Als NHL Stenden dit zelf bouwt, is een AI Regulatory Sandbox-aanvraag aanbevolen vanwege hoog-risico classificatie.', laag: 4, spoor: 1, status: 'verkenning', type: 'intern', tags: ['Studiesucces', 'Uitval', 'Voorspelling', 'Hoog-risico'], ambities: ['studiesucces', 'uitval'], impactInschatting: 'hoog' }
 ]
 
+// ============================================================
+// EU AI Act verplichtingen
+// Centrale bron voor Roadmap, Dashboard en rapportage.
+// deadlineISO wordt gebruikt voor de signaalberekening.
+// ============================================================
+export const AI_ACT_ITEMS = [
+  { id: 'aa1', artikel: 'Art. 4', titel: 'AI-geletterdheid voor medewerkers', omschrijving: 'Aanbieders en gebruikers van AI-systemen moeten redelijke maatregelen nemen om te zorgen voor voldoende AI-kennis bij medewerkers die met AI werken.', prioriteit: 'hoog', deadline: 'Augustus 2025 (van kracht)', deadlineISO: '2025-08-02', link: 'https://eur-lex.europa.eu/legal-content/NL/TXT/?uri=CELEX%3A32024R1689', status: 'lopend', gekoppeldAan: [5, 2] },
+  { id: 'aa2', artikel: 'Art. 9 & 10', titel: 'Risicobeheer hoog-risico AI-systemen', omschrijving: 'Voor hoog-risico AI-systemen (bijv. toetsbewaking, selectiesystemen) gelden verplichtingen rond risicoanalyse, datakwaliteit en menselijk toezicht.', prioriteit: 'hoog', deadline: 'Augustus 2026', deadlineISO: '2026-08-02', link: 'https://eur-lex.europa.eu/legal-content/NL/TXT/?uri=CELEX%3A32024R1689', status: 'te-starten', gekoppeldAan: [1] },
+  { id: 'aa3', artikel: 'Art. 13 & 14', titel: 'Transparantie en menselijk toezicht', omschrijving: 'Gebruikers van AI-systemen moeten begrijpen hoe het systeem werkt en er moet altijd een mens zijn die kan ingrijpen.', prioriteit: 'hoog', deadline: 'Augustus 2026', deadlineISO: '2026-08-02', link: 'https://eur-lex.europa.eu/legal-content/NL/TXT/?uri=CELEX%3A32024R1689', status: 'te-starten', gekoppeldAan: [1, 11] },
+  { id: 'aa4', artikel: 'Art. 50', titel: 'Transparantie bij AI-gegenereerde content', omschrijving: 'AI-systemen die tekst, beeld of audio genereren moeten dit duidelijk aangeven.', prioriteit: 'midden', deadline: 'Augustus 2026', deadlineISO: '2026-08-02', link: 'https://eur-lex.europa.eu/legal-content/NL/TXT/?uri=CELEX%3A32024R1689', status: 'te-starten', gekoppeldAan: [] },
+  { id: 'aa5', artikel: 'Art. 26', titel: 'Verplichtingen voor gebruikers van hoog-risico AI', omschrijving: 'NHL Stenden als gebruiker van hoog-risico AI heeft eigen verplichtingen: instructies opvolgen, gebruik monitoren, medewerkers trainen.', prioriteit: 'hoog', deadline: 'Augustus 2026', deadlineISO: '2026-08-02', link: 'https://eur-lex.europa.eu/legal-content/NL/TXT/?uri=CELEX%3A32024R1689', status: 'te-starten', gekoppeldAan: [1] },
+  { id: 'aa6', artikel: 'Art. 70', titel: 'Registratie hoog-risico AI-systemen', omschrijving: 'Hoog-risico AI-systemen die door NHL Stenden worden ingezet moeten worden geregistreerd in de EU-database.', prioriteit: 'midden', deadline: 'Augustus 2026', deadlineISO: '2026-08-02', link: 'https://eur-lex.europa.eu/legal-content/NL/TXT/?uri=CELEX%3A32024R1689', status: 'te-starten', gekoppeldAan: [1] },
+  { id: 'aa7', titel: 'Verbod op onacceptabele AI-toepassingen', artikel: 'Art. 5', omschrijving: 'Bepaalde AI-toepassingen zijn verboden: sociale scoring, realtime biometrische surveillance, manipulatie van mensen.', prioriteit: 'hoog', deadline: 'Februari 2025 (van kracht)', deadlineISO: '2025-02-02', link: 'https://eur-lex.europa.eu/legal-content/NL/TXT/?uri=CELEX%3A32024R1689', status: 'te-controleren', gekoppeldAan: [1] },
+]
+
+// Weergave-configuratie voor het verplichtingen-signaal
+export const SIGNAAL_CONFIG = {
+  rood:   { label: 'Actie nodig', dot: 'bg-red-500',    bg: 'bg-red-50',    border: 'border-red-200',    badge: 'bg-red-100 text-red-700',       tekstKleur: 'text-red-600' },
+  oranje: { label: 'Aandacht',    dot: 'bg-orange-400', bg: 'bg-orange-50', border: 'border-orange-200', badge: 'bg-orange-100 text-orange-700', tekstKleur: 'text-orange-600' },
+  groen:  { label: 'Op koers',    dot: 'bg-green-500',  bg: 'bg-green-50',  border: 'border-green-200',  badge: 'bg-green-100 text-green-700',   tekstKleur: 'text-green-600' },
+}
+
+// Berekent per verplichting het signaal op basis van deadline en gekoppeld roadmap-werk.
+// groen: de verplichting zelf loopt, of er is minstens een gekoppeld item lopend of afgerond
+// oranje: deadline verder dan 3 maanden weg, nog geen lopend werk
+// rood: deadline verstreken of binnen 3 maanden, zonder lopend werk
+export function verplichtingSignaal(vp, roadmap) {
+  const gekoppeld = (roadmap || []).filter(r => r.aiActKoppeling === vp.id)
+  const lopendWerk = gekoppeld.filter(r => r.status === 'lopend' || r.status === 'afgerond')
+  const nu = new Date()
+  const deadline = vp.deadlineISO ? new Date(vp.deadlineISO) : null
+  const maanden = deadline ? Math.floor((deadline.getTime() - nu.getTime()) / (1000 * 60 * 60 * 24 * 30.44)) : null
+  const verstreken = maanden !== null && maanden < 0
+  const krap = maanden !== null && maanden <= 3
+
+  if (vp.status === 'lopend' || lopendWerk.length > 0) {
+    return { kleur: 'groen', tekst: 'Er loopt werk aan deze verplichting', maanden, aantalGekoppeld: gekoppeld.length }
+  }
+  if (!verstreken && !krap) {
+    const tekst = gekoppeld.length === 0 ? 'Nog geen roadmap-item gekoppeld' : 'Werk gekoppeld, uitvoering nog niet gestart'
+    return { kleur: 'oranje', tekst, maanden, aantalGekoppeld: gekoppeld.length }
+  }
+  let tekst
+  if (verstreken) {
+    tekst = gekoppeld.length === 0 ? 'Verplichting is van kracht, geen werk gekoppeld' : 'Verplichting is van kracht, gekoppeld werk nog niet gestart'
+  } else if (gekoppeld.length === 0) {
+    tekst = 'Deadline nadert, geen werk gekoppeld'
+  } else {
+    tekst = 'Deadline nadert, gekoppeld werk nog niet gestart'
+  }
+  return { kleur: 'rood', tekst, maanden, aantalGekoppeld: gekoppeld.length }
+}
+
 export const vraagCategorieen = [
   { id: 'vraag', label: 'Een vraag stellen', icon: '💬', uitleg: 'Je hebt een concrete vraag over AI bij NHL Stenden en wil een antwoord of richting.' },
   { id: 'idee', label: 'Een idee delen', icon: '💡', uitleg: 'Je hebt een idee over hoe AI ingezet kan worden en wil dat kenbaar maken.' },

@@ -1,7 +1,7 @@
 import GradientHeader from '../components/GradientHeader'
 import { useState, useEffect } from 'react'
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom'
-import { initiatieven, sporen } from '../data'
+import { initiatieven, sporen, AI_ACT_ITEMS, SIGNAAL_CONFIG, verplichtingSignaal } from '../data'
 import InzichtenTab from '../components/InzichtenTab'
 import BetrokkenenWidget, { haalBetrokkenenOp } from '../components/BetrokkenenWidget'
 
@@ -10,16 +10,6 @@ const statusConfig = {
   groeiend:          { label: 'Groeiend',        kleur: 'bg-blue-100 text-nhl-blauw' },
   'in-ontwikkeling': { label: 'In ontwikkeling', kleur: 'bg-orange-100 text-orange-700' },
 }
-
-const AI_ACT_ITEMS = [
-  { id: 'aa1', artikel: 'Art. 4', titel: 'AI-geletterdheid voor medewerkers', omschrijving: 'Aanbieders en gebruikers van AI-systemen moeten redelijke maatregelen nemen om te zorgen voor voldoende AI-kennis bij medewerkers die met AI werken.', prioriteit: 'hoog', deadline: 'Augustus 2025 (van kracht)', link: 'https://eur-lex.europa.eu/legal-content/NL/TXT/?uri=CELEX%3A32024R1689', status: 'lopend', gekoppeldAan: [5, 2] },
-  { id: 'aa2', artikel: 'Art. 9 & 10', titel: 'Risicobeheer hoog-risico AI-systemen', omschrijving: 'Voor hoog-risico AI-systemen (bijv. toetsbewaking, selectiesystemen) gelden verplichtingen rond risicoanalyse, datakwaliteit en menselijk toezicht.', prioriteit: 'hoog', deadline: 'Augustus 2026', link: 'https://eur-lex.europa.eu/legal-content/NL/TXT/?uri=CELEX%3A32024R1689', status: 'te-starten', gekoppeldAan: [1] },
-  { id: 'aa3', artikel: 'Art. 13 & 14', titel: 'Transparantie en menselijk toezicht', omschrijving: 'Gebruikers van AI-systemen moeten begrijpen hoe het systeem werkt en er moet altijd een mens zijn die kan ingrijpen.', prioriteit: 'hoog', deadline: 'Augustus 2026', link: 'https://eur-lex.europa.eu/legal-content/NL/TXT/?uri=CELEX%3A32024R1689', status: 'te-starten', gekoppeldAan: [1, 11] },
-  { id: 'aa4', artikel: 'Art. 50', titel: 'Transparantie bij AI-gegenereerde content', omschrijving: 'AI-systemen die tekst, beeld of audio genereren moeten dit duidelijk aangeven.', prioriteit: 'midden', deadline: 'Augustus 2026', link: 'https://eur-lex.europa.eu/legal-content/NL/TXT/?uri=CELEX%3A32024R1689', status: 'te-starten', gekoppeldAan: [] },
-  { id: 'aa5', artikel: 'Art. 26', titel: 'Verplichtingen voor gebruikers van hoog-risico AI', omschrijving: 'NHL Stenden als gebruiker van hoog-risico AI heeft eigen verplichtingen: instructies opvolgen, gebruik monitoren, medewerkers trainen.', prioriteit: 'hoog', deadline: 'Augustus 2026', link: 'https://eur-lex.europa.eu/legal-content/NL/TXT/?uri=CELEX%3A32024R1689', status: 'te-starten', gekoppeldAan: [1] },
-  { id: 'aa6', artikel: 'Art. 70', titel: 'Registratie hoog-risico AI-systemen', omschrijving: 'Hoog-risico AI-systemen die door NHL Stenden worden ingezet moeten worden geregistreerd in de EU-database.', prioriteit: 'midden', deadline: 'Augustus 2026', link: 'https://eur-lex.europa.eu/legal-content/NL/TXT/?uri=CELEX%3A32024R1689', status: 'te-starten', gekoppeldAan: [1] },
-  { id: 'aa7', titel: 'Verbod op onacceptabele AI-toepassingen', artikel: 'Art. 5', omschrijving: 'Bepaalde AI-toepassingen zijn verboden: sociale scoring, realtime biometrische surveillance, manipulatie van mensen.', prioriteit: 'hoog', deadline: 'Februari 2025 (van kracht)', link: 'https://eur-lex.europa.eu/legal-content/NL/TXT/?uri=CELEX%3A32024R1689', status: 'te-controleren', gekoppeldAan: [1] },
-]
 
 const PRIORITEIT_KLEUR = {
   hoog:   'bg-red-50 text-red-700 border-red-200',
@@ -90,7 +80,7 @@ export default function Initiatieven({ roadmap, setRoadmap, inspiraties, setInsp
 
   const [addOpen, setAddOpen] = useState(false)
   const [toegevoegd, setToegevoegd] = useState(false)
-  const [form, setForm] = useState({ titel: '', omschrijving: '', prioriteit: 'hoog', verantwoordelijke: '', datum: '', naam: '' })
+  const [form, setForm] = useState({ titel: '', omschrijving: '', prioriteit: 'hoog', verantwoordelijke: '', datum: '', naam: '', aiActKoppeling: '' })
 
   const [initAddOpen, setInitAddOpen] = useState(false)
   const [initToegevoegd, setInitToegevoegd] = useState(false)
@@ -126,7 +116,7 @@ export default function Initiatieven({ roadmap, setRoadmap, inspiraties, setInsp
       id: Date.now(),
       ...form,
       status: 'te-starten',
-      aiActKoppeling: null,
+      aiActKoppeling: form.aiActKoppeling || null,
       toegevoegdDoor: form.naam || 'Anoniem',
       pendingAfgerond: false,
       pendingReopen: false,
@@ -190,6 +180,59 @@ export default function Initiatieven({ roadmap, setRoadmap, inspiraties, setInsp
     setInitForm({ naam: '', omschrijving: '', type: 'intern', spoor: '', status: 'in-ontwikkeling', contactNaam: '', ambities: [], impactInschatting: '' })
   }
 
+  const renderRoadmapItem = (item) => {
+    const s = ROADMAP_STATUS[item.status] || ROADMAP_STATUS['te-starten']
+    const isPendingAfgerond = item.pendingAfgerond && item.status !== 'afgerond'
+    const isPendingReopen = item.pendingReopen
+    return (
+      <div key={item.id} className={`rounded-2xl border p-5 transition-all ${
+        isPendingAfgerond ? 'bg-amber-50 border-amber-300' :
+        isPendingReopen ? 'bg-blue-50 border-blue-200' :
+        'bg-white border-gray-200'
+      }`}>
+        <div className="flex items-start gap-4 flex-wrap">
+          <button
+            onClick={() => wisselStatus(item.id)}
+            disabled={isPendingAfgerond || isPendingReopen}
+            className={`flex-shrink-0 mt-0.5 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
+              isPendingAfgerond ? 'bg-amber-400 border-amber-400 cursor-not-allowed' :
+              isPendingReopen ? 'bg-blue-400 border-blue-400 cursor-not-allowed' :
+              item.status === 'lopend' ? 'border-green-500 bg-green-50 hover:bg-green-100 cursor-pointer' :
+              item.status === 'in-ontwikkeling' ? 'border-blue-500 bg-blue-50 hover:bg-blue-100 cursor-pointer' :
+              'border-gray-300 bg-white hover:border-orange-400 hover:bg-orange-50 cursor-pointer'
+            }`}
+          >
+            {isPendingAfgerond && <span className="text-white text-xs">⏳</span>}
+            {!isPendingAfgerond && !isPendingReopen && item.status === 'lopend' && <span className="text-green-600 text-xs">▶</span>}
+            {!isPendingAfgerond && !isPendingReopen && item.status === 'in-ontwikkeling' && <span className="text-blue-500 text-xs">…</span>}
+          </button>
+
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-2 flex-wrap">
+              {isPendingAfgerond ? (
+                <div className="flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full font-medium bg-amber-100 text-amber-700">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500" /> Wacht op bevestiging afgerond
+                </div>
+              ) : (
+                <div className={`flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full font-medium ${s.kleur}`}>
+                  <span className={`w-1.5 h-1.5 rounded-full ${s.dot}`} /> {s.label}
+                </div>
+              )}
+              <span className={`text-xs px-2 py-0.5 rounded-full border font-medium ${PRIORITEIT_KLEUR[item.prioriteit]}`}>
+                {item.prioriteit === 'hoog' ? '🔴' : item.prioriteit === 'midden' ? '🟡' : '🟢'} {item.prioriteit}
+              </span>
+              {item.datum && <span className="text-xs text-gray-400">📅 {item.datum}</span>}
+            </div>
+            <div className="font-bold text-nhl-blauw mb-1">{item.titel}</div>
+            <p className="text-gray-500 text-sm leading-relaxed">{item.omschrijving}</p>
+            {item.verantwoordelijke && <div className="text-xs text-gray-400 mt-2">Verantwoordelijk: {item.verantwoordelijke}</div>}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+
   return (
     <div className="min-h-screen pt-16 bg-gray-50">
       <GradientHeader
@@ -205,7 +248,7 @@ export default function Initiatieven({ roadmap, setRoadmap, inspiraties, setInsp
             + Initiatief aanmelden
           </button>
           <button
-            onClick={() => { switchTab('roadmap'); setAddOpen(true); setToegevoegd(false); setForm({ titel:'', omschrijving:'', prioriteit:'hoog', verantwoordelijke:'', datum:'', naam:'' }) }}
+            onClick={() => { switchTab('roadmap'); setAddOpen(true); setToegevoegd(false); setForm({ titel:'', omschrijving:'', prioriteit:'hoog', verantwoordelijke:'', datum:'', naam:'', aiActKoppeling:'' }) }}
             className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white border border-white/30 px-5 py-2.5 rounded-xl font-semibold text-sm transition-colors"
           >
             + Roadmap item
@@ -348,13 +391,25 @@ export default function Initiatieven({ roadmap, setRoadmap, inspiraties, setInsp
         )}
 
         {/* TAB: ROADMAP */}
-        {actieveTab === 'roadmap' && (
+        {actieveTab === 'roadmap' && (() => {
+          const signalen = AI_ACT_ITEMS.map(vp => ({ vp, signaal: verplichtingSignaal(vp, roadmap) }))
+          const volgorde = { rood: 0, oranje: 1, groen: 2 }
+          const gesorteerd = [...signalen].sort((a, b) => {
+            const v = volgorde[a.signaal.kleur] - volgorde[b.signaal.kleur]
+            if (v !== 0) return v
+            return (a.vp.deadlineISO || '').localeCompare(b.vp.deadlineISO || '')
+          })
+          const telling = signalen.reduce((acc, s) => { acc[s.signaal.kleur] = (acc[s.signaal.kleur] || 0) + 1; return acc }, {})
+          const eigenKoers = actieveItems.filter(r => !r.aiActKoppeling)
+
+          return (
           <div>
-            <div className="grid sm:grid-cols-3 gap-4 mb-8">
+            <div className="grid sm:grid-cols-4 gap-4 mb-8">
               {[
-                { label: 'Lopend of in voorbereiding', n: aantalLopend, kleur: 'text-green-600', bg: 'bg-green-50 border-green-200' },
-                { label: 'Nog te starten', n: aantalTeStarten, kleur: 'text-orange-600', bg: 'bg-orange-50 border-orange-200' },
-                { label: 'Afgerond', n: afgerondItems.length, kleur: 'text-gray-500', bg: 'bg-gray-50 border-gray-200' },
+                { label: 'Actie nodig', n: telling.rood || 0, kleur: 'text-red-600', bg: 'bg-red-50 border-red-200' },
+                { label: 'Aandacht', n: telling.oranje || 0, kleur: 'text-orange-600', bg: 'bg-orange-50 border-orange-200' },
+                { label: 'Op koers', n: telling.groen || 0, kleur: 'text-green-600', bg: 'bg-green-50 border-green-200' },
+                { label: 'Eigen koers items', n: eigenKoers.length, kleur: 'text-nhl-blauw', bg: 'bg-blue-50 border-blue-200' },
               ].map(s => (
                 <div key={s.label} className={`rounded-2xl border p-5 ${s.bg}`}>
                   <div className={`text-3xl font-extrabold ${s.kleur}`}>{s.n}</div>
@@ -363,18 +418,97 @@ export default function Initiatieven({ roadmap, setRoadmap, inspiraties, setInsp
               ))}
             </div>
 
-            <div className="bg-white rounded-2xl border border-gray-200 p-6 mb-6">
+            <div className="bg-white rounded-2xl border border-gray-200 p-6 mb-8">
               <div className="flex items-start gap-4">
                 <div className="text-3xl">🗺️</div>
                 <div>
-                  <h3 className="font-bold text-nhl-blauw mb-1">Wat is deze roadmap?</h3>
+                  <h3 className="font-bold text-nhl-blauw mb-1">Hoe deze roadmap werkt</h3>
                   <p className="text-gray-600 text-sm leading-relaxed">
-                    Deze roadmap toont wat NHL Stenden moet organiseren op het gebied van AI-compliance en -beleid.
-                    Klik op de statusknop om voortgang bij te werken. Een beheerder bevestigt afgeronde items definitief.
+                    Deze roadmap redeneert vanuit de verplichtingen van de EU AI Act. Per verplichting zie je het signaal (actie nodig, aandacht of op koers) en welk werk eraan gekoppeld is.
+                    Items die niet uit een verplichting voortkomen staan onder Eigen koers. Klik op de statusknop van een item om voortgang bij te werken. Een beheerder bevestigt afgeronde items definitief.
                   </p>
                 </div>
               </div>
             </div>
+
+            {(aantalPendingAfgerond > 0 || aantalPendingReopen > 0) && (
+              <div className="space-y-2 mb-6">
+                {aantalPendingAfgerond > 0 && (
+                  <div className="bg-amber-50 border border-amber-300 rounded-2xl p-4 flex items-center gap-3">
+                    <span className="text-lg">⏳</span>
+                    <span className="text-sm font-semibold text-amber-800">{aantalPendingAfgerond} item{aantalPendingAfgerond !== 1 ? 's' : ''} wacht op bevestiging door een beheerder.</span>
+                  </div>
+                )}
+                {aantalPendingReopen > 0 && (
+                  <div className="bg-blue-50 border border-blue-300 rounded-2xl p-4 flex items-center gap-3">
+                    <span className="text-lg">↩</span>
+                    <span className="text-sm font-semibold text-blue-800">{aantalPendingReopen} item{aantalPendingReopen !== 1 ? 's' : ''} wacht op goedkeuring re-open.</span>
+                  </div>
+                )}
+              </div>
+            )}
+
+            <h2 className="font-bold text-nhl-blauw text-lg mb-4">Verplichtingen uit de AI Act</h2>
+            <div className="space-y-4 mb-10">
+              {gesorteerd.map(({ vp, signaal }) => {
+                const sc = SIGNAAL_CONFIG[signaal.kleur]
+                const gekoppeldeItems = actieveItems.filter(r => r.aiActKoppeling === vp.id)
+                const afgerondGekoppeld = afgerondItems.filter(r => r.aiActKoppeling === vp.id)
+                const initGekoppeld = (vp.gekoppeldAan || []).map(id => initiatieven.find(i => i.id === id)).filter(Boolean)
+                return (
+                  <div key={vp.id} className={`rounded-2xl border-2 bg-white overflow-hidden ${sc.border}`}>
+                    <div className={`px-5 py-4 ${sc.bg}`}>
+                      <div className="flex items-start justify-between gap-3 flex-wrap">
+                        <div className="flex items-start gap-3 flex-1 min-w-0">
+                          <span className={`mt-1.5 w-3 h-3 rounded-full flex-shrink-0 ${sc.dot}`} />
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap mb-1">
+                              <span className="text-xs font-bold text-gray-500">{vp.artikel}</span>
+                              <span className={`text-xs px-2 py-0.5 rounded-full border font-medium ${PRIORITEIT_KLEUR[vp.prioriteit]}`}>{vp.prioriteit}</span>
+                              <span className="text-xs text-gray-500">📅 {vp.deadline}</span>
+                            </div>
+                            <div className="font-bold text-nhl-blauw">{vp.titel}</div>
+                            <div className={`text-xs mt-1 font-medium ${sc.tekstKleur}`}>{signaal.tekst}</div>
+                          </div>
+                        </div>
+                        <span className={`text-xs px-2.5 py-1 rounded-full font-semibold flex-shrink-0 ${sc.badge}`}>{sc.label}</span>
+                      </div>
+                    </div>
+                    <div className="p-5">
+                      {gekoppeldeItems.length > 0 ? (
+                        <div className="space-y-3">{gekoppeldeItems.map(item => renderRoadmapItem(item))}</div>
+                      ) : (
+                        <div className="text-sm text-gray-400 italic">Nog geen actief roadmap-item gekoppeld aan deze verplichting.</div>
+                      )}
+                      {afgerondGekoppeld.length > 0 && (
+                        <div className="text-xs text-gray-400 mt-3">✅ {afgerondGekoppeld.length} gekoppeld item{afgerondGekoppeld.length !== 1 ? 's' : ''} afgerond</div>
+                      )}
+                      {initGekoppeld.length > 0 && (
+                        <div className="flex items-center gap-2 flex-wrap mt-4 pt-3 border-t border-gray-100">
+                          <span className="text-xs text-gray-400">Gerelateerde initiatieven:</span>
+                          {initGekoppeld.map(i => (
+                            <button key={i.id} onClick={() => switchTab('initiatieven')} className="text-xs bg-nhl-blauw/10 text-nhl-blauw px-2 py-0.5 rounded-full hover:bg-nhl-blauw/20">{i.naam}</button>
+                          ))}
+                        </div>
+                      )}
+                      <button
+                        onClick={() => { setAddOpen(true); setToegevoegd(false); setForm({ titel: '', omschrijving: '', prioriteit: 'hoog', verantwoordelijke: '', datum: '', naam: '', aiActKoppeling: vp.id }) }}
+                        className="mt-4 text-xs bg-white border border-gray-200 text-gray-600 hover:border-nhl-blauw hover:text-nhl-blauw px-3 py-1.5 rounded-lg font-medium transition-colors">
+                        + Item voor deze verplichting
+                      </button>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+
+            <h2 className="font-bold text-nhl-blauw text-lg mb-1">Eigen koers</h2>
+            <p className="text-sm text-gray-500 mb-4">Werk dat NHL Stenden zelf belangrijk vindt, zonder directe AI Act verplichting.</p>
+            {eigenKoers.length > 0 ? (
+              <div className="space-y-3 mb-10">{eigenKoers.map(item => renderRoadmapItem(item))}</div>
+            ) : (
+              <div className="text-sm text-gray-400 italic mb-10">Geen eigen koers items op dit moment.</div>
+            )}
 
             {afgerondItems.length > 0 && (
               <div className="mb-8">
@@ -424,94 +558,9 @@ export default function Initiatieven({ roadmap, setRoadmap, inspiraties, setInsp
                 )}
               </div>
             )}
-
-            {(aantalPendingAfgerond > 0 || aantalPendingReopen > 0) && (
-              <div className="space-y-2 mb-6">
-                {aantalPendingAfgerond > 0 && (
-                  <div className="bg-amber-50 border border-amber-300 rounded-2xl p-4 flex items-center gap-3">
-                    <span className="text-lg">⏳</span>
-                    <span className="text-sm font-semibold text-amber-800">{aantalPendingAfgerond} item{aantalPendingAfgerond !== 1 ? 's' : ''} wacht op bevestiging door een beheerder.</span>
-                  </div>
-                )}
-                {aantalPendingReopen > 0 && (
-                  <div className="bg-blue-50 border border-blue-300 rounded-2xl p-4 flex items-center gap-3">
-                    <span className="text-lg">↩</span>
-                    <span className="text-sm font-semibold text-blue-800">{aantalPendingReopen} item{aantalPendingReopen !== 1 ? 's' : ''} wacht op goedkeuring re-open.</span>
-                  </div>
-                )}
-              </div>
-            )}
-
-            <div className="flex items-center justify-between mb-5">
-              <h2 className="font-bold text-nhl-blauw text-lg">Actieve items</h2>
-            </div>
-
-            <div className="space-y-3">
-              {actieveItems.map(item => {
-                const s = ROADMAP_STATUS[item.status] || ROADMAP_STATUS['te-starten']
-                const aiAct = AI_ACT_ITEMS.find(a => a.id === item.aiActKoppeling)
-                const isPendingAfgerond = item.pendingAfgerond && item.status !== 'afgerond'
-                const isPendingReopen = item.pendingReopen
-
-                return (
-                  <div key={item.id} className={`rounded-2xl border p-5 transition-all ${
-                    isPendingAfgerond ? 'bg-amber-50 border-amber-300' :
-                    isPendingReopen ? 'bg-blue-50 border-blue-200' :
-                    'bg-white border-gray-200'
-                  }`}>
-                    <div className="flex items-start gap-4 flex-wrap">
-                      <button
-                        onClick={() => wisselStatus(item.id)}
-                        disabled={isPendingAfgerond || isPendingReopen}
-                        className={`flex-shrink-0 mt-0.5 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
-                          isPendingAfgerond ? 'bg-amber-400 border-amber-400 cursor-not-allowed' :
-                          isPendingReopen ? 'bg-blue-400 border-blue-400 cursor-not-allowed' :
-                          item.status === 'lopend' ? 'border-green-500 bg-green-50 hover:bg-green-100 cursor-pointer' :
-                          item.status === 'in-ontwikkeling' ? 'border-blue-500 bg-blue-50 hover:bg-blue-100 cursor-pointer' :
-                          'border-gray-300 bg-white hover:border-orange-400 hover:bg-orange-50 cursor-pointer'
-                        }`}
-                      >
-                        {isPendingAfgerond && <span className="text-white text-xs">⏳</span>}
-                        {!isPendingAfgerond && !isPendingReopen && item.status === 'lopend' && <span className="text-green-600 text-xs">▶</span>}
-                        {!isPendingAfgerond && !isPendingReopen && item.status === 'in-ontwikkeling' && <span className="text-blue-500 text-xs">…</span>}
-                      </button>
-
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-2 flex-wrap">
-                          {isPendingAfgerond ? (
-                            <div className="flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full font-medium bg-amber-100 text-amber-700">
-                              <span className="w-1.5 h-1.5 rounded-full bg-amber-500" /> Wacht op bevestiging afgerond
-                            </div>
-                          ) : (
-                            <div className={`flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full font-medium ${s.kleur}`}>
-                              <span className={`w-1.5 h-1.5 rounded-full ${s.dot}`} /> {s.label}
-                            </div>
-                          )}
-                          <span className={`text-xs px-2 py-0.5 rounded-full border font-medium ${PRIORITEIT_KLEUR[item.prioriteit]}`}>
-                            {item.prioriteit === 'hoog' ? '🔴' : item.prioriteit === 'midden' ? '🟡' : '🟢'} {item.prioriteit}
-                          </span>
-                          {item.datum && <span className="text-xs text-gray-400">📅 {item.datum}</span>}
-                        </div>
-                        <div className="font-bold text-nhl-blauw mb-1">{item.titel}</div>
-                        <p className="text-gray-500 text-sm leading-relaxed">{item.omschrijving}</p>
-                        {item.verantwoordelijke && <div className="text-xs text-gray-400 mt-2">Verantwoordelijk: {item.verantwoordelijke}</div>}
-                      </div>
-
-                      {aiAct && !isPendingAfgerond && (
-                        <div className="flex-shrink-0 bg-blue-50 border border-blue-200 rounded-xl p-3 max-w-48">
-                          <div className="text-xs font-bold text-nhl-blauw mb-1">⚖️ AI Act</div>
-                          <div className="text-xs font-semibold text-gray-700">{aiAct.artikel}</div>
-                          <div className="text-xs text-gray-500 leading-snug mt-0.5">{aiAct.titel}</div>
-                          <a href={aiAct.link} target="_blank" rel="noopener noreferrer" className="text-xs text-nhl-roze hover:underline mt-1 block">Lees artikel →</a>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
           </div>
-        )}
+          )
+        })()}
 
         {/* TAB: AI ACT */}
         {actieveTab === 'aiact' && (
@@ -586,7 +635,7 @@ export default function Initiatieven({ roadmap, setRoadmap, inspiraties, setInsp
                               ))}
                             </div>
                           ) : (
-                            <button onClick={() => { switchTab('roadmap'); setAddOpen(true) }} className="text-xs bg-orange-50 border border-orange-200 text-orange-600 px-3 py-1 rounded-full hover:bg-orange-100">+ Voeg roadmap-item toe</button>
+                            <button onClick={() => { switchTab('roadmap'); setAddOpen(true); setToegevoegd(false); setForm({ titel: '', omschrijving: '', prioriteit: 'hoog', verantwoordelijke: '', datum: '', naam: '', aiActKoppeling: item.id }) }} className="text-xs bg-orange-50 border border-orange-200 text-orange-600 px-3 py-1 rounded-full hover:bg-orange-100">+ Voeg roadmap-item toe</button>
                           )}
                         </div>
                       </div>
@@ -766,6 +815,14 @@ export default function Initiatieven({ roadmap, setRoadmap, inspiraties, setInsp
                   <input type="text" value={form.verantwoordelijke} onChange={e => upd('verantwoordelijke', e.target.value)}
                     placeholder="Bijv. OO&I, AI Compliance Groep"
                     className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-nhl-blauw" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Hoort dit bij een AI Act verplichting?</label>
+                  <select value={form.aiActKoppeling} onChange={e => upd('aiActKoppeling', e.target.value)}
+                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-nhl-blauw">
+                    <option value="">Nee, eigen koers</option>
+                    {AI_ACT_ITEMS.map(a => <option key={a.id} value={a.id}>{a.artikel}: {a.titel}</option>)}
+                  </select>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">Jouw naam (optioneel)</label>
