@@ -428,7 +428,11 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
     fetch('/.netlify/functions/storage?key=analytics-bezoeken')
       .then(r => r.json())
       .then(data => {
-        setAnalytics(Array.isArray(data.value) ? data.value : [])
+        let parsed = []
+        try {
+          parsed = typeof data.value === 'string' ? JSON.parse(data.value) : (Array.isArray(data.value) ? data.value : [])
+        } catch {}
+        setAnalytics(parsed)
         setAnalyticsLaden(false)
       })
       .catch(() => { setAnalyticsLaden(false) })

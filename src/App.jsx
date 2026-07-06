@@ -55,17 +55,11 @@ function PageTracker() {
       tijdstip: nu.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' }),
       ts: Date.now(),
     }
-    fetch('/.netlify/functions/storage?key=analytics-bezoeken')
-      .then(r => r.json())
-      .then(data => {
-        const bestaand = Array.isArray(data.value) ? data.value : []
-        fetch('/.netlify/functions/storage', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ key: 'analytics-bezoeken', value: [...bestaand, bezoek].slice(-500) }),
-        }).catch(() => {})
-      })
-      .catch(() => {})
+    fetch('/.netlify/functions/log-bezoek', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(bezoek),
+    }).catch(() => {})
   }, [location.pathname])
   return null
 }
