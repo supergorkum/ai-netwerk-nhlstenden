@@ -70,5 +70,4 @@ export default async (req) => {
 
 export const config = {
   schedule: '0 8,11,16 * * *',  // 10:00, 13:00, 18:00 NL tijd (UTC+2)
-  path: '/.netlify/functions/scheduled-backup',
 }
