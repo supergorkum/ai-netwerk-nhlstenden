@@ -1211,6 +1211,10 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
                   'Nieuwe pagina Agentic AI toegevoegd onder Kennis, met eigen visualisatie.',
                   "Documentatie en Video's verplaatst naar Beheer, achter de Beta-features knop.",
                   'Bug in de weergave van vragen en ideeën in Beheer verholpen.',
+                  'Bezoekersanalytics toegevoegd: paginatracking met overzicht en resetknop in Beheer.',
+                  'Cloud backup functions aangemaakt, drie keer per dag automatisch.',
+                  'Nieuws-deduplicatie persistent gemaakt via Netlify Blobs.',
+                  'Auto-markering toegevoegd bij automatisch opgehaalde nieuws-items.',
                 ],
               },
 
