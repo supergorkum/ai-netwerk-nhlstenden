@@ -282,6 +282,7 @@ export default function Initiatieven({ roadmap, setRoadmap, inspiraties, setInsp
                               {init.type === 'surf' ? '🌐 SURF' : init.type === 'extern' ? '🤝 Extern' : '🏫 Intern'}
                             </span>
                             {init.nieuw && <span className="inline-flex items-center gap-1 text-xs bg-nhl-roze text-white px-2 py-0.5 rounded-full font-bold animate-pulse">🆕 Nieuw</span>}
+                            {init.autoUpdate && <span title="Automatisch opgehaald via de nieuws-functie" className="inline-flex items-center gap-1 text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">🤖 Auto</span>}
                           </div>
                         </div>
                         <div className="font-bold text-nhl-blauw mb-2 leading-snug">{init.naam}</div>

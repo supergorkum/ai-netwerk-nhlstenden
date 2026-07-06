@@ -143,6 +143,7 @@ function HerstellModal({ data, bron, onHerstel, onSluiten }) {
 
 function NieuwsOphalen({ onNieuwItems, inspiraties = [] }) {
   // Laad al eerder geziene titels uit Blobs zodat deduplicatie ook na herlaad werkt
+  // Laad al eerder geziene titels uit Blobs zodat deduplicatie ook na herlaad werkt
   const [status, setStatus] = useState('idle')
   const [resultaat, setResultaat] = useState(null)
   const [tijdstip, setTijdstip] = useState(() => localStorage.getItem(REFRESH_KEY))

@@ -182,6 +182,7 @@ export default function InzichtenTab({ inspiraties, setInspiraties }) {
               <div className="text-xs text-gray-400">{b.naam !== 'Anoniem' ? b.naam : b.rol} · {b.datum}</div>
               <div className="flex items-center gap-2">
                 {b.nieuw && <span className="inline-flex items-center gap-1 text-xs bg-amber-500 text-white px-2 py-0.5 rounded-full font-bold">🆕 Nieuw</span>}
+                {b.autoUpdate && <span title="Automatisch opgehaald via de nieuws-functie" className="inline-flex items-center gap-1 text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">🤖 Auto</span>}
                   {b.intern && <span className="inline-flex items-center gap-1 text-xs bg-nhl-blauw/10 text-nhl-blauw px-2 py-0.5 rounded-full font-medium">🏛️ NHL Stenden</span>}
                 <div className="flex items-center gap-1">
                   <button onClick={() => stem(b.id, 'omhoog')}
