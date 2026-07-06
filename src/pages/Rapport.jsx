@@ -180,7 +180,7 @@ export default function Rapport({ pilots: pilotsProp, inspiraties: inspiratiesPr
 
           <p>Het AI-Netwerk is het antwoord van NHL Stenden op die vragen. Het is geen project met een einddatum, maar een levende organisatievorm die initiatieven, mensen en kennis rondom AI bij elkaar brengt. <strong>Het platform waarop u nu leest is de digitale weerslag van dat netwerk.</strong> Het wordt dagelijks bijgehouden en geeft altijd een actueel beeld van wat er speelt.</p>
 
-          <p>Dit rapport is bedoeld voor iedereen die meer wil weten over de AI-aanpak van NHL Stenden: van bestuurders en accreditatiepanels tot docenten, medewerkers en externe partners. We nemen u mee in de strategie, de themas, de concrete initiatieven en de governance rondom AI bij NHL Stenden.</p>
+          <p>Dit rapport is bedoeld voor iedereen die meer wil weten over de AI-aanpak van NHL Stenden: vans en accreditatiepanels tot docenten, medewerkers en externe partners. We nemen u mee in de strategie, de themas, de concrete initiatieven en de governance rondom AI bij NHL Stenden.</p>
 
           <div className="stat-row">
             <div className="stat-box"><div className="stat-num">{pilots.length}</div><div className="stat-lbl">Actieve pilots</div></div>

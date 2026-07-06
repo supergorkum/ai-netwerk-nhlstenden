@@ -31,7 +31,7 @@ export default function Hero() {
             </p>
 
             <p className="text-blue-200 mb-10 max-w-lg">
-              Of je nu docent, student, medewerker of bestuurder bent:               hier vind je overzicht, verbinding en richting.
+              Of je nu docent, student of medewerker bent:               hier vind je overzicht, verbinding en richting.
             </p>
 
             <div className="flex flex-wrap gap-4">

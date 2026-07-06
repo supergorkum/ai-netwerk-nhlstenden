@@ -206,7 +206,7 @@ export default function Start({ videos = [], pilots = [], evenementen = [], beri
                 De plek waar NHL Stenden alles rond AI samenbrengt: wat we doen, wie we zijn en hoe we het <strong className="text-white">verantwoord aanpakken</strong>.
               </p>
               <p className="text-blue-200 mb-8 max-w-lg">
-                Of je nu docent, student, medewerker of bestuurder bent, hier vind je in drie stappen waar je moet zijn.
+                Of je nu docent, student of medewerker bent, hier vind je in drie stappen waar je moet zijn.
               </p>
               <div className="flex flex-wrap gap-3">
                 <Link to="/themas" className="bg-white text-nhl-blauw hover:bg-blue-50 px-5 py-2.5 rounded-xl font-semibold text-sm transition-colors">

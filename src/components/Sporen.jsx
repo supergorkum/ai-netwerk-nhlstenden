@@ -81,7 +81,7 @@ export default function Sporen() {
               <div className="font-bold text-nhl-blauw mb-1">AI-Geletterdheid is de basis onder alles</div>
               <p className="text-gray-600 text-sm leading-relaxed">
                 Geen enkel spoor werkt zonder mensen die begrijpen wat AI is en wat het van hen vraagt. 
-                Geletterdheid is geen eenmalige training maar een doorlopend fundament: voor bestuurders, 
+                Geletterdheid is geen eenmalige training maar een doorlopend fundament: voors, 
                 docenten, studenten en medewerkers. Aansluiting bij{' '}
                 <a href="https://npuls.nl/onderwerpen/digitale-geletterdheid" target="_blank" rel="noopener noreferrer" className="text-nhl-teal underline">
                   NPULS Digitale Geletterdheid
