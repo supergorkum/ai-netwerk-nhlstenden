@@ -381,6 +381,29 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
   const [cloudTijdstempel, setCloudTijdstempel] = useState(null)
   const [changelogOpen, setChangelogOpen] = useState(false)
   const [actieveTab, setActieveTab] = useState('initiatieven')
+  const [analytics, setAnalytics] = useState(null)
+  const [analyticsLaden, setAnalyticsLaden] = useState(false)
+
+  const laadAnalytics = () => {
+    setAnalyticsLaden(true)
+    fetch('/.netlify/functions/storage?key=analytics-bezoeken')
+      .then(r => r.json())
+      .then(data => {
+        setAnalytics(Array.isArray(data.value) ? data.value : [])
+        setAnalyticsLaden(false)
+      })
+      .catch(() => { setAnalyticsLaden(false) })
+  }
+
+  const resetAnalytics = () => {
+    if (!window.confirm('Alle bezoekersdata wissen? Dit kan niet ongedaan worden gemaakt.')) return
+    fetch('/.netlify/functions/storage', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ key: 'analytics-bezoeken', value: [] }),
+    }).then(() => setAnalytics([]))
+  }
+
   const [alleInitiatieven, setAlleInitiatieven] = useState(initData)
 
   const [previewData, setPreviewData] = useState(null)
@@ -475,6 +498,7 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
     { id: 'video', label: "Video's", n: (videos || []).filter(v => v.status === 'wachtrij').length > 0 ? `${(videos || []).filter(v => v.status === 'wachtrij').length} wachtrij` : (videos || []).length },
   ]
   const tabsRij2 = [
+    { id: 'bezoekers', label: '📈 Bezoekers', n: null },
     { id: 'pilots', label: 'Pilots', n: (pilots || []).length },
     { id: 'docs', label: 'Documenten', n: (docs || []).length },
     { id: 'nieuws', label: '📰 Nieuws ophalen', n: null },
@@ -918,6 +942,141 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
                 </p>
               </div>
             )}
+            {actieveTab === 'bezoekers' && (
+              <div>
+                <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
+                  <div>
+                    <h2 className="text-lg font-bold text-nhl-blauw">Bezoekersoverzicht</h2>
+                    <p className="text-xs text-gray-400 mt-0.5">Paginabezoeken via de app, bijgehouden in Netlify Blobs.</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <button onClick={laadAnalytics} disabled={analyticsLaden}
+                      className="text-xs px-3 py-2 rounded-xl border bg-white border-gray-200 text-nhl-blauw hover:border-nhl-blauw transition-colors font-medium">
+                      {analyticsLaden ? 'Laden...' : '🔄 Vernieuwen'}
+                    </button>
+                    <button onClick={resetAnalytics}
+                      className="text-xs px-3 py-2 rounded-xl border bg-red-50 border-red-200 text-red-500 hover:bg-red-100 transition-colors font-medium">
+                      🗑 Reset teller
+                    </button>
+                  </div>
+                </div>
+
+                {analytics === null && (
+                  <div className="text-center py-12">
+                    <button onClick={laadAnalytics}
+                      className="bg-nhl-blauw text-white px-6 py-2.5 rounded-xl font-semibold text-sm hover:bg-nhl-blauw-dark transition-colors">
+                      Bezoekersdata laden
+                    </button>
+                    <p className="text-xs text-gray-400 mt-3">Data wordt opgehaald uit Netlify Blobs.</p>
+                  </div>
+                )}
+
+                {analytics !== null && analytics.length === 0 && (
+                  <div className="text-center py-12 text-gray-400">
+                    <div className="text-3xl mb-2">📭</div>
+                    <div>Nog geen bezoeken geregistreerd.</div>
+                    <div className="text-xs mt-1">Bezoekers worden bijgehouden zodra een pagina geladen wordt.</div>
+                  </div>
+                )}
+
+                {analytics !== null && analytics.length > 0 && (() => {
+                  const totaal = analytics.length
+                  const vandaag = analytics.filter(b => {
+                    const d = new Date(b.ts)
+                    const nu = new Date()
+                    return d.toDateString() === nu.toDateString()
+                  }).length
+
+                  // Meest bezochte pagina's
+                  const paginaTelling = {}
+                  analytics.forEach(b => {
+                    paginaTelling[b.label] = (paginaTelling[b.label] || 0) + 1
+                  })
+                  const topPaginas = Object.entries(paginaTelling)
+                    .sort((a, b) => b[1] - a[1])
+                    .slice(0, 8)
+
+                  // Bezoeken per uur van de dag
+                  const perUur = Array(24).fill(0)
+                  analytics.forEach(b => { if (b.uur !== undefined) perUur[b.uur]++ })
+                  const maxUur = Math.max(...perUur, 1)
+                  const piekUur = perUur.indexOf(Math.max(...perUur))
+
+                  // Recentste bezoeken
+                  const recente = [...analytics].reverse().slice(0, 15)
+
+                  return (
+                    <div className="space-y-6">
+                      <div className="grid sm:grid-cols-3 gap-4">
+                        <div className="bg-nhl-blauw/5 rounded-2xl p-5">
+                          <div className="text-3xl font-extrabold text-nhl-blauw">{totaal}</div>
+                          <div className="text-xs text-gray-500 mt-1">Totaal paginabezoeken</div>
+                        </div>
+                        <div className="bg-green-50 rounded-2xl p-5">
+                          <div className="text-3xl font-extrabold text-green-700">{vandaag}</div>
+                          <div className="text-xs text-gray-500 mt-1">Vandaag</div>
+                        </div>
+                        <div className="bg-amber-50 rounded-2xl p-5">
+                          <div className="text-3xl font-extrabold text-amber-700">{piekUur}:00</div>
+                          <div className="text-xs text-gray-500 mt-1">Piekuur</div>
+                        </div>
+                      </div>
+
+                      <div className="grid md:grid-cols-2 gap-5">
+                        <div className="bg-white rounded-2xl border border-gray-100 p-5">
+                          <div className="font-bold text-nhl-blauw mb-4 text-sm">Meest bezochte pagina's</div>
+                          <div className="space-y-2">
+                            {topPaginas.map(([label, n]) => (
+                              <div key={label} className="flex items-center gap-3">
+                                <div className="flex-1 min-w-0">
+                                  <div className="text-xs font-medium text-gray-700 truncate">{label}</div>
+                                  <div className="h-1.5 bg-gray-100 rounded-full mt-1">
+                                    <div className="h-1.5 bg-nhl-blauw rounded-full transition-all"
+                                      style={{ width: `${(n / topPaginas[0][1]) * 100}%` }} />
+                                  </div>
+                                </div>
+                                <span className="text-xs font-bold text-nhl-blauw flex-shrink-0">{n}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="bg-white rounded-2xl border border-gray-100 p-5">
+                          <div className="font-bold text-nhl-blauw mb-4 text-sm">Bezoeken per uur</div>
+                          <div className="flex items-end gap-0.5 h-24">
+                            {perUur.map((n, uur) => (
+                              <div key={uur} className="flex-1 flex flex-col items-center gap-0.5" title={`${uur}:00 · ${n} bezoek(en)`}>
+                                <div className="w-full bg-nhl-blauw/20 rounded-sm transition-all"
+                                  style={{ height: `${(n / maxUur) * 80}px`, minHeight: n > 0 ? '3px' : '0' }}
+                                />
+                              </div>
+                            ))}
+                          </div>
+                          <div className="flex justify-between text-xs text-gray-300 mt-1">
+                            <span>0u</span><span>12u</span><span>24u</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="bg-white rounded-2xl border border-gray-100 p-5">
+                        <div className="font-bold text-nhl-blauw mb-4 text-sm">Recente bezoeken</div>
+                        <div className="space-y-1.5">
+                          {recente.map((b, i) => (
+                            <div key={i} className="flex items-center gap-3 text-xs">
+                              <span className="text-gray-300 w-5 text-right flex-shrink-0">{i + 1}</span>
+                              <span className="font-medium text-nhl-blauw w-36 truncate flex-shrink-0">{b.label}</span>
+                              <span className="text-gray-400">{b.datum}</span>
+                              <span className="text-gray-300">{b.tijdstip}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })()}
+              </div>
+            )}
+
             {actieveTab === 'backup' && (
           <div className="space-y-6">
             <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
