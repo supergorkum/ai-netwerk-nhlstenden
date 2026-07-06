@@ -142,6 +142,7 @@ function HerstellModal({ data, bron, onHerstel, onSluiten }) {
 }
 
 function NieuwsOphalen({ onNieuwItems, inspiraties = [] }) {
+  // Laad al eerder geziene titels uit Blobs zodat deduplicatie ook na herlaad werkt
   const [status, setStatus] = useState('idle')
   const [resultaat, setResultaat] = useState(null)
   const [tijdstip, setTijdstip] = useState(() => localStorage.getItem(REFRESH_KEY))
@@ -151,7 +152,15 @@ function NieuwsOphalen({ onNieuwItems, inspiraties = [] }) {
     setResultaat(null)
     try {
       // Stuur bestaande titels mee zodat de server duplicates kan overslaan
-      const bekendeTitels = inspiraties.map(i => i.titel).filter(Boolean)
+      // Combineer titels uit huidige inspiraties met eerder opgeslagen titels uit Blobs
+      let opgeslagenTitels = []
+      try {
+        const r = await fetch('/.netlify/functions/storage?key=nieuws-bekende-titels')
+        const d = await r.json()
+        opgeslagenTitels = Array.isArray(d.value) ? d.value : []
+      } catch {}
+      const huidigeTitels = inspiraties.map(i => i.titel).filter(Boolean)
+      const bekendeTitels = [...new Set([...huidigeTitels, ...opgeslagenTitels])]
       const res = await fetch(NIEUWS_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
