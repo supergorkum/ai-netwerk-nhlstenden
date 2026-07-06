@@ -430,7 +430,8 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
       .then(data => {
         let parsed = []
         try {
-          parsed = typeof data.value === 'string' ? JSON.parse(data.value) : (Array.isArray(data.value) ? data.value : [])
+          const raw = data.value ?? data
+          parsed = typeof raw === 'string' ? JSON.parse(raw) : (Array.isArray(raw) ? raw : [])
         } catch {}
         setAnalytics(parsed)
         setAnalyticsLaden(false)
@@ -505,7 +506,11 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
     setCloudStatus('saving')
     try {
       const data = await laadUitCloud()
-      if (!data) { alert('Geen cloud backup gevonden.'); setCloudStatus('idle'); return }
+      const rawBackup = data.value ?? data
+      if (!rawBackup) { alert('Geen cloud backup gevonden.'); setCloudStatus('idle'); return }
+      // Vervang data.value referentie door rawBackup zodat rest van de code werkt
+      data = { ...data, value: typeof rawBackup === 'string' ? rawBackup : JSON.stringify(rawBackup) }
+      if (!data.value) { alert('Geen cloud backup gevonden.'); setCloudStatus('idle'); return }
       setPreviewData(data)
       setPreviewBron('cloud')
       setCloudStatus('idle')

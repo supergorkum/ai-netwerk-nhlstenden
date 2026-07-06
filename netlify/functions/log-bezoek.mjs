@@ -1,6 +1,7 @@
-import { getStore } from '@netlify/blobs'
+// Netlify Function: log één paginabezoek via dezelfde storage.js aanpak
+// Gebruikt fetch naar storage.js zodat het formaat consistent blijft
 
-export default async (req) => {
+export default async (req, context) => {
   if (req.method !== 'POST') {
     return new Response('POST only', { status: 405 })
   }
@@ -9,18 +10,28 @@ export default async (req) => {
 
   try {
     const bezoek = await req.json()
-    const store = getStore('aihub-data')
+
+    // Haal bestaande data op via storage.js (zelfde aanroep als de browser doet)
+    const siteUrl = process.env.URL || 'https://ai-netwerk-nhlstenden.netlify.app'
+    const getRes = await fetch(`${siteUrl}/.netlify/functions/storage?key=analytics-bezoeken`)
+    const getData = await getRes.json()
 
     let bestaand = []
     try {
-      const waarde = await store.get('analytics-bezoeken')
-      if (waarde) bestaand = JSON.parse(waarde)
+      const raw = getData.value
+      bestaand = typeof raw === 'string' ? JSON.parse(raw) : (Array.isArray(raw) ? raw : [])
     } catch {}
 
     const nieuw = [...bestaand, bezoek].slice(-500)
-    await store.set('analytics-bezoeken', JSON.stringify(nieuw))
 
-    return new Response(JSON.stringify({ ok: true }), { status: 200, headers })
+    // Sla op via storage.js
+    await fetch(`${siteUrl}/.netlify/functions/storage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ key: 'analytics-bezoeken', value: JSON.stringify(nieuw) }),
+    })
+
+    return new Response(JSON.stringify({ ok: true, totaal: nieuw.length }), { status: 200, headers })
   } catch (err) {
     return new Response(JSON.stringify({ error: err.message }), { status: 500, headers })
   }
