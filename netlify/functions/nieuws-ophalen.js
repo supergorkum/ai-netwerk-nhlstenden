@@ -17,7 +17,8 @@ const RSS_FEEDS = [
     url: 'https://digital-strategy.ec.europa.eu/en/rss.xml',
     alternatieveUrls: ['https://digital-strategy.ec.europa.eu/en/news/rss.xml', 'https://ec.europa.eu/newsroom/dae/rss.cfm'] },
   // Internationale AI-ontwikkelingen
-  { naam: 'The Gradient',   url: 'https://thegradient.pub/rss/',              label: 'The Gradient',   icon: '📊', maxItems: 3 },
+  { naam: 'The Gradient',   url: 'https://thegradient.pub/rss/',              label: 'The Gradient',   icon: '📊', maxItems: 3,
+    alternatieveUrls: ['https://thegradient.pub/rss', 'https://news.google.com/rss/search?q=site%3Athegradient.pub&hl=en-US&gl=US&ceid=US%3Aen'] },
   { naam: '80,000 Hours',   url: 'https://80000hours.org/feed/',               label: '80,000 Hours',   icon: '💡', maxItems: 3 },
   { naam: 'Import AI',      url: 'https://importai.substack.com/feed',         label: 'Import AI',      icon: '🤖', maxItems: 3 },
 ]
@@ -142,12 +143,18 @@ export default async (req) => {
       // Probeer de kandidaat-URLs na elkaar tot er een werkt
       const urls = [feed.url, ...(feed.alternatieveUrls || [])]
       const pogingen = []
+      // Totale tijdslimiet per bron: pogingen delen samen 8 seconden,
+      // met maximaal 5 seconden per poging. Een trage bron houdt zo
+      // de andere bronnen en de beoordeling niet op.
+      const bronDeadline = Date.now() + 8000
       for (const basisUrl of urls) {
+        const resterend = bronDeadline - Date.now()
+        if (resterend < 500) { pogingen.push('tijd op'); break }
         try {
           const feedUrlMet = basisUrl + (basisUrl.includes('?') ? '&' : '?') + '_t=' + Date.now()
           const res = await fetch(feedUrlMet, {
-            headers: { 'User-Agent': 'Mozilla/5.0 (compatible; NHLStendenAINetwerk/2.7)', Accept: 'application/rss+xml, application/atom+xml, application/xml, text/xml, */*' },
-            signal: AbortSignal.timeout(6000),
+            headers: { 'User-Agent': 'Mozilla/5.0 (compatible; NHLStendenAINetwerk/2.8)', Accept: 'application/rss+xml, application/atom+xml, application/xml, text/xml, */*' },
+            signal: AbortSignal.timeout(Math.min(5000, resterend)),
           })
           if (!res.ok) throw new Error(`HTTP ${res.status}`)
           const xml = await res.text()

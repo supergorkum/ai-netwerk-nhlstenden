@@ -144,13 +144,31 @@ export const initiatieven = [
 // deadlineISO wordt gebruikt voor de signaalberekening.
 // ============================================================
 export const AI_ACT_ITEMS = [
-  { id: 'aa1', artikel: 'Art. 4', titel: 'AI-geletterdheid voor medewerkers', omschrijving: 'Aanbieders en gebruikers van AI-systemen moeten redelijke maatregelen nemen om te zorgen voor voldoende AI-kennis bij medewerkers die met AI werken.', prioriteit: 'hoog', deadline: 'Augustus 2025 (van kracht)', deadlineISO: '2025-08-02', link: 'https://eur-lex.europa.eu/legal-content/NL/TXT/?uri=CELEX%3A32024R1689', status: 'lopend', gekoppeldAan: [5, 2] },
-  { id: 'aa2', artikel: 'Art. 9 & 10', titel: 'Risicobeheer hoog-risico AI-systemen', omschrijving: 'Voor hoog-risico AI-systemen (bijv. toetsbewaking, selectiesystemen) gelden verplichtingen rond risicoanalyse, datakwaliteit en menselijk toezicht.', prioriteit: 'hoog', deadline: 'Augustus 2026', deadlineISO: '2026-08-02', link: 'https://eur-lex.europa.eu/legal-content/NL/TXT/?uri=CELEX%3A32024R1689', status: 'te-starten', gekoppeldAan: [1] },
-  { id: 'aa3', artikel: 'Art. 13 & 14', titel: 'Transparantie en menselijk toezicht', omschrijving: 'Gebruikers van AI-systemen moeten begrijpen hoe het systeem werkt en er moet altijd een mens zijn die kan ingrijpen.', prioriteit: 'hoog', deadline: 'Augustus 2026', deadlineISO: '2026-08-02', link: 'https://eur-lex.europa.eu/legal-content/NL/TXT/?uri=CELEX%3A32024R1689', status: 'te-starten', gekoppeldAan: [1, 11] },
-  { id: 'aa4', artikel: 'Art. 50', titel: 'Transparantie bij AI-gegenereerde content', omschrijving: 'AI-systemen die tekst, beeld of audio genereren moeten dit duidelijk aangeven.', prioriteit: 'midden', deadline: 'Augustus 2026', deadlineISO: '2026-08-02', link: 'https://eur-lex.europa.eu/legal-content/NL/TXT/?uri=CELEX%3A32024R1689', status: 'te-starten', gekoppeldAan: [] },
-  { id: 'aa5', artikel: 'Art. 26', titel: 'Verplichtingen voor gebruikers van hoog-risico AI', omschrijving: 'NHL Stenden als gebruiker van hoog-risico AI heeft eigen verplichtingen: instructies opvolgen, gebruik monitoren, medewerkers trainen.', prioriteit: 'hoog', deadline: 'Augustus 2026', deadlineISO: '2026-08-02', link: 'https://eur-lex.europa.eu/legal-content/NL/TXT/?uri=CELEX%3A32024R1689', status: 'te-starten', gekoppeldAan: [1] },
-  { id: 'aa6', artikel: 'Art. 70', titel: 'Registratie hoog-risico AI-systemen', omschrijving: 'Hoog-risico AI-systemen die door NHL Stenden worden ingezet moeten worden geregistreerd in de EU-database.', prioriteit: 'midden', deadline: 'Augustus 2026', deadlineISO: '2026-08-02', link: 'https://eur-lex.europa.eu/legal-content/NL/TXT/?uri=CELEX%3A32024R1689', status: 'te-starten', gekoppeldAan: [1] },
-  { id: 'aa7', titel: 'Verbod op onacceptabele AI-toepassingen', artikel: 'Art. 5', omschrijving: 'Bepaalde AI-toepassingen zijn verboden: sociale scoring, realtime biometrische surveillance, manipulatie van mensen.', prioriteit: 'hoog', deadline: 'Februari 2025 (van kracht)', deadlineISO: '2025-02-02', link: 'https://eur-lex.europa.eu/legal-content/NL/TXT/?uri=CELEX%3A32024R1689', status: 'te-controleren', gekoppeldAan: [1] },
+  { id: 'aa1', artikel: 'Art. 4', titel: 'AI-geletterdheid voor medewerkers', spoor: 4, omschrijving: 'Aanbieders en gebruikers van AI-systemen moeten redelijke maatregelen nemen om te zorgen voor voldoende AI-kennis bij medewerkers die met AI werken.', prioriteit: 'hoog', deadline: 'Augustus 2025 (van kracht)', deadlineISO: '2025-08-02', link: 'https://eur-lex.europa.eu/legal-content/NL/TXT/?uri=CELEX%3A32024R1689', status: 'lopend', gekoppeldAan: [5, 2] },
+  { id: 'aa2', artikel: 'Art. 9 & 10', titel: 'Risicobeheer hoog-risico AI-systemen', spoor: 3, omschrijving: 'Voor hoog-risico AI-systemen (bijv. toetsbewaking, selectiesystemen) gelden verplichtingen rond risicoanalyse, datakwaliteit en menselijk toezicht.', prioriteit: 'hoog', deadline: 'Augustus 2026', deadlineISO: '2026-08-02', link: 'https://eur-lex.europa.eu/legal-content/NL/TXT/?uri=CELEX%3A32024R1689', status: 'te-starten', gekoppeldAan: [1] },
+  { id: 'aa3', artikel: 'Art. 13 & 14', titel: 'Transparantie en menselijk toezicht', spoor: 3, omschrijving: 'Gebruikers van AI-systemen moeten begrijpen hoe het systeem werkt en er moet altijd een mens zijn die kan ingrijpen.', prioriteit: 'hoog', deadline: 'Augustus 2026', deadlineISO: '2026-08-02', link: 'https://eur-lex.europa.eu/legal-content/NL/TXT/?uri=CELEX%3A32024R1689', status: 'te-starten', gekoppeldAan: [1, 11] },
+  { id: 'aa4', artikel: 'Art. 50', titel: 'Transparantie bij AI-gegenereerde content', spoor: 3, omschrijving: 'AI-systemen die tekst, beeld of audio genereren moeten dit duidelijk aangeven.', prioriteit: 'midden', deadline: 'Augustus 2026', deadlineISO: '2026-08-02', link: 'https://eur-lex.europa.eu/legal-content/NL/TXT/?uri=CELEX%3A32024R1689', status: 'te-starten', gekoppeldAan: [] },
+  { id: 'aa5', artikel: 'Art. 26', titel: 'Verplichtingen voor gebruikers van hoog-risico AI', spoor: 3, omschrijving: 'NHL Stenden als gebruiker van hoog-risico AI heeft eigen verplichtingen: instructies opvolgen, gebruik monitoren, medewerkers trainen.', prioriteit: 'hoog', deadline: 'Augustus 2026', deadlineISO: '2026-08-02', link: 'https://eur-lex.europa.eu/legal-content/NL/TXT/?uri=CELEX%3A32024R1689', status: 'te-starten', gekoppeldAan: [1] },
+  { id: 'aa6', artikel: 'Art. 70', titel: 'Registratie hoog-risico AI-systemen', spoor: 3, omschrijving: 'Hoog-risico AI-systemen die door NHL Stenden worden ingezet moeten worden geregistreerd in de EU-database.', prioriteit: 'midden', deadline: 'Augustus 2026', deadlineISO: '2026-08-02', link: 'https://eur-lex.europa.eu/legal-content/NL/TXT/?uri=CELEX%3A32024R1689', status: 'te-starten', gekoppeldAan: [1] },
+  { id: 'aa7', titel: 'Verbod op onacceptabele AI-toepassingen', artikel: 'Art. 5', spoor: 3, omschrijving: 'Bepaalde AI-toepassingen zijn verboden: sociale scoring, realtime biometrische surveillance, manipulatie van mensen.', prioriteit: 'hoog', deadline: 'Februari 2025 (van kracht)', deadlineISO: '2025-02-02', link: 'https://eur-lex.europa.eu/legal-content/NL/TXT/?uri=CELEX%3A32024R1689', status: 'te-controleren', gekoppeldAan: [1] },
+]
+
+// ============================================================
+// Overlegstructuur van het AI-Netwerk
+// Centrale bron voor het rapport (hoofdstuk Governance en organisatie).
+// spoor: null betekent netwerkbreed; een nummer koppelt het overleg aan
+// een koerslijn. Namen, frequenties en focus zijn hier op een plek aan
+// te passen zodra de structuur definitief wordt ingevuld.
+// ============================================================
+export const OVERLEG_STRUCTUUR = [
+  { id: 'stuurgroep', naam: 'Stuurgroep Digitalisering', frequentie: 'Per kwartaal', focus: 'Kaders, voortgang en besluiten over richting en middelen', spoor: null },
+  { id: 'kernteam', naam: 'Kernteam AI-Netwerk', frequentie: 'Maandelijks', focus: 'Voortgang, knelpunten en operationele besluiten', spoor: null },
+  { id: 'thema-1', naam: 'Thema-overleg AI & Leren', frequentie: 'Maandelijks', focus: 'Initiatieven en ontwikkelingen binnen de koerslijn', spoor: 1 },
+  { id: 'thema-2', naam: 'Thema-overleg AI & Werken', frequentie: 'Maandelijks', focus: 'Initiatieven en ontwikkelingen binnen de koerslijn', spoor: 2 },
+  { id: 'thema-3', naam: 'Thema-overleg AI & Verantwoordelijkheid', frequentie: 'Maandelijks', focus: 'AI Act verplichtingen, governance en ethiek', spoor: 3 },
+  { id: 'thema-4', naam: 'Thema-overleg AI & Geletterdheid', frequentie: 'Maandelijks', focus: 'Vaardigheden en professionalisering', spoor: 4 },
+  { id: 'thema-5', naam: 'Thema-overleg AI & Werkveld', frequentie: 'Maandelijks', focus: 'Regionale samenwerking en praktijkprojecten', spoor: 5 },
+  { id: 'thema-6', naam: 'Thema-overleg AI & Onderzoek', frequentie: 'Maandelijks', focus: 'Onderzoek met en naar AI', spoor: 6 },
 ]
 
 // Weergave-configuratie voor het verplichtingen-signaal
@@ -209,7 +227,7 @@ export const initiatief_types = ['intern', 'extern', 'surf']
 // Centraal versienummer: dit is de enige plek waar de versie wordt bijgehouden.
 // Elke functionele wijziging hoort dit nummer op te hogen en een regel toe te voegen
 // aan de changelog in Beheer.jsx. Patch-scripts doen dit voortaan zelf.
-export const APP_VERSIE = 'v2.7'
+export const APP_VERSIE = 'v2.8'
 export const APP_VERSIE_DATUM = 'Juli 2026'
 
 export const BEHEER_CODE = 'aihub2026'

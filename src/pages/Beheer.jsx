@@ -1369,6 +1369,16 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
                 versie: APP_VERSIE, datum: APP_VERSIE_DATUM,
                 label: 'Huidige versie', labelKleur: 'bg-green-100 text-green-700',
                 items: [
+                  'Rapport: hoofdstuk Governance toont de volledige overlegstructuur met per overleg een berekend agendavoorstel van maximaal drie punten, samengesteld uit AI Act signalen, open acties uit de actielijst en recente inzichten.',
+                  'Overlegstructuur is een centrale bron in data.js geworden (OVERLEG_STRUCTUUR); elke AI Act verplichting is gekoppeld aan een koerslijn.',
+                  'Nieuws: The Gradient heeft een vangnet via Google News RSS en elke bron heeft een eigen tijdslimiet, zodat een trage bron de andere niet ophoudt.',
+                ],
+              },
+
+              {
+                versie: 'v2.7', datum: 'Juli 2026',
+                label: null, labelKleur: '',
+                items: [
                   'Dashboard: het kern-ambitie dashboard staat bovenaan, Verplichtingen en roadmap eronder.',
                   'Rapport: per koerslijn een berekende top 3 van actuele agendapunten bij de overlegstructuur, en een bijlage Actielijst met open en afgehandelde acties per kwartaal.',
                   'Versienummer in de Footer leest nu echt uit het centrale APP_VERSIE (de tekst bleek "Versie 2.1" zonder v, daarom werd hij eerder gemist).',

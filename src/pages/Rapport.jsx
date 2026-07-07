@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { initiatieven as alleInitiatieven, sporen, AI_ACT_ITEMS, verplichtingSignaal, APP_VERSIE } from '../data'
+import { initiatieven as alleInitiatieven, sporen, AI_ACT_ITEMS, verplichtingSignaal, APP_VERSIE, OVERLEG_STRUCTUUR } from '../data'
 import { haalWijzigingenOp } from '../storage'
 import { INIT_PILOTS, INIT_INSPIRATIES } from '../initialData'
 
@@ -65,6 +65,47 @@ export default function Rapport({ pilots: pilotsProp, inspiraties: inspiratiesPr
   const urgent = gesorteerdeSignalen.filter(s => s.signaal.kleur === 'rood')
   const dekkingsgraad = AI_ACT_ITEMS.length > 0 ? Math.round(((telling.groen || 0) / AI_ACT_ITEMS.length) * 100) : 0
   const uitvoeringsgraad = rmActief.length > 0 ? Math.round((rmLopend.length / rmActief.length) * 100) : 0
+
+  // Agendavoorstel per overleg, maximaal drie punten, berekend uit
+  // AI Act signalen, open acties uit de actielijst en recente inzichten.
+  const agendaVoorstel = (overleg) => {
+    const punten = []
+    if (overleg.spoor) {
+      gesorteerdeSignalen
+        .filter(x => (x.vp.spoor || 3) === overleg.spoor && x.signaal.kleur !== 'groen')
+        .slice(0, 2)
+        .forEach(x => punten.push({ tekst: `AI Act ${x.vp.artikel} ${x.vp.titel}: ${x.signaal.kleur === 'rood' ? 'actie nodig' : 'aandacht'}`, bron: 'AI Act' }))
+      rmActief
+        .filter(r => { const vp = AI_ACT_ITEMS.find(a => a.id === r.aiActKoppeling); return vp && (vp.spoor || 3) === overleg.spoor })
+        .slice(0, 2)
+        .forEach(r => punten.push({ tekst: `Actie uit de actielijst: ${r.titel}${r.datum ? ` (${r.datum})` : ''}`, bron: 'Actielijst' }))
+      alleInitiatieven
+        .filter(i => i.spoor === overleg.spoor && (i.status === 'in-ontwikkeling' || i.status === 'verkenning'))
+        .slice(0, 2)
+        .forEach(i => punten.push({ tekst: `Voortgang en besluitvorming: ${i.naam}`, bron: 'Initiatief' }))
+      alleInitiatieven
+        .filter(i => i.spoor === overleg.spoor && i.status === 'actief' && i.impactInschatting === 'hoog')
+        .slice(0, 1)
+        .forEach(i => punten.push({ tekst: `Borging en opschaling: ${i.naam}`, bron: 'Initiatief' }))
+      inspiraties
+        .filter(b => b.spoor === overleg.spoor)
+        .slice(0, 1)
+        .forEach(b => punten.push({ tekst: `Inzicht om te bespreken: ${b.titel}`, bron: 'Inzichten' }))
+    } else if (overleg.id === 'stuurgroep') {
+      if (urgent.length > 0) punten.push({ tekst: `${urgent.length} verplichting${urgent.length !== 1 ? 'en' : ''} op actie nodig (${urgent.map(u => u.vp.artikel).join(', ')})`, bron: 'AI Act' })
+      punten.push({ tekst: `Dekkingsgraad AI Act: ${dekkingsgraad}% van de verplichtingen op koers`, bron: 'AI Act' })
+      alleInitiatieven
+        .filter(i => i.status === 'in-ontwikkeling' && i.impactInschatting === 'hoog')
+        .slice(0, 1)
+        .forEach(i => punten.push({ tekst: `Besluitvorming: ${i.naam}`, bron: 'Initiatief' }))
+    } else {
+      if (rmTeStarten.length > 0) punten.push({ tekst: `${rmTeStarten.length} roadmap-item${rmTeStarten.length !== 1 ? 's' : ''} nog te starten: prioriteren en beleggen`, bron: 'Actielijst' })
+      if (eigenKoers.length > 0) punten.push({ tekst: `Voortgang eigen koers: ${eigenKoers.length} open item${eigenKoers.length !== 1 ? 's' : ''} zonder AI Act koppeling`, bron: 'Actielijst' })
+      const nieuweInzichten = inspiraties.filter(b => b.nieuw).length
+      if (nieuweInzichten > 0) punten.push({ tekst: `${nieuweInzichten} nieuwe inzicht${nieuweInzichten !== 1 ? 'en' : ''} beoordelen en doorzetten naar de thema-overleggen`, bron: 'Inzichten' })
+    }
+    return punten.slice(0, 3)
+  }
 
   useEffect(() => {
     document.title = 'AI-Netwerk NHL Stenden Rapport ' + DATUM()
@@ -223,7 +264,7 @@ export default function Rapport({ pilots: pilotsProp, inspiraties: inspiratiesPr
           )}
 
           <h3>Leeswijzer</h3>
-          <p>Hoofdstuk 2 en 3 beschrijven wat het AI-Netwerk is en waar het op steunt. Hoofdstuk 4 en 5 tonen de zes koerslijnen en de initiatieven die eronder vallen, intern en extern. Hoofdstuk 6 en 7 vormen de kern voor sturing: de verplichtingen uit de AI Act met hun signaal, en de roadmap met de berekende prognose. Hoofdstuk 8 tot en met 10 geven verdieping: pilots, governance met de actuele agendapunten per koerslijn, en inzichten uit het netwerk. De bijlage sluit af met de actielijst: open en afgehandelde acties per kwartaal. Lezers met weinig tijd volstaan met deze samenvatting, hoofdstuk 6 en 7 en de actielijst.</p>
+          <p>Hoofdstuk 2 en 3 beschrijven wat het AI-Netwerk is en waar het op steunt. Hoofdstuk 4 en 5 tonen de zes koerslijnen en de initiatieven die eronder vallen, intern en extern. Hoofdstuk 6 en 7 vormen de kern voor sturing: de verplichtingen uit de AI Act met hun signaal, en de roadmap met de berekende prognose. Hoofdstuk 8 tot en met 10 geven verdieping: pilots, governance met de overlegstructuur en per overleg een berekend agendavoorstel, en inzichten uit het netwerk. De bijlage sluit af met de actielijst: open en afgehandelde acties per kwartaal. Lezers met weinig tijd volstaan met deze samenvatting, hoofdstuk 6 en 7 en de actielijst.</p>
 
           {wijzigingen.length > 0 && (
             <>
@@ -515,27 +556,27 @@ export default function Rapport({ pilots: pilotsProp, inspiraties: inspiratiesPr
                 {s.icon} {s.titel}
               </div>
               <div className="gov-body">
-                <strong>Trekker:</strong> Wordt ingevuld &nbsp;·&nbsp; <strong>Overleg:</strong> Maandelijks AI-Netwerk overleg &nbsp;·&nbsp; <strong>Verantwoording:</strong> Stuurgroep Digitalisering
+                <strong>Trekker:</strong> Wordt ingevuld &nbsp;·&nbsp; <strong>Overleg:</strong> {OVERLEG_STRUCTUUR.find(o => o.spoor === s.id)?.naam || 'AI-Netwerk overleg'} &nbsp;·&nbsp; <strong>Verantwoording:</strong> Stuurgroep Digitalisering
               </div>
             </div>
           ))}
 
-          <h3>Actuele agendapunten per koerslijn</h3>
-          <p>Berekend uit de actuele status: initiatieven die om besluitvorming vragen, verplichtingen met signaal actie nodig en lopend werk met hoge impact dat borging verdient. Maximaal drie punten per koerslijn, bedoeld als voorzet voor het maandelijkse overleg.</p>
-          {sporen.map(s => {
-            const punten = []
-            if (s.id === 3) {
-              gesorteerdeSignalen.filter(x => x.signaal.kleur === 'rood').slice(0, 2).forEach(x => punten.push(`AI Act ${x.vp.artikel}: ${x.vp.titel} (actie nodig)`))
-            }
-            alleInitiatieven.filter(i => i.spoor === s.id && (i.status === 'in-ontwikkeling' || i.status === 'verkenning')).slice(0, 3).forEach(i => punten.push(`Voortgang en besluitvorming: ${i.naam}`))
-            alleInitiatieven.filter(i => i.spoor === s.id && i.status === 'actief' && i.impactInschatting === 'hoog').slice(0, 2).forEach(i => punten.push(`Borging en opschaling: ${i.naam}`))
-            const top = punten.slice(0, 3)
-            if (top.length === 0) return null
+          <h3>Overlegstructuur en agendavoorstellen</h3>
+          <p>Het AI-Netwerk kent een vaste overlegstructuur: de stuurgroep voor richting en middelen, het kernteam voor de dagelijkse gang van zaken en per koerslijn een thema-overleg. Per overleg staat hieronder een berekend agendavoorstel van maximaal drie punten, samengesteld uit de verplichtingen met een signaal, de open acties uit de actielijst (zie bijlage) en recente inzichten uit het netwerk.</p>
+          {OVERLEG_STRUCTUUR.map(o => {
+            const punten = agendaVoorstel(o)
+            const spoorDef = o.spoor ? sporen.find(s => s.id === o.spoor) : null
             return (
-              <div key={s.id} className="gov-row">
-                <div className="gov-thema" style={{background: KOERS_KLEUREN[s.id] || '#003DA5'}}>{s.icon} {s.titel}</div>
+              <div key={o.id} className="gov-row">
+                <div className="gov-thema" style={{background: o.spoor ? (KOERS_KLEUREN[o.spoor] || '#003DA5') : '#06215C'}}>
+                  {spoorDef ? `${spoorDef.icon} ` : ''}{o.naam}
+                </div>
                 <div className="gov-body">
-                  {top.map((pt, i) => (<div key={i}>{i + 1}. {pt}</div>))}
+                  <div style={{fontSize:'8pt', color:'#9CA3AF', marginBottom:'4px'}}>{o.frequentie} · {o.focus}</div>
+                  {punten.length === 0 && <div>Geen agendapunten uit de actuele status. Het overleg bepaalt de eigen agenda.</div>}
+                  {punten.map((pt, i) => (
+                    <div key={i}>{i + 1}. {pt.tekst} <span style={{fontSize:'7.5pt', color:'#8C1D82', fontWeight:600}}>[{pt.bron}]</span></div>
+                  ))}
                 </div>
               </div>
             )
