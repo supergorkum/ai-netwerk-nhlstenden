@@ -1,5 +1,11 @@
 // Netlify Function — max 3 feeds, parallel Anthropic calls, duplicate-detectie via bekendeTitels
 
+import { AI_ACT_ITEMS } from '../../src/data.js'
+
+// Compacte context voor de beoordelingsprompt, direct uit de centrale bron
+// (geen duplicaat): id, artikel en titel per verplichting.
+const AI_ACT_CONTEXT = AI_ACT_ITEMS.map(v => `${v.id}: ${v.artikel} ${v.titel}`).join('; ')
+
 const RSS_FEEDS = [
   // Nederlandse en Europese bronnen: inhoudelijk (SURF, Npuls) en compliance (Rijksoverheid, EU/AI Act).
   // De Claude-beoordeling filtert per bericht op relevantie voor NHL Stenden,
@@ -63,7 +69,7 @@ async function beoordeelItem(item, feed, apiKey) {
         max_tokens: 150,
         messages: [{
           role: 'user',
-          content: `Relevant voor het AI-Netwerk van NHL Stenden Hogeschool (AI in hoger onderwijs, AI Act en compliance, digitale soevereiniteit, digitalisering onderwijs)?\n\nTitel: ${item.titel}\nBeschrijving: ${item.beschrijving.slice(0, 150)}\n\nThema's: 1=AI & Leren (onderwijs, didactiek, studenten), 2=AI & Werken (bedrijfsvoering, medewerkers, organisatie), 3=AI & Verantwoordelijkheid (AI Act, compliance, governance, ethiek, soevereiniteit, privacy), 4=AI-Geletterdheid (vaardigheden, bewustzijn, training), 5=AI & Werkveld (regionale samenwerking, praktijkgericht), 6=AI & Onderzoek (wetenschap, lectoraten)\n\nJSON alleen:\n{"relevant":true/false,"samenvatting":"max 1 zin Nederlands","doelgroep":"docenten/studenten/management/algemeen","spoor":1/2/3/4/5/6}`
+          content: `Relevant voor het AI-Netwerk van NHL Stenden Hogeschool (AI in hoger onderwijs, AI Act en compliance, digitale soevereiniteit, digitalisering onderwijs)?\n\nTitel: ${item.titel}\nBeschrijving: ${item.beschrijving.slice(0, 150)}\n\nThema's: 1=AI & Leren (onderwijs, didactiek, studenten), 2=AI & Werken (bedrijfsvoering, medewerkers, organisatie), 3=AI & Verantwoordelijkheid (AI Act, compliance, governance, ethiek, soevereiniteit, privacy), 4=AI-Geletterdheid (vaardigheden, bewustzijn, training), 5=AI & Werkveld (regionale samenwerking, praktijkgericht), 6=AI & Onderzoek (wetenschap, lectoraten)\n\nActuele AI Act verplichtingen van NHL Stenden: ${AI_ACT_CONTEXT}\nGeeft dit artikel aanleiding tot opvolging van een van deze verplichtingen (bijvoorbeeld een wijziging, aanscherping, uitstel of nieuwe uitleg)? Zo ja, benoem het id in aiActKoppeling, anders null.\n\nJSON alleen:\n{"relevant":true/false,"samenvatting":"max 1 zin Nederlands","doelgroep":"docenten/studenten/management/algemeen","spoor":1/2/3/4/5/6,"aiActSignaal":true/false,"aiActKoppeling":"aa1"/null}`
         }]
       }),
       signal: AbortSignal.timeout(5000),
@@ -96,6 +102,8 @@ async function beoordeelItem(item, feed, apiKey) {
       datum: new Date().toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' }),
       nieuw: true, autoUpdate: true,
       doelgroep: b.doelgroep || 'algemeen',
+      aiActSignaal: b.aiActSignaal === true,
+      aiActKoppeling: b.aiActKoppeling || null,
     }
   } catch { return null }
 }
@@ -214,12 +222,19 @@ export default async (req) => {
     }
   }
 
+  // Items met een AI Act signaal apart aangeven, los van de gewone
+  // bronrapportage, zodat opvolging niet tussen de rest verdwijnt.
+  const aiActAandacht = resultaten
+    .filter(r => r.aiActSignaal)
+    .map(r => ({ titel: r.titel, aiActKoppeling: r.aiActKoppeling, url: r.url, naam: r.naam }))
+
   return new Response(JSON.stringify({
     ok: true,
     aantalNieuw: resultaten.length,
     aantalGefilterd,
     geenNieuwNieuws: resultaten.length === 0 && aantalGefilterd > 0,
     items: resultaten,
+    aiActAandacht,
     beoordeeldeTitels,
     bronnen: bronRapport,
     fouten: fouten.length > 0 ? fouten : undefined,

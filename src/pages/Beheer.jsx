@@ -1369,6 +1369,15 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
                 versie: APP_VERSIE, datum: APP_VERSIE_DATUM,
                 label: 'Huidige versie', labelKleur: 'bg-green-100 text-green-700',
                 items: [
+                  'Nieuws ophalen: elk item wordt ook beoordeeld tegen de actuele AI Act verplichtingen. Artikelen die wijzen op een wijziging, aanscherping, uitstel of nieuwe uitleg krijgen een signaal en waar mogelijk een koppeling aan de specifieke verplichting.',
+                  'Rapport: het agendavoorstel van het thema-overleg Verantwoordelijkheid geeft AI Act signalen uit Inzichten voorrang boven een willekeurig ander inzicht.',
+                ],
+              },
+
+              {
+                versie: 'v2.9', datum: 'Juli 2026',
+                label: null, labelKleur: '',
+                items: [
                   'Rapport: elk agendavoorstel opent met de kernambitie van het eigen onderdeel. Thema-overleggen tonen de kernambitie van hun koerslijn (letterlijk uit de centrale bron, gelijk aan de site), stuurgroep en kernteam bewaken de globale kernambitie en de werking van het AI-Netwerk.',
                 ],
               },

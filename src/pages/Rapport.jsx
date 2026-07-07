@@ -89,8 +89,12 @@ export default function Rapport({ pilots: pilotsProp, inspiraties: inspiratiesPr
         .forEach(i => punten.push({ tekst: `Borging en opschaling: ${i.naam}`, bron: 'Initiatief' }))
       inspiraties
         .filter(b => b.spoor === overleg.spoor)
+        .sort((a, b) => (b.aiActSignaal ? 1 : 0) - (a.aiActSignaal ? 1 : 0))
         .slice(0, 1)
-        .forEach(b => punten.push({ tekst: `Inzicht om te bespreken: ${b.titel}`, bron: 'Inzichten' }))
+        .forEach(b => punten.push({
+          tekst: b.aiActSignaal ? `Mogelijke AI Act update, opvolging bepalen: ${b.titel}` : `Inzicht om te bespreken: ${b.titel}`,
+          bron: 'Inzichten',
+        }))
     } else if (overleg.id === 'stuurgroep') {
       if (urgent.length > 0) punten.push({ tekst: `${urgent.length} verplichting${urgent.length !== 1 ? 'en' : ''} op actie nodig (${urgent.map(u => u.vp.artikel).join(', ')})`, bron: 'AI Act' })
       punten.push({ tekst: `Dekkingsgraad AI Act: ${dekkingsgraad}% van de verplichtingen op koers`, bron: 'AI Act' })
