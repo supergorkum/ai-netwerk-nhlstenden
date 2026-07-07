@@ -340,7 +340,7 @@ function AppInner() {
           <Route path="/governance" element={<Governance />} />
           <Route path="/kader" element={<Kader />} />
           <Route path="/agentic-ai" element={<AgenticAI />} />
-          <Route path="/dashboard" element={<Dashboard pilots={pilots} evenementen={evenementen} />} />
+          <Route path="/dashboard" element={<Dashboard pilots={pilots} evenementen={evenementen} roadmap={roadmap} />} />
           <Route path="/wat-levert-het-op" element={<WatLeverHetOp />} />
           <Route path="/nvao" element={<NVAO />} />
           <Route path="/rapport" element={<Rapport pilots={pilots} inspiraties={inspiraties} />} />
