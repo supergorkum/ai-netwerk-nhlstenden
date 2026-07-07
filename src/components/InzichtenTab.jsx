@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { sporen, lagen } from '../data'
+import { sporen, lagen, AI_ACT_ITEMS } from '../data'
 import { logWijziging } from '../storage'
 
 const INSPIRATIE_TYPES = [
@@ -185,6 +185,13 @@ export default function InzichtenTab({ inspiraties, setInspiraties }) {
               <div className="flex items-center gap-2">
                 {b.nieuw && <span className="inline-flex items-center gap-1 text-xs bg-amber-500 text-white px-2 py-0.5 rounded-full font-bold">🆕 Nieuw</span>}
                 {b.autoUpdate && <span title="Automatisch opgehaald via de nieuws-functie" className="inline-flex items-center gap-1 text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">🤖 Auto</span>}
+                {b.aiActSignaal && (
+                  <span
+                    title={b.aiActKoppeling ? `Mogelijke opvolging: ${AI_ACT_ITEMS.find(v => v.id === b.aiActKoppeling)?.artikel || ''} ${AI_ACT_ITEMS.find(v => v.id === b.aiActKoppeling)?.titel || ''}`.trim() : 'Mogelijke opvolging voor de AI Act roadmap'}
+                    className="inline-flex items-center gap-1 text-xs bg-pink-50 text-nhl-roze px-2 py-0.5 rounded-full font-bold border border-pink-200">
+                    ⚖️ AI Act
+                  </span>
+                )}
                   {b.intern && <span className="inline-flex items-center gap-1 text-xs bg-nhl-blauw/10 text-nhl-blauw px-2 py-0.5 rounded-full font-medium">🏛️ NHL Stenden</span>}
                 <div className="flex items-center gap-1">
                   <button onClick={() => stem(b.id, 'omhoog')}
