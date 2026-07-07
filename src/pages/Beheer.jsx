@@ -1106,6 +1106,7 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
                     const nu = new Date()
                     return d.toDateString() === nu.toDateString()
                   }).length
+                  const dezeWeek = analytics.filter(b => b.ts && (Date.now() - b.ts) < 7 * 24 * 60 * 60 * 1000).length
 
                   // Meest bezochte pagina's
                   const paginaTelling = {}
@@ -1127,7 +1128,7 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
 
                   return (
                     <div className="space-y-6">
-                      <div className="grid sm:grid-cols-3 gap-4">
+                      <div className="grid sm:grid-cols-4 gap-4">
                         <div className="bg-nhl-blauw/5 rounded-2xl p-5">
                           <div className="text-3xl font-extrabold text-nhl-blauw">{totaal}</div>
                           <div className="text-xs text-gray-500 mt-1">Totaal paginabezoeken</div>
@@ -1135,6 +1136,10 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
                         <div className="bg-green-50 rounded-2xl p-5">
                           <div className="text-3xl font-extrabold text-green-700">{vandaag}</div>
                           <div className="text-xs text-gray-500 mt-1">Vandaag</div>
+                        </div>
+                        <div className="bg-blue-50 rounded-2xl p-5">
+                          <div className="text-3xl font-extrabold text-nhl-blauw">{dezeWeek}</div>
+                          <div className="text-xs text-gray-500 mt-1">Deze week</div>
                         </div>
                         <div className="bg-amber-50 rounded-2xl p-5">
                           <div className="text-3xl font-extrabold text-amber-700">{piekUur}:00</div>
@@ -1363,6 +1368,18 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
               {
                 versie: APP_VERSIE, datum: APP_VERSIE_DATUM,
                 label: 'Huidige versie', labelKleur: 'bg-green-100 text-green-700',
+                items: [
+                  'Dashboard: het kern-ambitie dashboard staat bovenaan, Verplichtingen en roadmap eronder.',
+                  'Rapport: per koerslijn een berekende top 3 van actuele agendapunten bij de overlegstructuur, en een bijlage Actielijst met open en afgehandelde acties per kwartaal.',
+                  'Versienummer in de Footer leest nu echt uit het centrale APP_VERSIE (de tekst bleek "Versie 2.1" zonder v, daarom werd hij eerder gemist).',
+                  'Nieuws: Rijksoverheid en Npuls hebben een gegarandeerd vangnet via Google News RSS, en foutmeldingen tonen alle geprobeerde URLs.',
+                  'Activiteit: extra telling Deze week.',
+                ],
+              },
+
+              {
+                versie: 'v2.6', datum: 'Juli 2026',
+                label: null, labelKleur: '',
                 items: [
                   'Wortel van de opslagproblemen opgelost: de Blobs-bibliotheek ontbrak op de server. Activiteit, duplicaat-detectie, wijzigingen-log en backup werken hierdoor weer.',
                   'Nieuwsbronnen proberen per bron meerdere kandidaat-URLs, zodat een verhuisd adres niet direct het einde betekent.',

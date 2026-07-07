@@ -6,13 +6,13 @@ const RSS_FEEDS = [
   // dus brede feeds leveren alleen AI/onderwijs-relevante items op.
   { naam: 'Rijksoverheid', label: 'Rijksoverheid', icon: '🏛️', maxItems: 3,
     url: 'https://www.rijksoverheid.nl/rss/nieuws',
-    alternatieveUrls: ['https://www.rijksoverheid.nl/actueel/nieuws/rss', 'https://feeds.rijksoverheid.nl/nieuws.rss'] },
+    alternatieveUrls: ['https://www.rijksoverheid.nl/actueel/nieuws/rss', 'https://feeds.rijksoverheid.nl/nieuws.rss', 'https://news.google.com/rss/search?q=site%3Arijksoverheid.nl%20AI&hl=nl&gl=NL&ceid=NL%3Anl'] },
   { naam: 'SURF', label: 'SURF', icon: '🤝', maxItems: 3,
     url: 'https://www.surf.nl/nieuws/rss',
     alternatieveUrls: ['https://www.surf.nl/rss', 'https://www.surf.nl/rss.xml'] },
   { naam: 'Npuls', label: 'Npuls', icon: '📚', maxItems: 3,
     url: 'https://npuls.nl/?feed=rss2',
-    alternatieveUrls: ['https://npuls.nl/feed/', 'https://npuls.nl/nieuws/feed/'] },
+    alternatieveUrls: ['https://npuls.nl/feed/', 'https://npuls.nl/nieuws/feed/', 'https://news.google.com/rss/search?q=Npuls%20hoger%20onderwijs&hl=nl&gl=NL&ceid=NL%3Anl'] },
   { naam: 'EU en AI Act', label: 'EU en AI Act', icon: '⚖️', maxItems: 3,
     url: 'https://digital-strategy.ec.europa.eu/en/rss.xml',
     alternatieveUrls: ['https://digital-strategy.ec.europa.eu/en/news/rss.xml', 'https://ec.europa.eu/newsroom/dae/rss.cfm'] },
@@ -141,12 +141,12 @@ export default async (req) => {
     RSS_FEEDS.map(async (feed) => {
       // Probeer de kandidaat-URLs na elkaar tot er een werkt
       const urls = [feed.url, ...(feed.alternatieveUrls || [])]
-      let laatsteFout = null
+      const pogingen = []
       for (const basisUrl of urls) {
         try {
           const feedUrlMet = basisUrl + (basisUrl.includes('?') ? '&' : '?') + '_t=' + Date.now()
           const res = await fetch(feedUrlMet, {
-            headers: { 'User-Agent': 'Mozilla/5.0 (compatible; NHLStendenAINetwerk/2.6)', Accept: 'application/rss+xml, application/atom+xml, application/xml, text/xml, */*' },
+            headers: { 'User-Agent': 'Mozilla/5.0 (compatible; NHLStendenAINetwerk/2.7)', Accept: 'application/rss+xml, application/atom+xml, application/xml, text/xml, */*' },
             signal: AbortSignal.timeout(6000),
           })
           if (!res.ok) throw new Error(`HTTP ${res.status}`)
@@ -155,10 +155,10 @@ export default async (req) => {
           if (items.length === 0) throw new Error('geen items')
           return { feed, items }
         } catch (err) {
-          laatsteFout = err
+          pogingen.push(err?.message || 'fout')
         }
       }
-      throw laatsteFout || new Error('geen van de URLs werkte')
+      throw new Error(pogingen.join(' | ') || 'geen van de URLs werkte')
     })
   )
 

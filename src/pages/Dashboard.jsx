@@ -30,6 +30,8 @@ export default function Dashboard({ pilots = [], evenementen = [], roadmap = [] 
         subtitle="De voortgang van het AI-Netwerk in cijfers, gekoppeld aan de doelstellingen en de verplichtingen uit de AI Act."
       />
 
+      <ImpactDashboard pilots={pilots} initiatieven={initiatieven} evenementen={evenementen} />
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
         <div className="mb-6">
           <h2 className="text-xl font-bold text-nhl-blauw">Verplichtingen en roadmap</h2>
@@ -106,7 +108,6 @@ export default function Dashboard({ pilots = [], evenementen = [], roadmap = [] 
         )}
       </div>
 
-      <ImpactDashboard pilots={pilots} initiatieven={initiatieven} evenementen={evenementen} />
     </div>
   )
 }

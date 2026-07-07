@@ -1,3 +1,4 @@
+import { APP_VERSIE } from '../data'
 import { Link } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 
@@ -90,7 +91,7 @@ export default function Footer() {
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-1.5">
               <span className="w-2 h-2 bg-nhl-roze rounded-full pulse-soft" />
-              <span>Versie 2.1: In ontwikkeling</span>
+              <span>Versie {APP_VERSIE.replace('v', '')}</span>
             </div>
             <Link to="/beheer" className="text-blue-400 hover:text-blue-200 transition-colors flex items-center gap-1.5">
               Beheer ↗

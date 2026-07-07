@@ -223,7 +223,7 @@ export default function Rapport({ pilots: pilotsProp, inspiraties: inspiratiesPr
           )}
 
           <h3>Leeswijzer</h3>
-          <p>Hoofdstuk 2 en 3 beschrijven wat het AI-Netwerk is en waar het op steunt. Hoofdstuk 4 en 5 tonen de zes koerslijnen en de initiatieven die eronder vallen, intern en extern. Hoofdstuk 6 en 7 vormen de kern voor sturing: de verplichtingen uit de AI Act met hun signaal, en de roadmap met de berekende prognose. Hoofdstuk 8 tot en met 10 geven verdieping: pilots, governance en inzichten uit het netwerk. Lezers met weinig tijd volstaan met deze samenvatting plus hoofdstuk 6 en 7.</p>
+          <p>Hoofdstuk 2 en 3 beschrijven wat het AI-Netwerk is en waar het op steunt. Hoofdstuk 4 en 5 tonen de zes koerslijnen en de initiatieven die eronder vallen, intern en extern. Hoofdstuk 6 en 7 vormen de kern voor sturing: de verplichtingen uit de AI Act met hun signaal, en de roadmap met de berekende prognose. Hoofdstuk 8 tot en met 10 geven verdieping: pilots, governance met de actuele agendapunten per koerslijn, en inzichten uit het netwerk. De bijlage sluit af met de actielijst: open en afgehandelde acties per kwartaal. Lezers met weinig tijd volstaan met deze samenvatting, hoofdstuk 6 en 7 en de actielijst.</p>
 
           {wijzigingen.length > 0 && (
             <>
@@ -520,6 +520,27 @@ export default function Rapport({ pilots: pilotsProp, inspiraties: inspiratiesPr
             </div>
           ))}
 
+          <h3>Actuele agendapunten per koerslijn</h3>
+          <p>Berekend uit de actuele status: initiatieven die om besluitvorming vragen, verplichtingen met signaal actie nodig en lopend werk met hoge impact dat borging verdient. Maximaal drie punten per koerslijn, bedoeld als voorzet voor het maandelijkse overleg.</p>
+          {sporen.map(s => {
+            const punten = []
+            if (s.id === 3) {
+              gesorteerdeSignalen.filter(x => x.signaal.kleur === 'rood').slice(0, 2).forEach(x => punten.push(`AI Act ${x.vp.artikel}: ${x.vp.titel} (actie nodig)`))
+            }
+            alleInitiatieven.filter(i => i.spoor === s.id && (i.status === 'in-ontwikkeling' || i.status === 'verkenning')).slice(0, 3).forEach(i => punten.push(`Voortgang en besluitvorming: ${i.naam}`))
+            alleInitiatieven.filter(i => i.spoor === s.id && i.status === 'actief' && i.impactInschatting === 'hoog').slice(0, 2).forEach(i => punten.push(`Borging en opschaling: ${i.naam}`))
+            const top = punten.slice(0, 3)
+            if (top.length === 0) return null
+            return (
+              <div key={s.id} className="gov-row">
+                <div className="gov-thema" style={{background: KOERS_KLEUREN[s.id] || '#003DA5'}}>{s.icon} {s.titel}</div>
+                <div className="gov-body">
+                  {top.map((pt, i) => (<div key={i}>{i + 1}. {pt}</div>))}
+                </div>
+              </div>
+            )
+          })}
+
           <div className="info-blok">
             <div className="info-titel">🔄 Overlegstructuur</div>
             <div className="info-body">
@@ -556,6 +577,53 @@ export default function Rapport({ pilots: pilotsProp, inspiraties: inspiratiesPr
             </table>
           </div>
         )}
+
+        {/* Actielijst */}
+        <div className="section page-break">
+          <div className="chapter-label">Bijlage</div>
+          <div className="chapter-title">Actielijst</div>
+          <div className="chapter-line"></div>
+          <div className="lead">Alle acties van de roadmap op een rij: wat staat open, wie is verantwoordelijk, in welk kwartaal het is voorzien, en wat inmiddels is afgehandeld.</div>
+
+          <h3>Open acties ({rmActief.length})</h3>
+          <table>
+            <thead><tr><th style={{width:'38%'}}>Actie</th><th>AI Act</th><th>Verantwoordelijk</th><th>Kwartaal</th><th>Status</th></tr></thead>
+            <tbody>
+              {[...rmActief].sort((a, b) => (a.datum || 'zzz').localeCompare(b.datum || 'zzz')).map(r => {
+                const vp = AI_ACT_ITEMS.find(a => a.id === r.aiActKoppeling)
+                return (
+                  <tr key={r.id}>
+                    <td><strong>{r.titel}</strong></td>
+                    <td style={{whiteSpace:'nowrap'}}>{vp ? vp.artikel : 'Eigen koers'}</td>
+                    <td style={{fontSize:'8.5pt'}}>{r.verantwoordelijke || 'n.t.b.'}</td>
+                    <td style={{whiteSpace:'nowrap'}}>{r.datum || 'n.t.b.'}</td>
+                    <td><span className="badge" style={{background: statusKleur(r.status)+'22', color: statusKleur(r.status)}}>{STATUS_TEKST[r.status] || r.status}</span></td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+
+          {rmAfgerond.length > 0 ? (
+            <>
+              <h3>Afgehandeld ({rmAfgerond.length})</h3>
+              <table>
+                <thead><tr><th style={{width:'55%'}}>Actie</th><th>Verantwoordelijk</th><th>Status</th></tr></thead>
+                <tbody>
+                  {rmAfgerond.map(r => (
+                    <tr key={r.id}>
+                      <td>{r.titel}</td>
+                      <td style={{fontSize:'8.5pt'}}>{r.verantwoordelijke || ''}</td>
+                      <td><span className="badge" style={{background:'#37415122', color:'#374151'}}>Afgerond ✓</span></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </>
+          ) : (
+            <p style={{color:'#9CA3AF', fontStyle:'italic'}}>Nog geen acties afgehandeld en bevestigd door een beheerder.</p>
+          )}
+        </div>
 
         {/* Afsluiting */}
         <div className="section page-break">
