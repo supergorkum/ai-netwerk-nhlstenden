@@ -4,10 +4,18 @@ const RSS_FEEDS = [
   // Nederlandse en Europese bronnen: inhoudelijk (SURF, Npuls) en compliance (Rijksoverheid, EU/AI Act).
   // De Claude-beoordeling filtert per bericht op relevantie voor NHL Stenden,
   // dus brede feeds leveren alleen AI/onderwijs-relevante items op.
-  { naam: 'Rijksoverheid',           url: 'https://feeds.rijksoverheid.nl/nieuws.rss',                    label: 'Rijksoverheid',           icon: '🏛️', maxItems: 3 },
-  { naam: 'SURF',                    url: 'https://www.surf.nl/rss.xml',                                  label: 'SURF',                    icon: '🤝', maxItems: 3 },
-  { naam: 'Npuls',                   url: 'https://npuls.nl/feed/',                                       label: 'Npuls',                   icon: '📚', maxItems: 3 },
-  { naam: 'EU digitale strategie',   url: 'https://digital-strategy.ec.europa.eu/en/news/rss.xml',        label: 'EU digitale strategie',   icon: '⚖️', maxItems: 3 },
+  { naam: 'Rijksoverheid', label: 'Rijksoverheid', icon: '🏛️', maxItems: 3,
+    url: 'https://www.rijksoverheid.nl/rss/nieuws',
+    alternatieveUrls: ['https://www.rijksoverheid.nl/actueel/nieuws/rss', 'https://feeds.rijksoverheid.nl/nieuws.rss'] },
+  { naam: 'SURF', label: 'SURF', icon: '🤝', maxItems: 3,
+    url: 'https://www.surf.nl/nieuws/rss',
+    alternatieveUrls: ['https://www.surf.nl/rss', 'https://www.surf.nl/rss.xml'] },
+  { naam: 'Npuls', label: 'Npuls', icon: '📚', maxItems: 3,
+    url: 'https://npuls.nl/?feed=rss2',
+    alternatieveUrls: ['https://npuls.nl/feed/', 'https://npuls.nl/nieuws/feed/'] },
+  { naam: 'EU en AI Act', label: 'EU en AI Act', icon: '⚖️', maxItems: 3,
+    url: 'https://digital-strategy.ec.europa.eu/en/rss.xml',
+    alternatieveUrls: ['https://digital-strategy.ec.europa.eu/en/news/rss.xml', 'https://ec.europa.eu/newsroom/dae/rss.cfm'] },
   // Internationale AI-ontwikkelingen
   { naam: 'The Gradient',   url: 'https://thegradient.pub/rss/',              label: 'The Gradient',   icon: '📊', maxItems: 3 },
   { naam: '80,000 Hours',   url: 'https://80000hours.org/feed/',               label: '80,000 Hours',   icon: '💡', maxItems: 3 },
@@ -131,16 +139,26 @@ export default async (req) => {
 
   const feedResults = await Promise.allSettled(
     RSS_FEEDS.map(async (feed) => {
-      const feedUrlMet = feed.url + (feed.url.includes('?') ? '&' : '?') + '_t=' + Date.now()
-      const res = await fetch(feedUrlMet, {
-        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; NHLStendenAIHUB/1.3)', Accept: 'application/rss+xml, */*' },
-        signal: AbortSignal.timeout(6000),
-      })
-      if (!res.ok) throw new Error(`HTTP ${res.status}`)
-      const xml = await res.text()
-      const items = parseRSS(xml).slice(0, feed.maxItems || 3)
-      if (items.length === 0) throw new Error('geen items')
-      return { feed, items }
+      // Probeer de kandidaat-URLs na elkaar tot er een werkt
+      const urls = [feed.url, ...(feed.alternatieveUrls || [])]
+      let laatsteFout = null
+      for (const basisUrl of urls) {
+        try {
+          const feedUrlMet = basisUrl + (basisUrl.includes('?') ? '&' : '?') + '_t=' + Date.now()
+          const res = await fetch(feedUrlMet, {
+            headers: { 'User-Agent': 'Mozilla/5.0 (compatible; NHLStendenAINetwerk/2.6)', Accept: 'application/rss+xml, application/atom+xml, application/xml, text/xml, */*' },
+            signal: AbortSignal.timeout(6000),
+          })
+          if (!res.ok) throw new Error(`HTTP ${res.status}`)
+          const xml = await res.text()
+          const items = parseRSS(xml).slice(0, feed.maxItems || 3)
+          if (items.length === 0) throw new Error('geen items')
+          return { feed, items }
+        } catch (err) {
+          laatsteFout = err
+        }
+      }
+      throw laatsteFout || new Error('geen van de URLs werkte')
     })
   )
 

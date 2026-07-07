@@ -1,5 +1,6 @@
-import { useEffect } from 'react'
-import { initiatieven as alleInitiatieven, sporen, AI_ACT_ITEMS, verplichtingSignaal } from '../data'
+import { useEffect, useState } from 'react'
+import { initiatieven as alleInitiatieven, sporen, AI_ACT_ITEMS, verplichtingSignaal, APP_VERSIE } from '../data'
+import { haalWijzigingenOp } from '../storage'
 import { INIT_PILOTS, INIT_INSPIRATIES } from '../initialData'
 
 const DATUM = () => new Date().toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' })
@@ -67,6 +68,13 @@ export default function Rapport({ pilots: pilotsProp, inspiraties: inspiratiesPr
 
   useEffect(() => {
     document.title = 'AI-Netwerk NHL Stenden Rapport ' + DATUM()
+  }, [])
+
+  // Recente aanpassingen uit de wijzigingen-log, voor het blok
+  // "Gewijzigd sinds het vorige rapport" in de managementsamenvatting
+  const [wijzigingen, setWijzigingen] = useState([])
+  useEffect(() => {
+    haalWijzigingenOp().then(w => setWijzigingen((w || []).slice(0, 10))).catch(() => {})
   }, [])
 
   return (
@@ -173,11 +181,12 @@ export default function Rapport({ pilots: pilotsProp, inspiraties: inspiratiesPr
             <div className="cover-title">AI-Netwerk<br/>NHL Stenden</div>
             <div className="cover-accent"></div>
             <div className="cover-sub">
-              Voortgangsrapport van het AI-Netwerk, opgebouwd langs de zes koerslijnen van de NHL Stenden AI-Koers. Dit rapport wordt automatisch gegenereerd vanuit de live data van het platform en geeft de actuele stand van initiatieven, verplichtingen en roadmap.
+              Voortgangsrapport van het AI-Netwerk, opgebouwd langs de zes koerslijnen van de NHL Stenden AI-Koers, met de actuele stand van initiatieven, verplichtingen en roadmap.
             </div>
           </div>
           <div className="cover-meta">
             <div className="cover-meta-item"><label>Rapportdatum</label><span>{DATUM()}</span></div>
+            <div className="cover-meta-item"><label>Rapportversie</label><span>{APP_VERSIE}</span></div>
             <div className="cover-meta-item"><label>Kader</label><span>AI-Koers v0.1</span></div>
             <div className="cover-meta-item"><label>Opgesteld door</label><span>Kwartiermaker Digitale Samenhang</span></div>
             <div className="cover-meta-item"><label>Status</label><span>Actief programma</span></div>
@@ -211,6 +220,28 @@ export default function Rapport({ pilots: pilotsProp, inspiraties: inspiratiesPr
                 {urgent.length} verplichting{urgent.length !== 1 ? 'en' : ''} ({urgent.map(u => u.vp.artikel).join(', ')}) staat of staan op actie nodig: de deadline is verstreken of nadert, zonder dat er lopend werk aan gekoppeld is. Hoofdstuk 6 en 7 werken dit uit, inclusief de berekende prognose.
               </div>
             </div>
+          )}
+
+          <h3>Leeswijzer</h3>
+          <p>Hoofdstuk 2 en 3 beschrijven wat het AI-Netwerk is en waar het op steunt. Hoofdstuk 4 en 5 tonen de zes koerslijnen en de initiatieven die eronder vallen, intern en extern. Hoofdstuk 6 en 7 vormen de kern voor sturing: de verplichtingen uit de AI Act met hun signaal, en de roadmap met de berekende prognose. Hoofdstuk 8 tot en met 10 geven verdieping: pilots, governance en inzichten uit het netwerk. Lezers met weinig tijd volstaan met deze samenvatting plus hoofdstuk 6 en 7.</p>
+
+          {wijzigingen.length > 0 && (
+            <>
+              <h3>Gewijzigd sinds het vorige rapport</h3>
+              <p>De meest recente aanpassingen op het platform, zoals vastgelegd in de wijzigingen-log:</p>
+              <table>
+                <thead><tr><th>Onderdeel</th><th>Aanpassing</th><th>Moment</th></tr></thead>
+                <tbody>
+                  {wijzigingen.map((w, i) => (
+                    <tr key={i}>
+                      <td style={{whiteSpace:'nowrap'}}>{w.icon || ''} {w.onderdeel}</td>
+                      <td>{w.actie}{w.titel ? `: ${w.titel}` : ''}</td>
+                      <td style={{whiteSpace:'nowrap'}}>{w.tijd}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </>
           )}
         </div>
 
@@ -535,13 +566,13 @@ export default function Rapport({ pilots: pilotsProp, inspiraties: inspiratiesPr
 
           <p>NHL Stenden staat voor de opgave om AI betekenisvol te integreren in het onderwijs, het onderzoek en de organisatie. Dat vraagt om meer dan technologie: het vraagt om cultuur, vaardigheden, governance en vertrouwen. De AI-Koers geeft de richting, het AI-Netwerk maakt de beweging zichtbaar en verbindt de mensen die haar dragen.</p>
 
-          <p>De komende periode richt zich op het invullen van de verplichtingen met signaal actie nodig, het aanstellen van trekkers per koerslijn, het uitvoeren van de AMCE-proeftuin en het verder ontsluiten van initiatieven. Dit rapport is automatisch gegenereerd op {DATUM()} en geeft de actuele stand van zaken weer.</p>
+          <p>De komende periode richt zich op het invullen van de verplichtingen met signaal actie nodig, het aanstellen van trekkers per koerslijn, het uitvoeren van de AMCE-proeftuin en het verder ontsluiten van initiatieven.</p>
 
           <div className="afsluiting-box">
             <div style={{fontSize:'28pt',marginBottom:'14px'}}>🤖</div>
             <div style={{fontSize:'16pt',fontWeight:800,marginBottom:'6px'}}>AI-Netwerk NHL Stenden</div>
             <div style={{color:'rgba(255,255,255,0.65)',fontSize:'10pt',marginBottom:'16px'}}>ai-netwerk-nhlstenden.netlify.app</div>
-            <div style={{color:'rgba(255,255,255,0.45)',fontSize:'8.5pt'}}>Dit rapport is automatisch gegenereerd op {DATUM()} vanuit de live data van het AI-Netwerk platform van NHL Stenden Hogeschool, in lijn met de AI-Koers v0.1.</div>
+            <div style={{color:'rgba(255,255,255,0.45)',fontSize:'8.5pt'}}>Stand van zaken op {DATUM()} · rapportversie {APP_VERSIE} · in lijn met de AI-Koers v0.1.</div>
           </div>
         </div>
 
@@ -552,7 +583,7 @@ export default function Rapport({ pilots: pilotsProp, inspiraties: inspiratiesPr
             <div className="footer-sub">Transitieprogramma Digitalisering · {DATUM()}</div>
           </div>
           <div style={{textAlign:'right',color:'rgba(255,255,255,0.35)',fontSize:'7.5pt'}}>
-            Live gegenereerd vanuit platform data<br/>
+            {APP_VERSIE} · {DATUM()}<br/>
             ai-netwerk-nhlstenden.netlify.app
           </div>
         </div>

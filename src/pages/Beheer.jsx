@@ -1067,10 +1067,12 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
                   </div>
                   <div className="flex gap-2">
                     <button onClick={laadAnalytics} disabled={analyticsLaden}
+                      title="Haalt de bezoeken en aanpassingen opnieuw op uit Netlify Blobs"
                       className="text-xs px-3 py-2 rounded-xl border bg-white border-gray-200 text-nhl-blauw hover:border-nhl-blauw transition-colors font-medium">
                       {analyticsLaden ? 'Laden...' : '🔄 Vernieuwen'}
                     </button>
                     <button onClick={resetAnalytics}
+                      title="Wist alle geregistreerde bezoeken definitief. Gebruik dit alleen om opnieuw te beginnen met tellen."
                       className="text-xs px-3 py-2 rounded-xl border bg-red-50 border-red-200 text-red-500 hover:bg-red-100 transition-colors font-medium">
                       🗑 Reset teller
                     </button>
@@ -1361,6 +1363,17 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
               {
                 versie: APP_VERSIE, datum: APP_VERSIE_DATUM,
                 label: 'Huidige versie', labelKleur: 'bg-green-100 text-green-700',
+                items: [
+                  'Wortel van de opslagproblemen opgelost: de Blobs-bibliotheek ontbrak op de server. Activiteit, duplicaat-detectie, wijzigingen-log en backup werken hierdoor weer.',
+                  'Nieuwsbronnen proberen per bron meerdere kandidaat-URLs, zodat een verhuisd adres niet direct het einde betekent.',
+                  'Rapport verfijnd: leeswijzer, rapportversie en moment op het voorblad, en een blok met wijzigingen sinds het vorige rapport. Vermelding van automatische generatie verwijderd.',
+                  'Versienummer in de Footer leest voortaan uit het centrale APP_VERSIE.',
+                ],
+              },
+
+              {
+                versie: 'v2.5', datum: 'Juli 2026',
+                label: null, labelKleur: '',
                 items: [
                   'Storage-function gehard: geeft altijd geldige JSON terug en slaat elke waarde als tekst op. Daarmee is de terugkerende klasse formaat-fouten definitief afgesloten.',
                   'Duidelijke diagnose in Beheer als de opslag toch een onverwacht antwoord geeft, met statuscode en hersteltip.',
