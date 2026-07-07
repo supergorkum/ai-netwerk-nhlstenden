@@ -309,7 +309,7 @@ function AppInner() {
 
   const location = useLocation()
   if (location.pathname === '/rapport') {
-    return <Rapport pilots={pilots} inspiraties={inspiraties} />
+    return <Rapport pilots={pilots} inspiraties={inspiraties} roadmap={roadmap} />
   }
 
   if (!loggedIn) {
@@ -343,7 +343,7 @@ function AppInner() {
           <Route path="/dashboard" element={<Dashboard pilots={pilots} evenementen={evenementen} roadmap={roadmap} />} />
           <Route path="/wat-levert-het-op" element={<WatLeverHetOp />} />
           <Route path="/nvao" element={<NVAO />} />
-          <Route path="/rapport" element={<Rapport pilots={pilots} inspiraties={inspiraties} />} />
+          <Route path="/rapport" element={<Rapport pilots={pilots} inspiraties={inspiraties} roadmap={roadmap} />} />
           <Route path="/beheer" element={
             <Beheer
               berichten={berichten} setBerichten={setBerichten_}

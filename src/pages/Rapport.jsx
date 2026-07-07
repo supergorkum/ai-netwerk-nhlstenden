@@ -1,36 +1,69 @@
 import { useEffect } from 'react'
-import { initiatieven as alleInitiatieven } from '../data'
+import { initiatieven as alleInitiatieven, sporen, AI_ACT_ITEMS, verplichtingSignaal } from '../data'
 import { INIT_PILOTS, INIT_INSPIRATIES } from '../initialData'
 
 const DATUM = () => new Date().toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' })
 
-const THEMAS = [
-  { titel: 'AI & Leren', icon: 'U+1F393', kleur: '#1E3A8A', omschrijving: 'Hoe AI het leerproces van studenten verrijkt en ondersteunt, van feedback op opdrachten tot persoonlijke leerroutes.' },
-  { titel: 'AI & Werken', icon: 'U+2699', kleur: '#0F766E', omschrijving: 'AI als hulpmiddel voor medewerkers in hun dagelijkse werk: van administratie tot data-analyse en procesautomatisering.' },
-  { titel: 'AI & Verantwoordelijkheid', icon: 'U+2696', kleur: '#7C3AED', omschrijving: 'Ethiek, governance en de EU AI Act als kader voor verantwoord gebruik. NHL Stenden werkt met een risicogestuurde aanpak.' },
-  { titel: 'AI & Geletterdheid', icon: 'U+1F4D6', kleur: '#B45309', omschrijving: 'Vaardigheden en kennis voor studenten en medewerkers om AI te begrijpen, kritisch te beoordelen en verantwoord toe te passen.' },
-  { titel: 'AI & Werkveld', icon: 'U+1F3E2', kleur: '#0E7490', omschrijving: 'Samenwerking met het werkveld en regionale AI-initiatieven. NHL Stenden als motor voor AI-innovatie in Noord-Nederland.' },
-  { titel: 'AI & Onderzoek', icon: 'U+1F52C', kleur: '#BE185D', omschrijving: 'Praktijkgericht onderzoek naar AI-toepassingen in onderwijs en zorg, uitgevoerd door lectoraten en in samenwerking met externe partners.' },
-]
+// Koerslijn-kleuren uit de NHL Stenden AI-Koers v0.1
+const KOERS_KLEUREN = {
+  1: '#1A3A6B', // AI & Leren
+  2: '#1E6B5A', // AI & Werken
+  3: '#C0186A', // AI & Verantwoordelijkheid
+  4: '#6B2490', // AI & Geletterdheid
+  5: '#A84520', // AI & Werkveld
+  6: '#1B5E72', // AI & Onderzoek
+}
 
-const NVAO = [
-  { nr: 1, titel: 'Beoogde leerresultaten', vraag: 'Passen de leerdoelen nog bij een beroepspraktijk waarin AI een vanzelfsprekende rol speelt?', nhl: 'NHL Stenden integreert AI-geletterdheid actief in leerdoelen via de Minor AI in Practice en de Minor Decision Making & Generative AI. Opleidingen worden gestimuleerd om beroepsprofielen te herzien in samenspraak met werkveldpartners en sectorale adviescolleges. Het AI-GO! raamwerk van Npuls vormt hierbij de inhoudelijke basis.' },
-  { nr: 2, titel: 'Onderwijsleeromgeving', vraag: 'Is er beleid, zijn er richtlijnen en is de leeromgeving ingericht op verantwoord AI-gebruik?', nhl: 'Het Centre for Teaching and Learning (CTL) biedt docenten actieve ondersteuning via richtlijnen, professionalisering en Npuls-webinars. ARDA AI-modules zijn beschikbaar voor medewerkers en studenten. Het I-AM-AI initiatief verbindt studenten, docenten en het werkveld rondom AI. De bibliotheek heeft LibGuides ontwikkeld als praktische wegwijzer voor verantwoord AI-gebruik.' },
-  { nr: 3, titel: 'Toetsing en examinering', vraag: 'Hoe borgt NHL Stenden de kwaliteit van toetsing in een tijdperk van generatieve AI?', nhl: 'NHL Stenden heeft een expliciet en gedocumenteerd toetsbeleid voor generatieve AI, ontwikkeld door het CTL. De instelling kiest bewust voor geen AI-detector, omdat betrouwbaarheid onvoldoende is aangetoond. In plaats daarvan wordt ingezet op sterk toetsontwerp, heldere toetsinstructies en het Design Based Education (DBE) concept waarbij studenten beoordeeld worden op proces en authentieke prestatie.' },
-  { nr: 4, titel: 'Gerealiseerde leerresultaten', vraag: 'Zijn studenten aantoonbaar voorbereid op een beroepspraktijk waarin AI een rol speelt?', nhl: 'Via het FrisiusLab werken studenten aan concrete AI-vraagstukken in de zorgsector. Portfolio-beoordelingen en criteriumgerichte interviews maken leerresultaten zichtbaar op een manier die minder gevoelig is voor AI-gegenereerde eindproducten. Praktijkgericht onderzoek via lectoraten verbindt studenten aan actuele AI-ontwikkelingen in het werkveld.' },
-]
+const SIGNAAL_HEX = { rood: '#DC2626', oranje: '#EA580C', groen: '#0F766E' }
+const SIGNAAL_LABEL = { rood: 'Actie nodig', oranje: 'Aandacht', groen: 'Op koers' }
+
+const STATUS_TEKST = {
+  lopend: 'Lopend',
+  'in-ontwikkeling': 'In voorbereiding',
+  'te-starten': 'Nog te starten',
+  'te-controleren': 'Te controleren',
+  afgerond: 'Afgerond',
+}
 
 function statusKleur(s) {
-  const m = { actief: '#0F766E', 'in-ontwikkeling': '#B45309', gepland: '#1E3A8A', afgerond: '#374151', Lopend: '#0F766E', Verkenning: '#B45309', verkenning: '#B45309' }
+  const m = { actief: '#0F766E', 'in-ontwikkeling': '#B45309', verkenning: '#B45309', groeiend: '#003DA5', gepland: '#003DA5', afgerond: '#374151', lopend: '#0F766E', 'te-starten': '#B45309', 'te-controleren': '#DC2626' }
   return m[s] || '#374151'
 }
 
-export default function Rapport({ pilots: pilotsProp, inspiraties: inspiratiesProp }) {
+function typeLabel(t) {
+  return t === 'surf' ? 'SURF / Nationaal' : t === 'extern' ? 'Extern' : 'Intern'
+}
+
+export default function Rapport({ pilots: pilotsProp, inspiraties: inspiratiesProp, roadmap = [] }) {
   const pilots = pilotsProp && pilotsProp.length > 0 ? pilotsProp : INIT_PILOTS
   const inspiraties = inspiratiesProp && inspiratiesProp.length > 0 ? inspiratiesProp : INIT_INSPIRATIES
+
   const intern = alleInitiatieven.filter(i => i.type === 'intern')
   const extern = alleInitiatieven.filter(i => i.type === 'extern' || i.type === 'surf')
   const actief = alleInitiatieven.filter(i => i.status === 'actief')
+
+  // AI Act signalering, berekend met dezelfde logica als de Roadmap en het Dashboard
+  const signalen = AI_ACT_ITEMS.map(vp => ({ vp, signaal: verplichtingSignaal(vp, roadmap) }))
+  const volgorde = { rood: 0, oranje: 1, groen: 2 }
+  const gesorteerdeSignalen = [...signalen].sort((a, b) => {
+    const v = volgorde[a.signaal.kleur] - volgorde[b.signaal.kleur]
+    if (v !== 0) return v
+    return (a.vp.deadlineISO || '').localeCompare(b.vp.deadlineISO || '')
+  })
+  const telling = signalen.reduce((acc, s) => { acc[s.signaal.kleur] = (acc[s.signaal.kleur] || 0) + 1; return acc }, {})
+
+  // Roadmap-cijfers
+  const rmActief = roadmap.filter(r => r.status !== 'afgerond')
+  const rmLopend = rmActief.filter(r => r.status === 'lopend')
+  const rmVoorbereiding = rmActief.filter(r => r.status === 'in-ontwikkeling')
+  const rmTeStarten = rmActief.filter(r => r.status === 'te-starten' || r.status === 'te-controleren')
+  const rmAfgerond = roadmap.filter(r => r.status === 'afgerond')
+  const eigenKoers = rmActief.filter(r => !r.aiActKoppeling)
+
+  // Prognose, puur berekend uit de statusdata
+  const urgent = gesorteerdeSignalen.filter(s => s.signaal.kleur === 'rood')
+  const dekkingsgraad = AI_ACT_ITEMS.length > 0 ? Math.round(((telling.groen || 0) / AI_ACT_ITEMS.length) * 100) : 0
+  const uitvoeringsgraad = rmActief.length > 0 ? Math.round((rmLopend.length / rmActief.length) * 100) : 0
 
   useEffect(() => {
     document.title = 'AI-Netwerk NHL Stenden Rapport ' + DATUM()
@@ -39,13 +72,13 @@ export default function Rapport({ pilots: pilotsProp, inspiraties: inspiratiesPr
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&display=swap');
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: #f8fafc; color: #1a1a2e; }
+        body { font-family: 'Nunito Sans', sans-serif; background: #f8fafc; color: #1a1a2e; }
         .rapport { max-width: 860px; margin: 0 auto; background: white; }
         .no-print { position: fixed; top: 20px; right: 20px; z-index: 999; display: flex; gap: 10px; }
-        .btn-print { background: #1E3A8A; color: white; border: none; padding: 12px 24px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 14px; box-shadow: 0 4px 12px rgba(30,58,138,0.3); }
-        .btn-back { background: white; color: #374151; border: 1px solid #E2E8F0; padding: 12px 20px; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 14px; }
+        .btn-print { background: #003DA5; color: white; border: none; padding: 12px 24px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 14px; font-family: 'Nunito Sans', sans-serif; box-shadow: 0 4px 12px rgba(0,61,165,0.3); }
+        .btn-back { background: white; color: #374151; border: 1px solid #E2E8F0; padding: 12px 20px; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 14px; font-family: 'Nunito Sans', sans-serif; }
         @media print {
           .no-print { display: none !important; }
           .page-break { page-break-before: always; }
@@ -53,94 +86,76 @@ export default function Rapport({ pilots: pilotsProp, inspiraties: inspiratiesPr
           @page { margin: 15mm; }
         }
 
-        /* Cover */
-        .cover { background: linear-gradient(135deg, #0F1E52 0%, #1E3A8A 60%, #162D6E 100%); min-height: 100vh; display: flex; flex-direction: column; justify-content: space-between; padding: 70px 70px 50px; color: white; position: relative; overflow: hidden; page-break-after: always; }
+        .cover { background: linear-gradient(135deg, #06215C 0%, #003DA5 60%, #0A2A6E 100%); min-height: 100vh; display: flex; flex-direction: column; justify-content: space-between; padding: 70px 70px 50px; color: white; position: relative; overflow: hidden; page-break-after: always; }
         .cover::before { content: ''; position: absolute; top: -80px; right: -80px; width: 450px; height: 450px; border: 1px solid rgba(255,255,255,0.07); border-radius: 50%; }
         .cover::after { content: ''; position: absolute; bottom: -120px; left: -120px; width: 550px; height: 550px; border: 1px solid rgba(255,255,255,0.05); border-radius: 50%; }
         .cover-label { font-size: 8.5pt; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(255,255,255,0.45); margin-bottom: 40px; }
-        .cover-title { font-size: 48pt; font-weight: 900; line-height: 1.05; letter-spacing: -0.02em; margin-bottom: 6px; }
-        .cover-accent { width: 56px; height: 4px; background: #4DAAFF; border-radius: 2px; margin: 28px 0; }
-        .cover-sub { font-size: 13pt; color: rgba(255,255,255,0.72); max-width: 520px; line-height: 1.6; font-weight: 400; }
-        .cover-meta { display: flex; gap: 48px; padding-top: 40px; border-top: 1px solid rgba(255,255,255,0.12); margin-top: 60px; }
+        .cover-title { font-size: 44pt; font-weight: 900; line-height: 1.05; letter-spacing: -0.02em; margin-bottom: 6px; }
+        .cover-accent { width: 56px; height: 4px; background: #8C1D82; border-radius: 2px; margin: 28px 0; }
+        .cover-sub { font-size: 13pt; color: rgba(255,255,255,0.72); max-width: 540px; line-height: 1.6; font-weight: 400; }
+        .cover-meta { display: flex; gap: 48px; padding-top: 40px; border-top: 1px solid rgba(255,255,255,0.12); margin-top: 60px; flex-wrap: wrap; }
         .cover-meta-item label { font-size: 7pt; text-transform: uppercase; letter-spacing: 0.12em; color: rgba(255,255,255,0.35); display: block; margin-bottom: 5px; }
         .cover-meta-item span { font-size: 10pt; font-weight: 600; }
 
-        /* Pagina layout */
         .section { padding: 54px 70px; border-bottom: 1px solid #F1F5F9; }
         .section:last-child { border-bottom: none; }
-        .chapter-label { font-size: 7.5pt; font-weight: 700; text-transform: uppercase; letter-spacing: 0.18em; color: #4DAAFF; margin-bottom: 10px; }
-        .chapter-title { font-size: 24pt; font-weight: 800; color: #0F1E52; line-height: 1.15; letter-spacing: -0.01em; }
-        .chapter-line { width: 40px; height: 3px; background: linear-gradient(90deg, #1E3A8A, #4DAAFF); border-radius: 2px; margin: 18px 0 28px; }
+        .chapter-label { font-size: 7.5pt; font-weight: 700; text-transform: uppercase; letter-spacing: 0.18em; color: #8C1D82; margin-bottom: 10px; }
+        .chapter-title { font-size: 24pt; font-weight: 800; color: #06215C; line-height: 1.15; letter-spacing: -0.01em; }
+        .chapter-line { width: 40px; height: 3px; background: linear-gradient(90deg, #003DA5, #8C1D82); border-radius: 2px; margin: 18px 0 28px; }
         .lead { font-size: 12.5pt; color: #374151; line-height: 1.75; margin-bottom: 22px; font-weight: 400; }
         p { font-size: 10pt; color: #4B5563; line-height: 1.8; margin-bottom: 14px; }
         p strong { color: #1F2937; }
-        h3 { font-size: 11pt; font-weight: 700; color: #0F1E52; margin: 24px 0 10px; }
+        h3 { font-size: 11pt; font-weight: 700; color: #06215C; margin: 24px 0 10px; }
 
-        /* Statistieken */
-        .stat-row { display: flex; gap: 14px; margin: 28px 0; }
-        .stat-box { flex: 1; background: linear-gradient(135deg, #0F1E52, #1E3A8A); border-radius: 14px; padding: 22px 18px; text-align: center; color: white; }
-        .stat-num { font-size: 30pt; font-weight: 900; color: #4DAAFF; line-height: 1; margin-bottom: 6px; }
+        .stat-row { display: flex; gap: 14px; margin: 28px 0; flex-wrap: wrap; }
+        .stat-box { flex: 1; min-width: 130px; background: linear-gradient(135deg, #06215C, #003DA5); border-radius: 14px; padding: 22px 18px; text-align: center; color: white; }
+        .stat-num { font-size: 30pt; font-weight: 900; color: #7EB3FF; line-height: 1; margin-bottom: 6px; }
         .stat-lbl { font-size: 8pt; font-weight: 600; color: rgba(255,255,255,0.65); text-transform: uppercase; letter-spacing: 0.08em; }
 
-        /* Kaarten */
         .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 20px 0; }
-        .card { background: #F8FAFC; border: 1px solid #E2E8F0; border-left: 3px solid #1E3A8A; border-radius: 12px; padding: 18px 20px; }
-        .card-dark { background: #0F1E52; border: none; color: white; }
-        .card-title { font-size: 10pt; font-weight: 700; color: #0F1E52; margin-bottom: 7px; }
+        .card { background: #F8FAFC; border: 1px solid #E2E8F0; border-left: 3px solid #003DA5; border-radius: 12px; padding: 18px 20px; }
+        .card-dark { background: #06215C; border: none; color: white; }
+        .card-title { font-size: 10pt; font-weight: 700; color: #06215C; margin-bottom: 7px; }
         .card-dark .card-title { color: white; }
         .card-body { font-size: 9pt; color: #6B7280; line-height: 1.65; }
         .card-dark .card-body { color: rgba(255,255,255,0.7); }
 
-        /* Thema */
-        .thema-block { border-radius: 12px; padding: 18px 20px; margin-bottom: 12px; display: flex; gap: 18px; align-items: flex-start; }
-        .thema-titel { font-size: 11pt; font-weight: 700; margin-bottom: 5px; }
-        .thema-tekst { font-size: 9pt; color: #6B7280; line-height: 1.6; }
+        .koers-block { border-radius: 12px; padding: 18px 20px; margin-bottom: 12px; display: flex; gap: 18px; align-items: flex-start; }
+        .koers-titel { font-size: 11pt; font-weight: 800; margin-bottom: 5px; }
+        .koers-kort { font-size: 9.5pt; font-weight: 600; color: #374151; margin-bottom: 5px; }
+        .koers-tekst { font-size: 9pt; color: #6B7280; line-height: 1.6; }
 
-        /* NVAO */
-        .nvao-blok { border: 1px solid #E2E8F0; border-radius: 12px; overflow: hidden; margin-bottom: 14px; }
-        .nvao-header { background: #0F1E52; color: white; padding: 14px 20px; display: flex; align-items: center; gap: 14px; }
-        .nvao-nr { font-size: 18pt; font-weight: 900; color: #4DAAFF; flex-shrink: 0; width: 32px; }
-        .nvao-titel { font-size: 11pt; font-weight: 700; }
-        .nvao-vraag { font-size: 8.5pt; color: rgba(255,255,255,0.6); margin-top: 2px; font-style: italic; }
-        .nvao-body { padding: 16px 20px; background: white; font-size: 9.5pt; color: #374151; line-height: 1.7; }
+        .vp-blok { border: 1px solid #E2E8F0; border-radius: 12px; overflow: hidden; margin-bottom: 12px; }
+        .vp-header { padding: 12px 18px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+        .vp-body { padding: 12px 18px; background: white; font-size: 9pt; color: #4B5563; line-height: 1.65; border-top: 1px solid #F1F5F9; }
+        .vp-item { display: flex; gap: 8px; align-items: baseline; margin-bottom: 5px; }
+        .vp-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; position: relative; top: -1px; }
 
-        /* Pilots */
         .pilot-blok { border: 1px solid #E2E8F0; border-radius: 12px; margin-bottom: 14px; overflow: hidden; }
         .pilot-header { padding: 14px 20px; display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid #F1F5F9; }
-        .pilot-naam { font-size: 11pt; font-weight: 700; color: #0F1E52; }
+        .pilot-naam { font-size: 11pt; font-weight: 700; color: #06215C; }
         .pilot-body { padding: 14px 20px; }
-        .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 8pt; font-weight: 600; }
+        .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 8pt; font-weight: 600; white-space: nowrap; }
 
-        /* Netwerk */
-        .netwerk-box { background: linear-gradient(135deg, #0F1E52 0%, #1a2f6b 100%); border-radius: 16px; padding: 44px; margin: 24px 0; text-align: center; color: white; }
-        .netwerk-nodes { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin: 14px 0; }
-        .netwerk-node { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.18); border-radius: 8px; padding: 7px 14px; font-size: 8.5pt; font-weight: 600; }
-        .netwerk-center { width: 76px; height: 76px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 26pt; margin: 16px auto; box-shadow: 0 0 0 10px rgba(255,255,255,0.08), 0 0 0 22px rgba(255,255,255,0.04); }
-
-        /* Governance */
         .gov-row { display: flex; gap: 12px; margin-bottom: 10px; }
-        .gov-thema { border-radius: 8px; padding: 12px 14px; color: white; font-size: 9pt; font-weight: 600; flex: 0 0 170px; display: flex; align-items: center; }
-        .gov-body { flex: 1; background: #F8FAFC; border-radius: 8px; padding: 12px 14px; font-size: 9pt; color: #374151; border-left: 3px solid #4DAAFF; line-height: 1.6; }
+        .gov-thema { border-radius: 8px; padding: 12px 14px; color: white; font-size: 9pt; font-weight: 600; flex: 0 0 180px; display: flex; align-items: center; }
+        .gov-body { flex: 1; background: #F8FAFC; border-radius: 8px; padding: 12px 14px; font-size: 9pt; color: #374151; border-left: 3px solid #8C1D82; line-height: 1.6; }
 
-        /* Tabel */
         table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 9pt; }
-        th { background: #0F1E52; color: white; padding: 10px 14px; text-align: left; font-size: 7.5pt; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+        th { background: #06215C; color: white; padding: 10px 14px; text-align: left; font-size: 7.5pt; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
         td { padding: 10px 14px; border-bottom: 1px solid #F1F5F9; color: #374151; vertical-align: top; }
         tr:nth-child(even) td { background: #F8FAFC; }
 
-        /* Footer */
-        .rapport-footer { background: #0F1E52; color: white; padding: 32px 70px; display: flex; justify-content: space-between; align-items: center; }
+        .rapport-footer { background: #06215C; color: white; padding: 32px 70px; display: flex; justify-content: space-between; align-items: center; }
         .footer-logo { font-weight: 800; font-size: 12pt; }
         .footer-sub { color: rgba(255,255,255,0.45); font-size: 8pt; margin-top: 3px; }
 
-        /* Info blok */
         .info-blok { background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 12px; padding: 18px 20px; margin: 20px 0; }
-        .info-titel { font-size: 10pt; font-weight: 700; color: #1E3A8A; margin-bottom: 6px; }
+        .info-titel { font-size: 10pt; font-weight: 700; color: #003DA5; margin-bottom: 6px; }
         .info-body { font-size: 9pt; color: #374151; line-height: 1.65; }
-        .success-blok { background: #F0FDF4; border: 1px solid #BBF7D0; border-left: 3px solid #0F766E; border-radius: 12px; padding: 18px 20px; margin: 20px 0; }
+        .prognose-blok { background: #FDF2F8; border: 1px solid #FBCFE8; border-left: 3px solid #8C1D82; border-radius: 12px; padding: 18px 20px; margin: 20px 0; }
 
-        /* Afsluiting */
-        .afsluiting-box { background: linear-gradient(135deg, #0F1E52, #1E3A8A); color: white; border-radius: 16px; padding: 40px; text-align: center; margin: 28px 0; }
+        .afsluiting-box { background: linear-gradient(135deg, #06215C, #003DA5); color: white; border-radius: 16px; padding: 40px; text-align: center; margin: 28px 0; }
       `}</style>
 
       <div className="no-print">
@@ -158,110 +173,122 @@ export default function Rapport({ pilots: pilotsProp, inspiraties: inspiratiesPr
             <div className="cover-title">AI-Netwerk<br/>NHL Stenden</div>
             <div className="cover-accent"></div>
             <div className="cover-sub">
-              Een levend overzicht van de AI-strategie, initiatieven en governance van NHL Stenden Hogeschool. Dit rapport wordt automatisch gegenereerd vanuit de live data van het AI-Netwerk platform en geeft altijd de meest actuele stand van zaken.
+              Voortgangsrapport van het AI-Netwerk, opgebouwd langs de zes koerslijnen van de NHL Stenden AI-Koers. Dit rapport wordt automatisch gegenereerd vanuit de live data van het platform en geeft de actuele stand van initiatieven, verplichtingen en roadmap.
             </div>
           </div>
           <div className="cover-meta">
             <div className="cover-meta-item"><label>Rapportdatum</label><span>{DATUM()}</span></div>
-            <div className="cover-meta-item"><label>Versie</label><span>Live rapport</span></div>
+            <div className="cover-meta-item"><label>Kader</label><span>AI-Koers v0.1</span></div>
             <div className="cover-meta-item"><label>Opgesteld door</label><span>Kwartiermaker Digitale Samenhang</span></div>
             <div className="cover-meta-item"><label>Status</label><span>Actief programma</span></div>
           </div>
         </div>
 
-        {/* H1 */}
+        {/* H1 Managementsamenvatting */}
         <div className="section page-break">
           <div className="chapter-label">Hoofdstuk 1</div>
-          <div className="chapter-title">Wat is het AI-Netwerk?</div>
+          <div className="chapter-title">Managementsamenvatting</div>
           <div className="chapter-line"></div>
-          <div className="lead">Het AI-Netwerk is de centrale plek waar NHL Stenden alles rondom kunstmatige intelligentie samenvoegt: wat we doen, wie we zijn, en hoe we AI verantwoord inzetten.</div>
-
-          <p>Kunstmatige intelligentie verandert ingrijpend hoe we leren, werken, toetsen en samenwerken. Voor een hogeschool als NHL Stenden roept dat fundamentele vragen op: hoe bereiden we studenten voor op een beroepspraktijk die steeds meer door AI wordt bepaald? Hoe helpen we docenten en medewerkers om AI zinvol en veilig in te zetten? En hoe doen we dat op een manier die aansluit bij onze waarden en wettelijke verplichtingen?</p>
-
-          <p>Het AI-Netwerk is het antwoord van NHL Stenden op die vragen. Het is geen project met een einddatum, maar een levende organisatievorm die initiatieven, mensen en kennis rondom AI bij elkaar brengt. <strong>Het platform waarop u nu leest is de digitale weerslag van dat netwerk.</strong> Het wordt dagelijks bijgehouden en geeft altijd een actueel beeld van wat er speelt.</p>
-
-          <p>Dit rapport is bedoeld voor iedereen die meer wil weten over de AI-aanpak van NHL Stenden: vans en accreditatiepanels tot docenten, medewerkers en externe partners. We nemen u mee in de strategie, de themas, de concrete initiatieven en de governance rondom AI bij NHL Stenden.</p>
+          <div className="lead">NHL Stenden werkt langs zes koerslijnen aan een verantwoorde en betekenisvolle inzet van AI. Dit hoofdstuk vat de stand van zaken samen in cijfers en signalen.</div>
 
           <div className="stat-row">
-            <div className="stat-box"><div className="stat-num">{pilots.length}</div><div className="stat-lbl">Actieve pilots</div></div>
             <div className="stat-box"><div className="stat-num">{alleInitiatieven.length}</div><div className="stat-lbl">Initiatieven</div></div>
             <div className="stat-box"><div className="stat-num">{actief.length}</div><div className="stat-lbl">Actief lopend</div></div>
-            <div className="stat-box"><div className="stat-num">6</div><div className="stat-lbl">Themas</div></div>
+            <div className="stat-box"><div className="stat-num">{rmActief.length}</div><div className="stat-lbl">Roadmap-items open</div></div>
+            <div className="stat-box"><div className="stat-num">{telling.groen || 0}/{AI_ACT_ITEMS.length}</div><div className="stat-lbl">Verplichtingen op koers</div></div>
           </div>
 
-          <h3>Waarom een AI-Netwerk?</h3>
-          <p>Zonder structuur ontstaat versnippering. Elke academie, elke dienst, elk lectoraat werkt aan AI-vraagstukken, maar die initiatieven zijn niet altijd zichtbaar voor elkaar. Het AI-Netwerk doorbreekt die silos: het maakt zichtbaar wat er al loopt, verbindt mensen die aan vergelijkbare vraagstukken werken en helpt de instelling om richting te geven aan AI-ontwikkeling als geheel.</p>
+          <p>
+            Het AI-Netwerk verbindt op dit moment <strong>{intern.length} interne initiatieven</strong> en <strong>{extern.length} externe of nationale samenwerkingen</strong>, verdeeld over de zes koerslijnen van de AI-Koers.
+            Van de <strong>{AI_ACT_ITEMS.length} verplichtingen uit de EU AI Act</strong> staan er {telling.groen || 0} op koers, vragen er {telling.oranje || 0} aandacht en vereisen er {telling.rood || 0} directe actie.
+            Op de roadmap staan {rmActief.length} openstaande items: {rmLopend.length} lopend, {rmVoorbereiding.length} in voorbereiding en {rmTeStarten.length} nog te starten. Daarnaast zijn {rmAfgerond.length} items afgerond en bevestigd.
+          </p>
 
-          <div className="card-grid">
-            <div className="card"><div className="card-title">🎯 Overzicht en richting</div><div className="card-body">Alle AI-initiatieven, kennis, pilots en mensen bij NHL Stenden samenbrengen op een plek, toegankelijk voor iedereen die betrokken is bij of geinteresseerd is in AI.</div></div>
-            <div className="card"><div className="card-title">🔗 Verbinding en samenwerking</div><div className="card-body">Silos doorbreken door initiatieven van verschillende academies, diensten en externe partners aan elkaar te verbinden. Kennis delen, leren van elkaar.</div></div>
-            <div className="card"><div className="card-title">⚖️ Verantwoord en zorgvuldig</div><div className="card-body">AI wordt ingezet met aandacht voor ethiek, privacy, de EU AI Act en de menselijke maat. NHL Stenden kiest voor een risicogestuurde aanpak.</div></div>
-            <div className="card"><div className="card-title">📋 Transparantie en verantwoording</div><div className="card-body">Het platform dient als levende bewijslast voor accreditatie, bestuurlijke verantwoording en externe communicatie over de AI-aanpak van NHL Stenden.</div></div>
-          </div>
+          {urgent.length > 0 && (
+            <div className="prognose-blok">
+              <div style={{fontWeight:700, color:'#8C1D82', marginBottom:'8px'}}>Signaal voor de stuurgroep</div>
+              <div style={{fontSize:'9.5pt', color:'#374151', lineHeight:'1.7'}}>
+                {urgent.length} verplichting{urgent.length !== 1 ? 'en' : ''} ({urgent.map(u => u.vp.artikel).join(', ')}) staat of staan op actie nodig: de deadline is verstreken of nadert, zonder dat er lopend werk aan gekoppeld is. Hoofdstuk 6 en 7 werken dit uit, inclusief de berekende prognose.
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* H2 */}
+        {/* H2 Wat is het AI-Netwerk */}
         <div className="section page-break">
           <div className="chapter-label">Hoofdstuk 2</div>
-          <div className="chapter-title">Het fundament</div>
+          <div className="chapter-title">Wat is het AI-Netwerk?</div>
           <div className="chapter-line"></div>
-          <div className="lead">Het AI-Netwerk staat niet op zichzelf. Het is geworteld in een helder bestuurlijk kader, verbonden aan nationale en regionale netwerken en ingekaderd door wet- en regelgeving.</div>
+          <div className="lead">Het AI-Netwerk is de plek waar NHL Stenden overzicht en samenhang brengt in alles rondom kunstmatige intelligentie: wat er loopt, wie erbij betrokken is en hoe het zich verhoudt tot de koers en de wetgeving.</div>
 
-          <h3>Bestuurlijk kader</h3>
-          <p>Het AI-Netwerk is een initiatief van het Transitieprogramma Digitalisering van NHL Stenden. De Stuurgroep Digitalisering vormt het bestuurlijke dak. De Kwartiermaker Digitale Samenhang is aangesteld om samenhang te brengen in de digitale vraagstukken die de instelling raken, waaronder AI. Het CvB heeft in 2026 de opdracht bevestigd om een samenhangende AI-netwerkorganisatie te vormen met duidelijke speerpunten.</p>
+          <p>Kunstmatige intelligentie verandert hoe studenten leren, hoe docenten begeleiden en hoe medewerkers werken. Echte digitale verandering begint daarbij niet bij technologie maar bij mensen: bij de mate waarin zij begrijpen wat AI voor hen betekent en zich daar zeker en vaardig in voelen. Het AI-Netwerk ondersteunt die beweging door zichtbaar te maken wat er speelt, mensen met elkaar te verbinden en richting te geven.</p>
 
-          <h3>Wettelijk en normatief kader</h3>
-          <p>NHL Stenden werkt binnen de kaders van de Algemene Verordening Gegevensbescherming (AVG) en de Europese AI Act. De AI Act verplicht organisaties om AI-toepassingen te classificeren naar risiconiveau en passende maatregelen te treffen. NHL Stenden heeft een risicogestuurde aanpak ingericht: alle nieuwe AI-toepassingen worden gevalideerd via een interne AI-risicoscan. Hoog-risico toepassingen, zoals AI-systemen die leerresultaten of toegang tot onderwijs beinvloeden, vallen onder strenge voorwaarden.</p>
-
-          <h3>Nationaal netwerk</h3>
-          <p>NHL Stenden is actief betrokken bij nationale platforms en programmas. Via <strong>SURF</strong> participeert de hogeschool in de AI-Hub en Denktank, en wordt toegang geboden tot veilige en AVG-conforme AI-infrastructuur inclusief GPT-NL. Via <strong>NPULS</strong> wordt gewerkt aan AI-geletterdheid, toetsing en docentprofessionalisering. De Vereniging Hogescholen fungeert als platform voor landelijke afstemming over beroepsprofielen en curricula.</p>
-
-          <h3>Regionaal netwerk</h3>
-          <p>In Noord-Nederland werkt NHL Stenden samen met Frisius MC, Firda en andere partners aan een gezamenlijke Friese AI-propositie. Het FrisiusLab is een concreet samenwerkingsverband waarin onderwijs, zorg en onderzoek samenkomen rondom AI-toepassingen in de zorgpraktijk. De AI Fryslaan-coalitie en verbindingen met de RUG geven verdere regionale verankering.</p>
+          <p><strong>Het AI-Netwerk is een verbinder, geen inhoudelijke eigenaar.</strong> De inhoudelijke kaders liggen bij de vakeigenaren: het Centre for Teaching and Learning voor toetsing en didactiek, OO&I voor onderwijs, onderzoek en data. Het AI-Netwerk vat hun werk kort samen en verwijst expliciet door naar de oorspronkelijke bron. Zo ontstaat overzicht zonder een tweede, mogelijk conflicterende regelbron.</p>
 
           <div className="card-grid">
-            <div className="card"><div className="card-title">🏛️ Bestuurlijk kader</div><div className="card-body">Transitieprogramma Digitalisering · Stuurgroep Digitalisering · CvB-opdracht · Kwartiermaker Digitale Samenhang</div></div>
-            <div className="card"><div className="card-title">⚖️ Wettelijk kader</div><div className="card-body">AVG · EU AI Act · BKO-standaarden · AI-risicoscan voor alle nieuwe toepassingen · NVAO-kaders</div></div>
-            <div className="card"><div className="card-title">🤝 Nationaal netwerk</div><div className="card-body">SURF AI-Hub · GPT-NL · NPULS · Vereniging Hogescholen · Nationaal richtlijnen en kaders</div></div>
-            <div className="card"><div className="card-title">🌍 Regionaal netwerk</div><div className="card-body">FrisiusLab · Frisius MC · Firda · AI Fryslaan-coalitie · RUG · Regionale AI-propositie</div></div>
+            <div className="card"><div className="card-title">🎯 Overzicht en richting</div><div className="card-body">Alle AI-initiatieven, kennis, pilots en mensen bij NHL Stenden samengebracht op een plek, geordend langs de zes koerslijnen van de AI-Koers.</div></div>
+            <div className="card"><div className="card-title">🔗 Verbinding en samenwerking</div><div className="card-body">Silo's doorbreken door initiatieven van academies, diensten en externe partners aan elkaar te verbinden. Kennis delen en van elkaar leren.</div></div>
+            <div className="card"><div className="card-title">⚖️ Verantwoord en zorgvuldig</div><div className="card-body">De verplichtingen uit de EU AI Act vormen het vertrekpunt van de roadmap. Per verplichting is zichtbaar wat er loopt en wie ermee bezig is.</div></div>
+            <div className="card"><div className="card-title">📋 Transparantie en verantwoording</div><div className="card-body">Het platform dient als levende bewijslast voor bestuurlijke verantwoording en externe communicatie over de AI-aanpak van NHL Stenden.</div></div>
           </div>
         </div>
 
-        {/* H3 */}
+        {/* H3 Fundament */}
         <div className="section page-break">
           <div className="chapter-label">Hoofdstuk 3</div>
-          <div className="chapter-title">De zes themas</div>
+          <div className="chapter-title">Het fundament</div>
           <div className="chapter-line"></div>
-          <div className="lead">Het AI-Netwerk is georganiseerd rondom zes themas die samen het volledige spectrum van AI bij NHL Stenden omvatten. Elk thema heeft een eigen trekker, eigen initiatieven en een eigen plek in de netwerkorganisatie.</div>
+          <div className="lead">Het AI-Netwerk staat niet op zichzelf. Het is geworteld in de AI-Koers, verbonden aan nationale en regionale netwerken en ingekaderd door wet- en regelgeving.</div>
 
-          <p>De keuze voor zes themas is niet willekeurig. Samen bestrijken ze de volle breedte van de uitdaging: van het leerproces van studenten tot de bedrijfsvoering van de instelling, van ethische vragen tot praktijkgericht onderzoek. De themas zijn niet los van elkaar: ze raken elkaar voortdurend en versterken elkaar. Een docent die werkt aan AI-geletterdheid (thema 4) draagt ook bij aan betere toetsing (thema 3 in de NVAO-context) en bereidt studenten voor op het werkveld (thema 5).</p>
+          <h3>Bestuurlijk kader</h3>
+          <p>Het AI-Netwerk is een initiatief van het Transitieprogramma Digitalisering van NHL Stenden. De Stuurgroep Digitalisering vormt het bestuurlijke dak. De Kwartiermaker Digitale Samenhang brengt samenhang in de digitale vraagstukken die de instelling raken, waaronder AI. De NHL Stenden AI-Koers v0.1 vormt het inhoudelijke kader: drie kernovertuigingen en zes koerslijnen die richting geven aan alle AI-activiteiten.</p>
 
-          {THEMAS.map(t => (
-            <div key={t.titel} className="thema-block" style={{background: t.kleur + '10', borderLeft: '3px solid ' + t.kleur}}>
-              <div style={{width:'40px',height:'40px',background:t.kleur,borderRadius:'10px',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'16pt',flexShrink:0}}>
-                {t.titel === 'AI & Leren' ? '🎓' : t.titel === 'AI & Werken' ? '⚙️' : t.titel === 'AI & Verantwoordelijkheid' ? '⚖️' : t.titel === 'AI & Geletterdheid' ? '📖' : t.titel === 'AI & Werkveld' ? '🏢' : '🔬'}
+          <h3>Wettelijk en normatief kader</h3>
+          <p>NHL Stenden werkt binnen de kaders van de Algemene Verordening Gegevensbescherming en de EU AI Act. De AI Act verplicht organisaties om AI-toepassingen te classificeren naar risiconiveau en passende maatregelen te treffen. NHL Stenden hanteert een risicogestuurde aanpak: nieuwe AI-toepassingen worden gevalideerd via een interne AI-risicoscan, en de verplichtingen uit de AI Act zijn het vertrekpunt van de roadmap in dit rapport.</p>
+
+          <h3>Nationaal en regionaal netwerk</h3>
+          <p>Via <strong>SURF</strong> participeert NHL Stenden in de AI-Hub en Denktank en heeft de hogeschool toegang tot veilige, AVG-conforme infrastructuur inclusief GPT-NL. Via <strong>Npuls</strong> wordt gewerkt aan AI-geletterdheid en docentprofessionalisering. Regionaal werkt NHL Stenden samen met Frisius MC, Firda en de RUG aan een Friese AI-propositie, en sluit de instelling aan bij Programma Bach voor digitale autonomie en soevereiniteit.</p>
+
+          <div className="card-grid">
+            <div className="card"><div className="card-title">🏛️ Bestuurlijk kader</div><div className="card-body">Transitieprogramma Digitalisering · Stuurgroep Digitalisering · AI-Koers v0.1 · Kwartiermaker Digitale Samenhang</div></div>
+            <div className="card"><div className="card-title">⚖️ Wettelijk kader</div><div className="card-body">AVG · EU AI Act · AI-risicoscan voor nieuwe toepassingen · risicogestuurde aanpak</div></div>
+            <div className="card"><div className="card-title">🤝 Nationaal netwerk</div><div className="card-body">SURF AI-Hub · GPT-NL · Npuls · Vereniging Hogescholen</div></div>
+            <div className="card"><div className="card-title">🌍 Regionaal netwerk</div><div className="card-body">Frisius MC · Firda · RUG · Friese AI-propositie · Programma Bach · AI-Fabriek Groningen</div></div>
+          </div>
+        </div>
+
+        {/* H4 De zes koerslijnen */}
+        <div className="section page-break">
+          <div className="chapter-label">Hoofdstuk 4</div>
+          <div className="chapter-title">De zes koerslijnen</div>
+          <div className="chapter-line"></div>
+          <div className="lead">De AI-Koers ordent alle AI-activiteiten langs zes koerslijnen. Samen bestrijken ze de volle breedte: van het leerproces van studenten tot governance, van geletterdheid tot praktijkgericht onderzoek.</div>
+
+          {sporen.map(s => (
+            <div key={s.id} className="koers-block" style={{background: (KOERS_KLEUREN[s.id] || '#003DA5') + '0D', borderLeft: '3px solid ' + (KOERS_KLEUREN[s.id] || '#003DA5')}}>
+              <div style={{width:'40px',height:'40px',background:(KOERS_KLEUREN[s.id] || '#003DA5'),borderRadius:'10px',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'16pt',flexShrink:0}}>
+                {s.icon}
               </div>
               <div>
-                <div className="thema-titel" style={{color: t.kleur}}>{t.titel}</div>
-                <div className="thema-tekst">{t.omschrijving}</div>
+                <div className="koers-titel" style={{color: KOERS_KLEUREN[s.id] || '#003DA5'}}>{s.titel}</div>
+                <div className="koers-kort">{s.kort}</div>
+                <div className="koers-tekst">{s.waarom}</div>
               </div>
             </div>
           ))}
 
           <div className="info-blok" style={{marginTop:'24px'}}>
-            <div className="info-titel">Groeiend netwerk</div>
-            <div className="info-body">Per thema worden trekkers aangesteld die het thema actief voeden, vertegenwoordigen en in verbinding brengen met de rest van de organisatie. De themas zijn nu in opbouw. Naarmate het netwerk groeit, worden de trekkers en hun contactgegevens toegevoegd aan het AI-Netwerk platform.</div>
+            <div className="info-titel">Bron en verdieping</div>
+            <div className="info-body">De volledige uitwerking van de koerslijnen, inclusief kernambities en bronverwijzingen naar CTL en OO&I, staat op het AI-Netwerk platform onder <strong>ai-netwerk-nhlstenden.netlify.app/themas</strong>.</div>
           </div>
         </div>
 
-        {/* H4 Initiatieven */}
+        {/* H5 Initiatieven per koerslijn */}
         <div className="section page-break">
-          <div className="chapter-label">Hoofdstuk 4</div>
-          <div className="chapter-title">Initiatieven</div>
+          <div className="chapter-label">Hoofdstuk 5</div>
+          <div className="chapter-title">Initiatieven per koerslijn</div>
           <div className="chapter-line"></div>
-          <div className="lead">NHL Stenden heeft een rijk palet aan AI-initiatieven, zowel intern als in samenwerking met externe partners. Onderstaand overzicht geeft een beeld van de breedte en variatie van wat er bij NHL Stenden rondom AI loopt.</div>
-
-          <p>De initiatieven variëren van strategische programmas op instellingsniveau tot concrete projecten binnen academies en diensten. Sommige zijn al actief en leveren resultaten op; andere zijn in ontwikkeling of verkenning. Het onderscheid tussen intern (NHL Stenden-eigen) en extern (in samenwerking met of via externe partners) is van belang voor de governance: externe initiatieven vragen om goede afspraken over eigenaarschap, AVG-compliance en verwerkersverantwoordelijkheid.</p>
+          <div className="lead">Wat doet NHL Stenden concreet? Dit hoofdstuk ordent alle initiatieven, intern en extern, onder de koerslijn waar ze aan bijdragen. Zo wordt zichtbaar waar de energie zit en waar ruimte is.</div>
 
           <div className="stat-row">
             <div className="stat-box"><div className="stat-num">{intern.length}</div><div className="stat-lbl">Intern NHL Stenden</div></div>
@@ -270,49 +297,148 @@ export default function Rapport({ pilots: pilotsProp, inspiraties: inspiratiesPr
             <div className="stat-box"><div className="stat-num">{alleInitiatieven.filter(i => i.status === 'in-ontwikkeling' || i.status === 'verkenning').length}</div><div className="stat-lbl">In ontwikkeling</div></div>
           </div>
 
-          <h3>Interne initiatieven</h3>
-          <p>De interne initiatieven laten zien dat AI bij NHL Stenden breed gedragen wordt: van de AI Compliance Groep die governance borgt, tot academies die AI integreren in hun curriculum, tot diensten als FCP die AI inzetten voor datagedreven bedrijfsvoering.</p>
+          {sporen.map(s => {
+            const items = alleInitiatieven.filter(i => i.spoor === s.id)
+            if (items.length === 0) return null
+            return (
+              <div key={s.id} style={{marginBottom:'28px'}}>
+                <h3 style={{color: KOERS_KLEUREN[s.id] || '#003DA5', display:'flex', alignItems:'center', gap:'8px'}}>
+                  <span style={{display:'inline-block', width:'12px', height:'12px', borderRadius:'3px', background: KOERS_KLEUREN[s.id] || '#003DA5'}}></span>
+                  {s.icon} {s.titel} ({items.length})
+                </h3>
+                <table>
+                  <thead><tr><th style={{width:'55%'}}>Initiatief</th><th>Type</th><th>Status</th></tr></thead>
+                  <tbody>
+                    {items.map(i => (
+                      <tr key={i.id}>
+                        <td><strong>{i.naam}</strong><br/><span style={{color:'#9CA3AF',fontSize:'8pt'}}>{(i.omschrijving||'').slice(0,90)}{i.omschrijving && i.omschrijving.length > 90 ? '...' : ''}</span></td>
+                        <td><span className="badge" style={{background: i.type==='surf'?'#EDE9FE':i.type==='extern'?'#F0FDF4':'#EFF6FF', color: i.type==='surf'?'#6B2490':i.type==='extern'?'#065F46':'#003DA5'}}>{typeLabel(i.type)}</span></td>
+                        <td><span className="badge" style={{background: statusKleur(i.status)+'22', color: statusKleur(i.status)}}>{i.status}</span></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )
+          })}
 
-          <table>
-            <thead><tr><th>Initiatief</th><th>Status</th><th>Impact</th></tr></thead>
-            <tbody>
-              {intern.map(i => (
-                <tr key={i.id}>
-                  <td><strong>{i.naam}</strong><br/><span style={{color:'#9CA3AF',fontSize:'8pt'}}>{(i.omschrijving||'').slice(0,90)}{i.omschrijving && i.omschrijving.length > 90 ? '...' : ''}</span></td>
-                  <td><span className="badge" style={{background: statusKleur(i.status)+'22', color: statusKleur(i.status)}}>{i.status}</span></td>
-                  <td style={{color:'#6B7280',fontSize:'9pt'}}>{i.impactInschatting||'n.v.t.'}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-
-          <h3>Externe initiatieven en samenwerkingen</h3>
-          <p>Naast interne ontwikkelingen werkt NHL Stenden actief samen met externe partners. Via SURF wordt toegang geboden tot veilige AI-infrastructuur. Via de Friese AI-propositie wordt samengewerkt aan regionale AI-toepassingen in zorg, onderwijs en industrie. Programma Bach positioneert het noorden van Nederland als motor voor digitale soevereiniteit.</p>
-
-          <table>
-            <thead><tr><th>Initiatief</th><th>Type</th><th>Status</th></tr></thead>
-            <tbody>
-              {extern.map(i => (
-                <tr key={i.id}>
-                  <td><strong>{i.naam}</strong><br/><span style={{color:'#9CA3AF',fontSize:'8pt'}}>{(i.omschrijving||'').slice(0,90)}{i.omschrijving && i.omschrijving.length > 90 ? '...' : ''}</span></td>
-                  <td><span className="badge" style={{background: i.type==='surf'?'#EDE9FE':'#F0FDF4', color: i.type==='surf'?'#7C3AED':'#065F46'}}>{i.type}</span></td>
-                  <td><span className="badge" style={{background: statusKleur(i.status)+'22', color: statusKleur(i.status)}}>{i.status}</span></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          {alleInitiatieven.filter(i => !i.spoor).length > 0 && (
+            <div style={{marginBottom:'28px'}}>
+              <h3>Instellingsbreed, zonder specifieke koerslijn</h3>
+              <table>
+                <thead><tr><th style={{width:'55%'}}>Initiatief</th><th>Type</th><th>Status</th></tr></thead>
+                <tbody>
+                  {alleInitiatieven.filter(i => !i.spoor).map(i => (
+                    <tr key={i.id}>
+                      <td><strong>{i.naam}</strong><br/><span style={{color:'#9CA3AF',fontSize:'8pt'}}>{(i.omschrijving||'').slice(0,90)}{i.omschrijving && i.omschrijving.length > 90 ? '...' : ''}</span></td>
+                      <td><span className="badge" style={{background: i.type==='surf'?'#EDE9FE':i.type==='extern'?'#F0FDF4':'#EFF6FF', color: i.type==='surf'?'#6B2490':i.type==='extern'?'#065F46':'#003DA5'}}>{typeLabel(i.type)}</span></td>
+                      <td><span className="badge" style={{background: statusKleur(i.status)+'22', color: statusKleur(i.status)}}>{i.status}</span></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
 
-        {/* H5 Pilots */}
+        {/* H6 AI Act verplichtingen */}
         <div className="section page-break">
-          <div className="chapter-label">Hoofdstuk 5</div>
+          <div className="chapter-label">Hoofdstuk 6</div>
+          <div className="chapter-title">Verplichtingen uit de AI Act</div>
+          <div className="chapter-line"></div>
+          <div className="lead">De EU AI Act is het vertrekpunt van de roadmap. Per verplichting is berekend of NHL Stenden op koers ligt, op basis van de deadline en het gekoppelde werk.</div>
+
+          <p>
+            Het signaal per verplichting volgt dezelfde rekenregels als op het platform: <strong style={{color:SIGNAAL_HEX.groen}}>op koers</strong> betekent dat er werk loopt of is afgerond,
+            <strong style={{color:SIGNAAL_HEX.oranje}}> aandacht</strong> betekent dat er wel werk gekoppeld is maar de uitvoering nog niet is gestart,
+            en <strong style={{color:SIGNAAL_HEX.rood}}> actie nodig</strong> betekent dat de deadline is verstreken of binnen drie maanden valt zonder lopend werk.
+          </p>
+
+          {gesorteerdeSignalen.map(({ vp, signaal }) => {
+            const hex = SIGNAAL_HEX[signaal.kleur]
+            const items = roadmap.filter(r => r.aiActKoppeling === vp.id)
+            return (
+              <div key={vp.id} className="vp-blok" style={{borderLeft: '3px solid ' + hex}}>
+                <div className="vp-header" style={{background: hex + '0D'}}>
+                  <div>
+                    <div style={{fontSize:'8pt', fontWeight:700, color:'#6B7280'}}>{vp.artikel} · deadline {vp.deadline}</div>
+                    <div style={{fontSize:'10.5pt', fontWeight:700, color:'#06215C'}}>{vp.titel}</div>
+                    <div style={{fontSize:'8.5pt', color:hex, fontWeight:600, marginTop:'2px'}}>{signaal.tekst}</div>
+                  </div>
+                  <span className="badge" style={{background: hex + '22', color: hex}}>{SIGNAAL_LABEL[signaal.kleur]}</span>
+                </div>
+                {items.length > 0 && (
+                  <div className="vp-body">
+                    {items.map(r => (
+                      <div key={r.id} className="vp-item">
+                        <span className="vp-dot" style={{background: statusKleur(r.status)}}></span>
+                        <span><strong>{r.titel}</strong> · {STATUS_TEKST[r.status] || r.status}{r.verantwoordelijke ? ` · ${r.verantwoordelijke}` : ''}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )
+          })}
+        </div>
+
+        {/* H7 Roadmap en prognose */}
+        <div className="section page-break">
+          <div className="chapter-label">Hoofdstuk 7</div>
+          <div className="chapter-title">Roadmap en prognose</div>
+          <div className="chapter-line"></div>
+          <div className="lead">De roadmap vertaalt de verplichtingen en de eigen ambities naar concreet werk. De prognose hieronder is volledig berekend uit de actuele statusdata, zonder aannames.</div>
+
+          <div className="stat-row">
+            <div className="stat-box"><div className="stat-num">{rmLopend.length}</div><div className="stat-lbl">Lopend</div></div>
+            <div className="stat-box"><div className="stat-num">{rmVoorbereiding.length}</div><div className="stat-lbl">In voorbereiding</div></div>
+            <div className="stat-box"><div className="stat-num">{rmTeStarten.length}</div><div className="stat-lbl">Nog te starten</div></div>
+            <div className="stat-box"><div className="stat-num">{rmAfgerond.length}</div><div className="stat-lbl">Afgerond</div></div>
+          </div>
+
+          <h3>Berekende prognose</h3>
+          <div className="prognose-blok">
+            <div style={{fontSize:'9.5pt', color:'#374151', lineHeight:'1.8'}}>
+              <strong>Dekkingsgraad AI Act:</strong> {dekkingsgraad}% van de verplichtingen heeft lopend of afgerond werk ({telling.groen || 0} van {AI_ACT_ITEMS.length}).<br/>
+              <strong>Uitvoeringsgraad roadmap:</strong> {uitvoeringsgraad}% van de openstaande items is daadwerkelijk in uitvoering ({rmLopend.length} van {rmActief.length}).<br/>
+              <strong>Vooruitzicht:</strong> {telling.rood > 0
+                ? `bij ongewijzigd tempo worden ${telling.rood} verplichting${telling.rood !== 1 ? 'en' : ''} (${urgent.map(u => u.vp.artikel).join(', ')}) niet aantoonbaar ingevuld voor de deadline. Het starten van de gekoppelde items, of het koppelen en starten van nieuw werk, is daarvoor de bepalende stap.`
+                : telling.oranje > 0
+                ? `de verplichtingen met signaal aandacht hebben werk gekoppeld dat nog moet starten. Zodra dat werk start, kleuren deze verplichtingen groen.`
+                : `alle verplichtingen hebben lopend of afgerond werk. De inzet verschuift naar het aantoonbaar afronden en documenteren.`}
+            </div>
+          </div>
+
+          <p style={{fontSize:'8.5pt', color:'#9CA3AF'}}>Deze prognose is een rekenkundige weergave van de statusdata op {DATUM()} en bevat geen inhoudelijke beoordeling. De duiding en prioritering zijn aan het kernteam en de stuurgroep.</p>
+
+          {eigenKoers.length > 0 && (
+            <>
+              <h3>Eigen koers</h3>
+              <p>Naast de verplichtingen kiest NHL Stenden ook eigen speerpunten. De volgende roadmap-items komen niet voort uit een AI Act verplichting maar uit de eigen ambities van de instelling.</p>
+              <table>
+                <thead><tr><th style={{width:'55%'}}>Item</th><th>Status</th><th>Verantwoordelijk</th></tr></thead>
+                <tbody>
+                  {eigenKoers.map(r => (
+                    <tr key={r.id}>
+                      <td><strong>{r.titel}</strong></td>
+                      <td><span className="badge" style={{background: statusKleur(r.status)+'22', color: statusKleur(r.status)}}>{STATUS_TEKST[r.status] || r.status}</span></td>
+                      <td style={{fontSize:'8.5pt'}}>{r.verantwoordelijke || 'n.t.b.'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </>
+          )}
+        </div>
+
+        {/* H8 Pilots */}
+        <div className="section page-break">
+          <div className="chapter-label">Hoofdstuk 8</div>
           <div className="chapter-title">Pilots</div>
           <div className="chapter-line"></div>
-          <div className="lead">Pilots zijn concrete experimenten waarbij AI wordt ingezet in een afgebakende context. Ze leveren directe leerervaring op, maken duidelijk wat werkt en wat niet, en vormen de basis voor bredere implementatie.</div>
+          <div className="lead">Pilots zijn concrete experimenten waarbij AI wordt ingezet in een afgebakende context. Ze leveren directe leerervaring op en vormen de basis voor bredere implementatie.</div>
 
-          <p>NHL Stenden kiest bewust voor een experimenterende aanpak: liever klein beginnen en leren, dan grote systemen uitrollen zonder bewijs. Elke pilot heeft een duidelijk doel, een verantwoordelijk team en een verwacht resultaat. Na afronding worden de leerpunten gedeeld met het bredere netwerk zodat andere academies en diensten ervan kunnen profiteren.</p>
-
-          <p>Alle pilots voldoen aan de geldende privacy- en AVG-kaders. Waar nodig is een DPIA uitgevoerd en zijn verwerkersovereenkomsten afgesloten. NHL Stenden kiest voor de rol van gebruiker (niet aanbieder) van AI-systemen, waardoor een Regulatory Sandbox-aanvraag in de meeste gevallen niet noodzakelijk is.</p>
+          <p>NHL Stenden kiest bewust voor een experimenterende aanpak: liever klein beginnen en leren, dan grote systemen uitrollen zonder bewijs. Elke pilot heeft een duidelijk doel, een verantwoordelijk team en een verwacht resultaat. Na afronding worden de leerpunten gedeeld met het bredere netwerk.</p>
 
           {pilots.length > 0 ? pilots.map(p => (
             <div key={p.id} className="pilot-blok">
@@ -326,77 +452,21 @@ export default function Rapport({ pilots: pilotsProp, inspiraties: inspiratiesPr
               <div className="pilot-body">
                 <p style={{marginBottom:'8px'}}><strong>Doel:</strong> {p.doel}</p>
                 {p.bereiken && <p style={{marginBottom:'8px'}}><strong>Beoogd resultaat:</strong> {p.bereiken}</p>}
-                {p.bronLabel && <div style={{fontSize:'8pt',color:'#1E3A8A',marginTop:'6px'}}>🔗 Meer informatie: {p.bronLabel}</div>}
+                {p.bronLabel && <div style={{fontSize:'8pt',color:'#003DA5',marginTop:'6px'}}>🔗 Meer informatie: {p.bronLabel}</div>}
               </div>
             </div>
           )) : <p style={{color:'#9CA3AF',fontStyle:'italic'}}>Op dit moment zijn nog geen pilots geregistreerd in het systeem.</p>}
         </div>
 
-        {/* H6 NVAO */}
+        {/* H9 Governance */}
         <div className="section page-break">
-          <div className="chapter-label">Hoofdstuk 6</div>
-          <div className="chapter-title">NHL Stenden en de NVAO</div>
-          <div className="chapter-line"></div>
-          <div className="lead">De NVAO vraagt van instellingen een integrale, aantoonbare aanpak van generatieve AI langs alle vier accreditatiestandaarden. NHL Stenden neemt die vraag serieus en loopt daarin voorop.</div>
-
-          <p>In januari 2026 publiceerde de NVAO de Startverkenning Generatieve AI, een analyse van 509 opleidingsbeoordelingen. De conclusie is helder: de meeste instellingen richten zich te sterk op toetsing en fraudepreventie, en te weinig op een integrale benadering. Panels adviseren een breder perspectief: AI moet langs alle vier accreditatiestandaarden worden bezien.</p>
-
-          <p>NHL Stenden onderschrijft dit standpunt en heeft de vier standaarden als uitgangspunt genomen voor de inrichting van het AI-beleid en de AI-netwerkorganisatie. Hieronder leest u per standaard wat de NVAO vraagt en hoe NHL Stenden daar concreet invulling aan geeft.</p>
-
-          {NVAO.map(s => (
-            <div key={s.nr} className="nvao-blok">
-              <div className="nvao-header">
-                <div className="nvao-nr">{s.nr}</div>
-                <div>
-                  <div className="nvao-titel">{s.titel}</div>
-                  <div className="nvao-vraag">{s.vraag}</div>
-                </div>
-              </div>
-              <div className="nvao-body">{s.nhl}</div>
-            </div>
-          ))}
-
-          <div className="info-blok">
-            <div className="info-titel">📄 Verdieping beschikbaar</div>
-            <div className="info-body">De volledige NVAO-pagina met bronverwijzingen, links naar CTL-richtlijnen en concrete voorbeelden is beschikbaar op het AI-Netwerk platform: <strong>ai-netwerk-nhlstenden.netlify.app/nvao</strong>. De NVAO Startverkenning is te downloaden via nvao.net.</div>
-          </div>
-        </div>
-
-        {/* H7 Netwerk */}
-        <div className="section page-break">
-          <div className="chapter-label">Hoofdstuk 7</div>
-          <div className="chapter-title">Het netwerk in beeld</div>
-          <div className="chapter-line"></div>
-          <div className="lead">Het AI-Netwerk is geen hierarchie maar een levend ecosysteem van mensen, initiatieven en kennis. De visualisatie hieronder laat zien hoe NHL Stenden zich verhoudt tot het externe landschap en hoe de interne themas zijn georganiseerd.</div>
-
-          <p>In het centrum staat de AI-netwerkorganisatie van NHL Stenden, aangestuurd door de Kwartiermaker Digitale Samenhang. Naar buiten toe zijn verbindingen met nationale en regionale partners: SURF voor infrastructuur en kennisdeling, NPULS voor geletterdheid en professionalisering, regionale samenwerkingspartners voor praktijkgericht onderzoek en innovatie. Naar binnen toe zijn zes themas georganiseerd die elk een eigen deel van het AI-domein bestrijken.</p>
-
-          <div className="netwerk-box">
-            <div style={{fontSize:'9pt',fontWeight:700,color:'rgba(255,255,255,0.45)',marginBottom:'14px',textTransform:'uppercase',letterSpacing:'0.12em'}}>Extern</div>
-            <div className="netwerk-nodes">
-              {['🤝 SURF','📚 NPULS','🌍 AI Fryslân','🏥 Frisius MC','🎓 Firda','🔬 RUG'].map(n => <div key={n} className="netwerk-node">{n}</div>)}
-            </div>
-            <div style={{width:'1px',height:'24px',background:'rgba(255,255,255,0.15)',margin:'0 auto'}}></div>
-            <div className="netwerk-center">🤖</div>
-            <div style={{fontSize:'13pt',fontWeight:800,marginBottom:'4px'}}>AI-Netwerk NHL Stenden</div>
-            <div style={{fontSize:'9pt',color:'rgba(255,255,255,0.55)',marginBottom:'22px'}}>Kwartiermaker Digitale Samenhang · Transitieprogramma Digitalisering</div>
-            <div style={{width:'1px',height:'24px',background:'rgba(255,255,255,0.15)',margin:'0 auto'}}></div>
-            <div className="netwerk-nodes" style={{marginTop:'16px'}}>
-              {THEMAS.map(t => <div key={t.titel} className="netwerk-node">{t.titel === 'AI & Leren' ? '🎓' : t.titel === 'AI & Werken' ? '⚙️' : t.titel === 'AI & Verantwoordelijkheid' ? '⚖️' : t.titel === 'AI & Geletterdheid' ? '📖' : t.titel === 'AI & Werkveld' ? '🏢' : '🔬'} {t.titel}</div>)}
-            </div>
-            <div style={{fontSize:'9pt',fontWeight:700,color:'rgba(255,255,255,0.45)',marginTop:'14px',textTransform:'uppercase',letterSpacing:'0.12em'}}>Intern</div>
-          </div>
-        </div>
-
-        {/* H8 Governance */}
-        <div className="section page-break">
-          <div className="chapter-label">Hoofdstuk 8</div>
+          <div className="chapter-label">Hoofdstuk 9</div>
           <div className="chapter-title">Governance en organisatie</div>
           <div className="chapter-line"></div>
           <div className="lead">Het AI-Netwerk is geen project dat ooit klaar is. Het is een continue organisatievorm die meegroeit met de instelling, de technologie en de samenleving.</div>
 
           <h3>Besturingsstructuur</h3>
-          <p>De <strong>Stuurgroep Digitalisering</strong> vormt het bestuurlijke kader. De stuurgroep stelt de kaders, bewaakt de voortgang en neemt besluiten over richting en middelen. De <strong>Kwartiermaker Digitale Samenhang</strong> is de dagelijkse aansturing van het AI-Netwerk en rapporteert aan de stuurgroep. Het <strong>kernteam AI-Netwerk</strong> bestaat uit de Kwartiermaker, een Informatiemanager en een ICT Analist, en heeft de operationele verantwoordelijkheid voor het platform en de netwerkorganisatie. Daaronder functioneert een laag van <strong>techniek en infrastructuur</strong>: solution partners die expertise inbrengen op AVG, API-koppelingen en het AI-applicatielandschap.</p>
+          <p>De <strong>Stuurgroep Digitalisering</strong> vormt het bestuurlijke kader: zij stelt de kaders, bewaakt de voortgang en neemt besluiten over richting en middelen. De <strong>Kwartiermaker Digitale Samenhang</strong> verzorgt de dagelijkse aansturing en rapporteert aan de stuurgroep. Het <strong>kernteam AI-Netwerk</strong> heeft de operationele verantwoordelijkheid voor het platform en de netwerkorganisatie, ondersteund door solution partners voor AVG, koppelingen en het AI-applicatielandschap.</p>
 
           <div className="card-grid" style={{marginBottom:'24px'}}>
             <div className="card card-dark"><div className="card-title">Stuurgroep Digitalisering</div><div className="card-body">Bestuurlijke opdrachtgever. Stelt kaders, bewaakt voortgang, neemt besluiten over richting en middelen. Rapportage elk kwartaal.</div></div>
@@ -405,13 +475,13 @@ export default function Rapport({ pilots: pilotsProp, inspiraties: inspiratiesPr
             <div className="card"><div className="card-title">Techniek en Infrastructuur</div><div className="card-body">Solution partners voor veilige AI-integratie. Expertise op AVG, API-koppelingen, security en het AI-applicatielandschap.</div></div>
           </div>
 
-          <h3>Thema-verantwoordelijkheden</h3>
-          <p>Per thema wordt een trekker aangesteld die verantwoordelijk is voor de agenda, de initiatieven en de verbinding met de rest van het netwerk. De trekkers rapporteren via het maandelijkse kernteam-overleg en zijn aanspreekpunt voor mensen die zich willen aansluiten bij een thema.</p>
+          <h3>Verantwoordelijkheid per koerslijn</h3>
+          <p>Per koerslijn wordt een trekker aangesteld die verantwoordelijk is voor de agenda, de initiatieven en de verbinding met de rest van het netwerk. De trekkers rapporteren via het maandelijkse kernteam-overleg.</p>
 
-          {THEMAS.map(t => (
-            <div key={t.titel} className="gov-row">
-              <div className="gov-thema" style={{background: t.kleur}}>
-                {t.titel === 'AI & Leren' ? '🎓' : t.titel === 'AI & Werken' ? '⚙️' : t.titel === 'AI & Verantwoordelijkheid' ? '⚖️' : t.titel === 'AI & Geletterdheid' ? '📖' : t.titel === 'AI & Werkveld' ? '🏢' : '🔬'} {t.titel}
+          {sporen.map(s => (
+            <div key={s.id} className="gov-row">
+              <div className="gov-thema" style={{background: KOERS_KLEUREN[s.id] || '#003DA5'}}>
+                {s.icon} {s.titel}
               </div>
               <div className="gov-body">
                 <strong>Trekker:</strong> Wordt ingevuld &nbsp;·&nbsp; <strong>Overleg:</strong> Maandelijks AI-Netwerk overleg &nbsp;·&nbsp; <strong>Verantwoording:</strong> Stuurgroep Digitalisering
@@ -419,24 +489,24 @@ export default function Rapport({ pilots: pilotsProp, inspiraties: inspiratiesPr
             </div>
           ))}
 
-          <div className="success-blok">
-            <div style={{fontWeight:700,color:'#065F46',marginBottom:'8px'}}>🔄 Overlegstructuur</div>
-            <div style={{fontSize:'9.5pt',color:'#374151',lineHeight:'1.7'}}>
+          <div className="info-blok">
+            <div className="info-titel">🔄 Overlegstructuur</div>
+            <div className="info-body">
               <strong>Maandelijks:</strong> AI-Netwerk kernteam overleg: voortgang, nieuwe initiatieven, knelpunten en besluiten op operationeel niveau.<br/>
               <strong>Kwartaal:</strong> Update stuurgroep: rapportage over voortgang, besluiten over richting en middelen, bijsturing waar nodig.<br/>
-              <strong>Jaarlijks:</strong> Evaluatie en herijking: doelstellingen, themas, governance en aansluiting op externe ontwikkelingen.<br/>
-              <strong>Continu:</strong> Platform-updates: het AI-Netwerk platform wordt dagelijks bijgehouden en geeft altijd de meest actuele stand van zaken.
+              <strong>Jaarlijks:</strong> Evaluatie en herijking: doelstellingen, koerslijnen, governance en aansluiting op externe ontwikkelingen.<br/>
+              <strong>Continu:</strong> Het AI-Netwerk platform wordt dagelijks bijgehouden en geeft altijd de meest actuele stand van zaken.
             </div>
           </div>
         </div>
 
-        {/* Inzichten */}
+        {/* H10 Inzichten */}
         {inspiraties.length > 0 && (
           <div className="section page-break">
-            <div className="chapter-label">Hoofdstuk 9</div>
+            <div className="chapter-label">Hoofdstuk 10</div>
             <div className="chapter-title">Inzichten en beweging</div>
             <div className="chapter-line"></div>
-            <div className="lead">Het AI-Netwerk haalt ook buiten de muren van NHL Stenden inzichten op. Onderstaande items geven een beeld van wat medewerkers, docenten en studenten delen en relevant vinden voor de NHL Stenden context.</div>
+            <div className="lead">Het AI-Netwerk haalt ook buiten de muren van NHL Stenden inzichten op. Onderstaande items geven een beeld van wat medewerkers, docenten en studenten delen en relevant vinden.</div>
 
             <table>
               <thead><tr><th>Titel</th><th>Type</th><th>Datum</th></tr></thead>
@@ -461,19 +531,17 @@ export default function Rapport({ pilots: pilotsProp, inspiraties: inspiratiesPr
           <div className="chapter-label">Afsluiting</div>
           <div className="chapter-title">Vooruitkijken</div>
           <div className="chapter-line"></div>
-          <div className="lead">Het AI-Netwerk is geen eindpunt maar een vertrekpunt. De echte waarde ontstaat wanneer mensen ermee werken, er op voortbouwen en er eigenaarschap bij ervaren.</div>
+          <div className="lead">Het AI-Netwerk is geen eindpunt maar een vertrekpunt. De echte waarde ontstaat wanneer mensen ermee werken, erop voortbouwen en er eigenaarschap bij ervaren.</div>
 
-          <p>NHL Stenden staat voor de opgave om AI betekenisvol te integreren in het onderwijs, het onderzoek en de organisatie. Dat vraagt om meer dan technologie: het vraagt om cultuur, vaardigheden, governance en vertrouwen. Het AI-Netwerk is het instrument om die opgave te ondersteunen.</p>
+          <p>NHL Stenden staat voor de opgave om AI betekenisvol te integreren in het onderwijs, het onderzoek en de organisatie. Dat vraagt om meer dan technologie: het vraagt om cultuur, vaardigheden, governance en vertrouwen. De AI-Koers geeft de richting, het AI-Netwerk maakt de beweging zichtbaar en verbindt de mensen die haar dragen.</p>
 
-          <p>De komende periode richt zich op het verder uitbouwen van de zes themas, het aanstellen van trekkers per thema, het ontsluiten van meer initiatieven en het verdiepen van de verbinding met accreditatie en bestuurlijke verantwoording. Nieuwe pilots worden opgezet, bestaande pilots worden geëvalueerd en de leerpunten worden gedeeld.</p>
-
-          <p>Dit rapport is automatisch gegenereerd op {DATUM()} en geeft de meest actuele stand van zaken weer. Voor de meest recente versie en aanvullende informatie verwijzen wij naar het AI-Netwerk platform.</p>
+          <p>De komende periode richt zich op het invullen van de verplichtingen met signaal actie nodig, het aanstellen van trekkers per koerslijn, het uitvoeren van de AMCE-proeftuin en het verder ontsluiten van initiatieven. Dit rapport is automatisch gegenereerd op {DATUM()} en geeft de actuele stand van zaken weer.</p>
 
           <div className="afsluiting-box">
             <div style={{fontSize:'28pt',marginBottom:'14px'}}>🤖</div>
             <div style={{fontSize:'16pt',fontWeight:800,marginBottom:'6px'}}>AI-Netwerk NHL Stenden</div>
             <div style={{color:'rgba(255,255,255,0.65)',fontSize:'10pt',marginBottom:'16px'}}>ai-netwerk-nhlstenden.netlify.app</div>
-            <div style={{color:'rgba(255,255,255,0.45)',fontSize:'8.5pt'}}>Dit rapport is automatisch gegenereerd op {DATUM()} vanuit de live data van het AI-Netwerk platform van NHL Stenden Hogeschool.</div>
+            <div style={{color:'rgba(255,255,255,0.45)',fontSize:'8.5pt'}}>Dit rapport is automatisch gegenereerd op {DATUM()} vanuit de live data van het AI-Netwerk platform van NHL Stenden Hogeschool, in lijn met de AI-Koers v0.1.</div>
           </div>
         </div>
 

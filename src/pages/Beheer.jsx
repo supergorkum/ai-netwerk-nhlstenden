@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { initiatieven as initData, sporen, lagen, BEHEER_CODE } from '../data'
 import { exportJSON, importJSON } from '../storage'
 
@@ -8,13 +8,35 @@ const BACKUP_KEY = 'aihub-backup-v1'
 
 async function slaOpInCloud(data) {
   const payload = { ...data, backupDatum: new Date().toISOString() }
-  localStorage.setItem(BACKUP_KEY, JSON.stringify(payload))
+  const json = JSON.stringify(payload)
+  // Lokale kopie als vangnet
+  try { localStorage.setItem(BACKUP_KEY, json) } catch {}
+  // De echte cloud backup: naar Netlify Blobs via de storage-function
+  const res = await fetch('/.netlify/functions/storage', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ key: BACKUP_KEY, value: json }),
+  })
+  if (!res.ok) throw new Error('Opslaan in Netlify Blobs mislukt')
   return payload.backupDatum
 }
 
 async function laadUitCloud() {
-  const raw = localStorage.getItem(BACKUP_KEY)
-  return raw ? JSON.parse(raw) : null
+  // Eerst uit Netlify Blobs, daarna localStorage als vangnet
+  try {
+    const r = await fetch(`/.netlify/functions/storage?key=${BACKUP_KEY}`)
+    const d = await r.json()
+    if (d.value) return typeof d.value === 'string' ? JSON.parse(d.value) : d.value
+  } catch {}
+  try {
+    const raw = localStorage.getItem(BACKUP_KEY)
+    return raw ? JSON.parse(raw) : null
+  } catch { return null }
+}
+
+async function haalCloudTijdstempel() {
+  const data = await laadUitCloud()
+  return data && data.backupDatum ? data.backupDatum : null
 }
 
 function formatDatumKort(iso) {
@@ -46,6 +68,7 @@ function HerstellModal({ data, bron, onHerstel, onSluiten }) {
     { key: 'videos', label: "Video's", icon: '🎬' },
     { key: 'pilots', label: 'Pilots', icon: '🧪' },
     { key: 'docs', label: 'Documenten', icon: '📁' },
+    { key: 'roadmap', label: 'Roadmap', icon: '🗺️' },
   ]
 
   const beschikbaar = categorieën.filter(c => Array.isArray(data[c.key]) && data[c.key].length > 0)
@@ -412,7 +435,7 @@ function AntwoordVeld({ berichtId, onAntwoord }) {
   )
 }
 
-export default function Beheer({ berichten, setBerichten, videos, setVideos, actiefVideoId, setActiefVideoId, pilots, setPilots, docs, setDocs, inspiraties, setInspiraties }) {
+export default function Beheer({ berichten, setBerichten, videos, setVideos, actiefVideoId, setActiefVideoId, pilots, setPilots, docs, setDocs, inspiraties, setInspiraties, roadmap, setRoadmap }) {
   const [code, setCode] = useState('')
   const [toegang, setToegang] = useState(false)
   const [fout, setFout] = useState('')
@@ -422,6 +445,11 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
   const [actieveTab, setActieveTab] = useState('initiatieven')
   const [analytics, setAnalytics] = useState(null)
   const [analyticsLaden, setAnalyticsLaden] = useState(false)
+
+  // Haal bij het openen de tijdstempel van de laatste gelukte cloud backup op
+  useEffect(() => {
+    haalCloudTijdstempel().then(ts => { if (ts) setCloudTijdstempel(ts) }).catch(() => {})
+  }, [])
 
   const laadAnalytics = () => {
     setAnalyticsLaden(true)
@@ -474,6 +502,7 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
     if (geselecteerd.pilots && previewData.pilots) setPilots(previewData.pilots)
     if (geselecteerd.docs && previewData.docs) setDocs(previewData.docs)
     if (geselecteerd.inspiraties && previewData.inspiraties) setInspiraties(previewData.inspiraties)
+    if (geselecteerd.roadmap && previewData.roadmap && setRoadmap) setRoadmap(previewData.roadmap)
     if (previewBron === 'cloud' && previewData.backupDatum) setCloudTijdstempel(previewData.backupDatum)
     setPreviewData(null)
     setPreviewBron(null)
@@ -491,7 +520,7 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
   }
 
   const handleExport = () => {
-    exportJSON({ alleInitiatieven, berichten, videos, pilots, docs, inspiraties, exportDatum: new Date().toISOString() }, `aihub-export-${Date.now()}.json`)
+    exportJSON({ alleInitiatieven, berichten, videos, pilots, docs, inspiraties, roadmap, exportDatum: new Date().toISOString() }, `aihub-export-${Date.now()}.json`)
   }
 
   const handleImport = async (file) => {
@@ -506,11 +535,7 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
     setCloudStatus('saving')
     try {
       const data = await laadUitCloud()
-      const rawBackup = data.value ?? data
-      if (!rawBackup) { alert('Geen cloud backup gevonden.'); setCloudStatus('idle'); return }
-      // Vervang data.value referentie door rawBackup zodat rest van de code werkt
-      data = { ...data, value: typeof rawBackup === 'string' ? rawBackup : JSON.stringify(rawBackup) }
-      if (!data.value) { alert('Geen cloud backup gevonden.'); setCloudStatus('idle'); return }
+      if (!data) { alert('Geen cloud backup gevonden.'); setCloudStatus('idle'); return }
       setPreviewData(data)
       setPreviewBron('cloud')
       setCloudStatus('idle')
@@ -604,7 +629,7 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
                 <div className="text-gray-400 leading-tight mt-0.5">
                   {cloudTijdstempel
                     ? new Date(cloudTijdstempel).toLocaleString('nl-NL', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
-                    : 'Automatisch om 08:00, 12:00 en 18:00'}
+                    : 'Nog geen cloud backup gevonden'}
                 </div>
               </div>
             </div>
@@ -866,7 +891,7 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
               <div className="space-y-4">
                 <div>
                   <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">PDF Rapport genereren</div>
-                  <p className="text-gray-500 text-sm mb-3">Genereer een volledig professioneel rapport van het AI-Netwerk als PDF. Live gegenereerd met de meest actuele data: initiatieven, pilots, inzichten, NVAO-kaders en governance.</p>
+                  <p className="text-gray-500 text-sm mb-3">Genereer een professioneel voortgangsrapport van het AI-Netwerk als PDF, opgebouwd langs de AI-Koers. Live gegenereerd met de meest actuele data: koerslijnen, initiatieven, AI Act verplichtingen, roadmap, prognose en governance.</p>
                   <button onClick={() => (() => {
                     try {
                       /* geen data via URL */
@@ -881,15 +906,15 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
                 <div className="bg-blue-50 border border-blue-100 rounded-xl p-4">
                   <div className="text-xs font-semibold text-nhl-blauw mb-3">Inhoud van het rapport</div>
                   <div className="space-y-1.5 text-xs text-gray-600">
-                    <div>✓ Inleiding: wat is het AI-Netwerk en het doel</div>
-                    <div>✓ Fundament: strategie, beleid en externe verbindingen</div>
-                    <div>✓ Zes themas met kerndoelstellingen</div>
-                    <div>✓ Initiatieven overzicht intern en extern</div>
-                    <div>✓ Pilots: lopende experimenten met resultaten</div>
-                    <div>✓ NVAO: invulling per accreditatiestandaard</div>
-                    <div>✓ Netwerk visualisatie</div>
+                    <div>✓ Managementsamenvatting met kerncijfers en signalen</div>
+                    <div>✓ Fundament: bestuurlijk kader, wetgeving en netwerken</div>
+                    <div>✓ De zes koerslijnen uit de AI-Koers</div>
+                    <div>✓ Initiatieven per koerslijn, intern en extern</div>
+                    <div>✓ AI Act verplichtingen met signalering per verplichting</div>
+                    <div>✓ Roadmap en berekende prognose</div>
+                    <div>✓ Pilots: lopende experimenten</div>
                     <div>✓ Governance en overlegstructuur</div>
-                    <div>✓ Bijlage: volledig overzicht pilots, initiatieven en inzichten</div>
+                    <div>✓ Inzichten uit het netwerk</div>
                   </div>
                 </div>
               </div>
@@ -1140,7 +1165,7 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
                     <div className="text-blue-200 text-xs">
                       {cloudTijdstempel
                         ? `Laatste backup: ${new Date(cloudTijdstempel).toLocaleString('nl-NL', { weekday: 'short', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })}`
-                        : 'Nog geen backup gemaakt. Automatisch om 08:00, 12:00 en 18:00.'}
+                        : 'Nog geen cloud backup gevonden. Maak er hieronder een.'}
                     </div>
                   </div>
                 </div>
@@ -1151,8 +1176,8 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
                     <span className="text-xl">☁️</span>
                     <h3 className="font-bold text-nhl-blauw">Sla op in de cloud</h3>
                   </div>
-                  <p className="text-gray-500 text-sm mb-4">Sla de huidige staat op in de cloud via Netlify. Maximaal 12 versies bewaard.</p>
-                  <button onClick={() => voerBackupUit({ alleInitiatieven, berichten, videos, pilots, docs, inspiraties })}
+                  <p className="text-gray-500 text-sm mb-4">Sla de huidige staat op in Netlify Blobs, inclusief de roadmap. De vorige cloudversie wordt overschreven; download daarnaast regelmatig een JSON-kopie.</p>
+                  <button onClick={() => voerBackupUit({ alleInitiatieven, berichten, videos, pilots, docs, inspiraties, roadmap })}
                     disabled={cloudStatus === 'saving'}
                     className="btn-primary w-full disabled:opacity-50 flex items-center justify-center gap-2">
                     {cloudStatus === 'saving' ? <><span className="animate-spin">⟳</span> Bezig...</> :
@@ -1184,7 +1209,7 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
                 <button onClick={handleExport} className="btn-primary w-full">⬇ Download als JSON</button>
                 <div className="mt-4 pt-4 border-t border-gray-100">
                   <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Rapport</div>
-                  <p className="text-gray-500 text-sm mb-3">Genereer een volledig professioneel rapport van het AI-Netwerk als PDF. Het rapport bevat alle actuele data: initiatieven, pilots, inzichten, NVAO-kaders en governance.</p>
+                  <p className="text-gray-500 text-sm mb-3">Genereer een professioneel voortgangsrapport van het AI-Netwerk als PDF, opgebouwd langs de AI-Koers. Het rapport bevat de actuele koerslijnen, initiatieven, AI Act verplichtingen, roadmap, prognose en governance.</p>
                   <button onClick={() => (() => {
                     try {
                       /* geen data via URL */
