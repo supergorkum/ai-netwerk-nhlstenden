@@ -1,23 +1,7 @@
 import { APP_VERSIE } from '../data'
 import { Link } from 'react-router-dom'
-import { useState, useEffect } from 'react'
 
 export default function Footer() {
-  const [wachtrij, setWachtrij] = useState(0)
-
-  useEffect(() => {
-    const tel = () => {
-      try {
-        const videos = JSON.parse(localStorage.getItem('aihub-videos') || '[]')
-        setWachtrij(videos.filter(v => v.status === 'wachtrij').length)
-      } catch {}
-    }
-    tel()
-    window.addEventListener('storage', tel)
-    const interval = setInterval(tel, 5000)
-    return () => { window.removeEventListener('storage', tel); clearInterval(interval) }
-  }, [])
-
   return (
     <footer className="bg-nhl-blauw text-white" style={{ background: 'linear-gradient(180deg, #0F1E52 0%, #162D6E 100%)' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-12 pb-8">
@@ -92,13 +76,8 @@ export default function Footer() {
               <span className="w-2 h-2 bg-nhl-roze rounded-full pulse-soft" />
               <span>Versie {APP_VERSIE.replace('v', '')}</span>
             </div>
-            <Link to="/beheer" className="text-blue-400 hover:text-blue-200 transition-colors flex items-center gap-1.5">
-              Beheer ↗
-              {wachtrij > 0 && (
-                <span className="bg-nhl-roze text-white text-xs font-bold px-1.5 py-0.5 rounded-full leading-none">
-                  {wachtrij}
-                </span>
-              )}
+            <Link to="/dashboard" className="text-blue-400 hover:text-blue-200 transition-colors">
+              Dashboard →
             </Link>
           </div>
         </div>

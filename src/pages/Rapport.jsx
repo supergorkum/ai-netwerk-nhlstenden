@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { initiatieven as alleInitiatieven, sporen, AI_ACT_ITEMS, verplichtingSignaal, APP_VERSIE, OVERLEG_STRUCTUUR } from '../data'
+import { initiatieven as alleInitiatieven, sporen, AI_ACT_ITEMS, verplichtingSignaal, APP_VERSIE, OVERLEG_STRUCTUUR, BEHEER_CODE } from '../data'
 import { haalWijzigingenOp } from '../storage'
 import { INIT_PILOTS, INIT_INSPIRATIES } from '../initialData'
 
@@ -36,6 +36,16 @@ function typeLabel(t) {
 }
 
 export default function Rapport({ pilots: pilotsProp, inspiraties: inspiratiesProp, roadmap = [] }) {
+  // Zelfde beveiliging als Beheer: het rapport bevat gevoelige voortgangs-
+  // en compliance-informatie en is geen publiek toegankelijke pagina.
+  const [code, setCode] = useState('')
+  const [toegang, setToegang] = useState(false)
+  const [fout, setFout] = useState('')
+  const login = () => {
+    if (code === BEHEER_CODE) { setToegang(true); setFout('') }
+    else setFout('Onjuiste code.')
+  }
+
   const pilots = pilotsProp && pilotsProp.length > 0 ? pilotsProp : INIT_PILOTS
   const inspiraties = inspiratiesProp && inspiratiesProp.length > 0 ? inspiratiesProp : INIT_INSPIRATIES
 
@@ -121,6 +131,24 @@ export default function Rapport({ pilots: pilotsProp, inspiraties: inspiratiesPr
   useEffect(() => {
     haalWijzigingenOp().then(w => setWijzigingen((w || []).slice(0, 10))).catch(() => {})
   }, [])
+
+  if (!toegang) {
+    return (
+      <div className="min-h-screen pt-16 bg-gray-50 flex items-center justify-center">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 w-full max-w-sm">
+          <div className="text-center mb-6">
+            <div className="text-4xl mb-3">🔒</div>
+            <h2 className="text-xl font-bold text-nhl-blauw">Rapport</h2>
+            <p className="text-gray-500 text-sm mt-1">Voer de beheercode in om het rapport te openen.</p>
+          </div>
+          <input type="password" value={code} onChange={e => setCode(e.target.value)} onKeyDown={e => e.key === 'Enter' && login()}
+            placeholder="Beheercode..." className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-nhl-blauw" />
+          {fout && <div className="text-red-500 text-xs mb-3">{fout}</div>}
+          <button onClick={login} className="btn-primary w-full">Openen</button>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <>

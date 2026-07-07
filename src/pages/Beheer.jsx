@@ -1369,6 +1369,15 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
                 versie: APP_VERSIE, datum: APP_VERSIE_DATUM,
                 label: 'Huidige versie', labelKleur: 'bg-green-100 text-green-700',
                 items: [
+                  'Rapport: /rapport was een volledig open route en is nu met dezelfde beheercode beveiligd als Beheer zelf.',
+                  'Footer: link "Beheer" in de onderbalk vervangen door "Dashboard". De Beheer-route blijft bereikbaar via de URL, alleen de link in de footer is weg.',
+                ],
+              },
+
+              {
+                versie: 'v2.17', datum: 'Juli 2026',
+                label: null, labelKleur: '',
+                items: [
                   'Footer: link "Documentatie" uit de Navigatie-lijst verwijderd. Tweede en laatste plek waar deze Beta-only pagina nog voor gewone gebruikers zichtbaar was, naast de CTA-kaart op de Startpagina die in v2.16 al is aangepast.',
                 ],
               },
