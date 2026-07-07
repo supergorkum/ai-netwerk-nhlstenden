@@ -1369,6 +1369,14 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
                 versie: APP_VERSIE, datum: APP_VERSIE_DATUM,
                 label: 'Huidige versie', labelKleur: 'bg-green-100 text-green-700',
                 items: [
+                  'Footer: link "Documentatie" uit de Navigatie-lijst verwijderd. Tweede en laatste plek waar deze Beta-only pagina nog voor gewone gebruikers zichtbaar was, naast de CTA-kaart op de Startpagina die in v2.16 al is aangepast.',
+                ],
+              },
+
+              {
+                versie: 'v2.16', datum: 'Juli 2026',
+                label: null, labelKleur: '',
+                items: [
                   'Startpagina: CTA-kaart "Documentatie" (linkte naar /documentatie, een Beta-only onderdeel) vervangen door "Rapport" (/rapport), dat wel in de huidige release zit.',
                 ],
               },

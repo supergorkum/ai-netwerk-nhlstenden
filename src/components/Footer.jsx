@@ -44,7 +44,6 @@ export default function Footer() {
               {[
                 ['/', 'Start'],
                 ['/bronnen', 'Bronnen'],
-                ['/documentatie', 'Documentatie'],
                 ['/evenementen', 'Evenementen'],
                 ['/fundament', 'Fundament'],
                 ['/initiatieven', 'Initiatieven'],
