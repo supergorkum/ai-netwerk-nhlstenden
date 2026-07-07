@@ -1369,6 +1369,14 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
                 versie: APP_VERSIE, datum: APP_VERSIE_DATUM,
                 label: 'Huidige versie', labelKleur: 'bg-green-100 text-green-700',
                 items: [
+                  'Startpagina: CTA-kaart "Documentatie" (linkte naar /documentatie, een Beta-only onderdeel) vervangen door "Rapport" (/rapport), dat wel in de huidige release zit.',
+                ],
+              },
+
+              {
+                versie: 'v2.15', datum: 'Juli 2026',
+                label: null, labelKleur: '',
+                items: [
                   'Opgeruimd: src/components/Hero.jsx verwijderd. Ongebruikte component (nergens meer geimporteerd), toonde nog een eigen, losse versiebadge.',
                 ],
               },
