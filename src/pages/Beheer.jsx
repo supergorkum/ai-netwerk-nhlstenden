@@ -1369,6 +1369,14 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
                 versie: APP_VERSIE, datum: APP_VERSIE_DATUM,
                 label: 'Huidige versie', labelKleur: 'bg-green-100 text-green-700',
                 items: [
+                  'De publieke Rapport-kaart verwijst nu naar het Dashboard: levende voortgang voor bezoekers. Het rapport blijft bereikbaar via Beheer.',
+                ],
+              },
+
+              {
+                versie: 'v2.19', datum: APP_VERSIE_DATUM,
+                label: null, labelKleur: '',
+                items: [
                   'Beheer-link in de footer hersteld: die verwees per abuis naar het Dashboard.',
                 ],
               },
