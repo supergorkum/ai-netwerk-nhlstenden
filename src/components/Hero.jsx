@@ -1,3 +1,5 @@
+import { APP_VERSIE, APP_VERSIE_DATUM } from '../data'
+
 export default function Hero() {
   return (
     <section className="nhl-gradient pt-16 min-h-[92vh] flex items-center relative overflow-hidden">
@@ -15,7 +17,7 @@ export default function Hero() {
           <div>
             <div className="inline-flex items-center gap-2 bg-white/10 text-blue-100 text-sm px-3 py-1.5 rounded-full mb-6 border border-white/20">
               <span className="w-2 h-2 bg-nhl-oranje rounded-full pulse-soft" />
-              In ontwikkeling: versie 1.6 | Juni 2026
+              In ontwikkeling: {APP_VERSIE} | {APP_VERSIE_DATUM}
             </div>
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-tight mb-6">
