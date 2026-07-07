@@ -1369,6 +1369,14 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
                 versie: APP_VERSIE, datum: APP_VERSIE_DATUM,
                 label: 'Huidige versie', labelKleur: 'bg-green-100 text-green-700',
                 items: [
+                  'Rapport: elk agendavoorstel opent met de kernambitie van het eigen onderdeel. Thema-overleggen tonen de kernambitie van hun koerslijn (letterlijk uit de centrale bron, gelijk aan de site), stuurgroep en kernteam bewaken de globale kernambitie en de werking van het AI-Netwerk.',
+                ],
+              },
+
+              {
+                versie: 'v2.8', datum: 'Juli 2026',
+                label: null, labelKleur: '',
+                items: [
                   'Rapport: hoofdstuk Governance toont de volledige overlegstructuur met per overleg een berekend agendavoorstel van maximaal drie punten, samengesteld uit AI Act signalen, open acties uit de actielijst en recente inzichten.',
                   'Overlegstructuur is een centrale bron in data.js geworden (OVERLEG_STRUCTUUR); elke AI Act verplichting is gekoppeld aan een koerslijn.',
                   'Nieuws: The Gradient heeft een vangnet via Google News RSS en elke bron heeft een eigen tijdslimiet, zodat een trage bron de andere niet ophoudt.',

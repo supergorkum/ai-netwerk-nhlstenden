@@ -562,7 +562,7 @@ export default function Rapport({ pilots: pilotsProp, inspiraties: inspiratiesPr
           ))}
 
           <h3>Overlegstructuur en agendavoorstellen</h3>
-          <p>Het AI-Netwerk kent een vaste overlegstructuur: de stuurgroep voor richting en middelen, het kernteam voor de dagelijkse gang van zaken en per koerslijn een thema-overleg. Per overleg staat hieronder een berekend agendavoorstel van maximaal drie punten, samengesteld uit de verplichtingen met een signaal, de open acties uit de actielijst (zie bijlage) en recente inzichten uit het netwerk.</p>
+          <p>Het AI-Netwerk kent een vaste overlegstructuur: de stuurgroep voor richting en middelen, het kernteam voor de dagelijkse gang van zaken en per koerslijn een thema-overleg. Elk agendavoorstel opent met de kernambitie van het eigen onderdeel, als herinnering waarvoor het overleg het doet. Daaronder staat een berekend voorstel van maximaal drie punten, samengesteld uit de verplichtingen met een signaal, de open acties uit de actielijst (zie bijlage) en recente inzichten uit het netwerk.</p>
           {OVERLEG_STRUCTUUR.map(o => {
             const punten = agendaVoorstel(o)
             const spoorDef = o.spoor ? sporen.find(s => s.id === o.spoor) : null
@@ -572,6 +572,9 @@ export default function Rapport({ pilots: pilotsProp, inspiraties: inspiratiesPr
                   {spoorDef ? `${spoorDef.icon} ` : ''}{o.naam}
                 </div>
                 <div className="gov-body">
+                  <div style={{fontSize:'8.5pt', fontWeight:700, color: o.spoor ? (KOERS_KLEUREN[o.spoor] || '#003DA5') : '#06215C', marginBottom:'3px'}}>
+                    🎯 Kernambitie: {spoorDef ? spoorDef.kort : o.ambitie}
+                  </div>
                   <div style={{fontSize:'8pt', color:'#9CA3AF', marginBottom:'4px'}}>{o.frequentie} · {o.focus}</div>
                   {punten.length === 0 && <div>Geen agendapunten uit de actuele status. Het overleg bepaalt de eigen agenda.</div>}
                   {punten.map((pt, i) => (

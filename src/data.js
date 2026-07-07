@@ -161,8 +161,8 @@ export const AI_ACT_ITEMS = [
 // te passen zodra de structuur definitief wordt ingevuld.
 // ============================================================
 export const OVERLEG_STRUCTUUR = [
-  { id: 'stuurgroep', naam: 'Stuurgroep Digitalisering', frequentie: 'Per kwartaal', focus: 'Kaders, voortgang en besluiten over richting en middelen', spoor: null },
-  { id: 'kernteam', naam: 'Kernteam AI-Netwerk', frequentie: 'Maandelijks', focus: 'Voortgang, knelpunten en operationele besluiten', spoor: null },
+  { id: 'stuurgroep', naam: 'Stuurgroep Digitalisering', frequentie: 'Per kwartaal', focus: 'Kaders, voortgang en besluiten over richting en middelen', ambitie: 'Bewaakt de globale kernambitie: AI die aantoonbaar bijdraagt aan de doelen van NHL Stenden.', spoor: null },
+  { id: 'kernteam', naam: 'Kernteam AI-Netwerk', frequentie: 'Maandelijks', focus: 'Voortgang, knelpunten en operationele besluiten', ambitie: 'Bewaakt de werking van het AI-Netwerk: effectief samenwerken tussen de overleggen en samen doelen bereiken.', spoor: null },
   { id: 'thema-1', naam: 'Thema-overleg AI & Leren', frequentie: 'Maandelijks', focus: 'Initiatieven en ontwikkelingen binnen de koerslijn', spoor: 1 },
   { id: 'thema-2', naam: 'Thema-overleg AI & Werken', frequentie: 'Maandelijks', focus: 'Initiatieven en ontwikkelingen binnen de koerslijn', spoor: 2 },
   { id: 'thema-3', naam: 'Thema-overleg AI & Verantwoordelijkheid', frequentie: 'Maandelijks', focus: 'AI Act verplichtingen, governance en ethiek', spoor: 3 },
@@ -227,7 +227,7 @@ export const initiatief_types = ['intern', 'extern', 'surf']
 // Centraal versienummer: dit is de enige plek waar de versie wordt bijgehouden.
 // Elke functionele wijziging hoort dit nummer op te hogen en een regel toe te voegen
 // aan de changelog in Beheer.jsx. Patch-scripts doen dit voortaan zelf.
-export const APP_VERSIE = 'v2.8'
+export const APP_VERSIE = 'v2.9'
 export const APP_VERSIE_DATUM = 'Juli 2026'
 
 export const BEHEER_CODE = 'aihub2026'
