@@ -1,9 +1,17 @@
 // Netlify Function — max 3 feeds, parallel Anthropic calls, duplicate-detectie via bekendeTitels
 
 const RSS_FEEDS = [
-  { naam: 'The Gradient',   url: 'https://thegradient.pub/rss/',              label: 'The Gradient',   icon: '📊' },
-  { naam: '80,000 Hours',   url: 'https://80000hours.org/feed/',               label: '80,000 Hours',   icon: '💡' },
-  { naam: 'Import AI',      url: 'https://importai.substack.com/feed',         label: 'Import AI',      icon: '🤖' },
+  // Nederlandse en Europese bronnen: inhoudelijk (SURF, Npuls) en compliance (Rijksoverheid, EU/AI Act).
+  // De Claude-beoordeling filtert per bericht op relevantie voor NHL Stenden,
+  // dus brede feeds leveren alleen AI/onderwijs-relevante items op.
+  { naam: 'Rijksoverheid',           url: 'https://feeds.rijksoverheid.nl/nieuws.rss',                    label: 'Rijksoverheid',           icon: '🏛️', maxItems: 3 },
+  { naam: 'SURF',                    url: 'https://www.surf.nl/rss.xml',                                  label: 'SURF',                    icon: '🤝', maxItems: 3 },
+  { naam: 'Npuls',                   url: 'https://npuls.nl/feed/',                                       label: 'Npuls',                   icon: '📚', maxItems: 3 },
+  { naam: 'EU digitale strategie',   url: 'https://digital-strategy.ec.europa.eu/en/news/rss.xml',        label: 'EU digitale strategie',   icon: '⚖️', maxItems: 3 },
+  // Internationale AI-ontwikkelingen
+  { naam: 'The Gradient',   url: 'https://thegradient.pub/rss/',              label: 'The Gradient',   icon: '📊', maxItems: 3 },
+  { naam: '80,000 Hours',   url: 'https://80000hours.org/feed/',               label: '80,000 Hours',   icon: '💡', maxItems: 3 },
+  { naam: 'Import AI',      url: 'https://importai.substack.com/feed',         label: 'Import AI',      icon: '🤖', maxItems: 3 },
 ]
 
 function parseRSS(xml) {
@@ -46,7 +54,7 @@ async function beoordeelItem(item, feed, apiKey) {
         max_tokens: 150,
         messages: [{
           role: 'user',
-          content: `Relevant voor NHL Stenden AI-HUB (AI onderwijs, AI Act, digitale soevereiniteit, hoger onderwijs)?\n\nTitel: ${item.titel}\nBeschrijving: ${item.beschrijving.slice(0, 150)}\n\nThema's: 1=AI & Leren (onderwijs, didactiek, studenten), 2=AI & Werken (bedrijfsvoering, medewerkers, organisatie), 3=AI & Verantwoordelijkheid (AI Act, governance, ethiek, soevereiniteit), 4=AI-Geletterdheid (vaardigheden, bewustzijn, training)\n\nJSON alleen:\n{"relevant":true/false,"samenvatting":"max 1 zin Nederlands","doelgroep":"docenten/studenten/management/algemeen","spoor":1/2/3/4}`
+          content: `Relevant voor het AI-Netwerk van NHL Stenden Hogeschool (AI in hoger onderwijs, AI Act en compliance, digitale soevereiniteit, digitalisering onderwijs)?\n\nTitel: ${item.titel}\nBeschrijving: ${item.beschrijving.slice(0, 150)}\n\nThema's: 1=AI & Leren (onderwijs, didactiek, studenten), 2=AI & Werken (bedrijfsvoering, medewerkers, organisatie), 3=AI & Verantwoordelijkheid (AI Act, compliance, governance, ethiek, soevereiniteit, privacy), 4=AI-Geletterdheid (vaardigheden, bewustzijn, training), 5=AI & Werkveld (regionale samenwerking, praktijkgericht), 6=AI & Onderzoek (wetenschap, lectoraten)\n\nJSON alleen:\n{"relevant":true/false,"samenvatting":"max 1 zin Nederlands","doelgroep":"docenten/studenten/management/algemeen","spoor":1/2/3/4/5/6}`
         }]
       }),
       signal: AbortSignal.timeout(5000),
@@ -69,6 +77,8 @@ async function beoordeelItem(item, feed, apiKey) {
         { titel: 'AI & Werken', icon: '⚙️' },
         { titel: 'AI & Verantwoordelijkheid', icon: '⚖️' },
         { titel: 'AI-Geletterdheid', icon: '📖' },
+        { titel: 'AI & Werkveld', icon: '🏭' },
+        { titel: 'AI & Onderzoek', icon: '🔬' },
       ][b.spoor] || null : null,
       laag: null,
       titel: item.titel, tekst: b.samenvatting,
@@ -128,7 +138,7 @@ export default async (req) => {
       })
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
       const xml = await res.text()
-      const items = parseRSS(xml)
+      const items = parseRSS(xml).slice(0, feed.maxItems || 3)
       if (items.length === 0) throw new Error('geen items')
       return { feed, items }
     })
@@ -157,11 +167,13 @@ export default async (req) => {
 
   const aantalGefilterd = alleItems.reduce((t, { items }) => t + items.length, 0) - nieuweItems.reduce((t, { items }) => t + items.length, 0)
 
-  // Alleen nieuwe items beoordelen door Anthropic
+  // Alleen nieuwe items beoordelen door Anthropic, met een plafond per run tegen timeouts
+  const teBeoordelen = nieuweItems
+    .flatMap(({ feed, items }) => items.map(item => ({ feed, item })))
+    .slice(0, 12)
+  const beoordeeldeTitels = teBeoordelen.map(({ item }) => item.titel)
   const beoordelingen = await Promise.allSettled(
-    nieuweItems.flatMap(({ feed, items }) =>
-      items.map(item => beoordeelItem(item, feed, apiKey))
-    )
+    teBeoordelen.map(({ feed, item }) => beoordeelItem(item, feed, apiKey))
   )
 
   const resultaten = beoordelingen
@@ -183,6 +195,7 @@ export default async (req) => {
     aantalGefilterd,
     geenNieuwNieuws: resultaten.length === 0 && aantalGefilterd > 0,
     items: resultaten,
+    beoordeeldeTitels,
     bronnen: bronRapport,
     fouten: fouten.length > 0 ? fouten : undefined,
     tijdstip: new Date().toISOString(),

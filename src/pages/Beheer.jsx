@@ -191,7 +191,9 @@ function NieuwsOphalen({ onNieuwItems, inspiraties = [] }) {
       try {
         const r = await fetch('/.netlify/functions/storage?key=nieuws-bekende-titels')
         const d = await r.json()
-        opgeslagenTitels = Array.isArray(d.value) ? d.value : []
+        const raw = d.value
+        if (Array.isArray(raw)) opgeslagenTitels = raw
+        else if (typeof raw === 'string') { try { const parsed = JSON.parse(raw); if (Array.isArray(parsed)) opgeslagenTitels = parsed } catch {} }
       } catch {}
       const huidigeTitels = inspiraties.map(i => i.titel).filter(Boolean)
       const bekendeTitels = [...new Set([...huidigeTitels, ...opgeslagenTitels])]
@@ -209,12 +211,19 @@ function NieuwsOphalen({ onNieuwItems, inspiraties = [] }) {
       if (data.items?.length > 0) {
         onNieuwItems(data.items)
         logWijziging('Inzicht', `${data.items.length} nieuws-item${data.items.length !== 1 ? 's' : ''} automatisch toegevoegd`, '', '🤖')
-        const nieuweTitels = data.items.map(i => i.titel).filter(Boolean)
-        const alleTitels = [...new Set([...bekendeTitels, ...nieuweTitels])].slice(-200)
+      }
+      // Alle beoordeelde titels onthouden, ook de niet-relevante, zodat dezelfde
+      // berichten niet elke run opnieuw langs de Anthropic-beoordeling gaan
+      const nieuweTitels = [
+        ...(data.items || []).map(i => i.titel),
+        ...(data.beoordeeldeTitels || []),
+      ].filter(Boolean)
+      if (nieuweTitels.length > 0) {
+        const alleTitels = [...new Set([...bekendeTitels, ...nieuweTitels])].slice(-300)
         fetch('/.netlify/functions/storage', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ key: 'nieuws-bekende-titels', value: alleTitels }),
+          body: JSON.stringify({ key: 'nieuws-bekende-titels', value: JSON.stringify(alleTitels) }),
         }).catch(() => {})
       }
       setStatus('klaar')
@@ -249,7 +258,7 @@ function NieuwsOphalen({ onNieuwItems, inspiraties = [] }) {
       </div>
       <div className="px-6 py-4 border-b border-gray-100 bg-gray-50">
         <p className="text-sm text-gray-600">
-          Haalt nieuws op van <strong>The Gradient</strong>, <strong>80,000 Hours</strong> en <strong>Import AI</strong>.
+          Haalt nieuws op van <strong>Rijksoverheid</strong>, <strong>SURF</strong>, <strong>Npuls</strong> en <strong>EU en AI Act</strong> (compliance), aangevuld met internationale bronnen: <strong>The Gradient</strong>, <strong>80,000 Hours</strong> en <strong>Import AI</strong>.
           De Anthropic AI beoordeelt elk artikel op relevantie voor NHL Stenden en schrijft een Nederlandse samenvatting.
           Relevante items worden direct toegevoegd aan <strong>Inzichten</strong>.
         </p>
@@ -891,9 +900,9 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
                       {[
                         { naam: 'Rijksoverheid', omschrijving: 'AI-beleid, AI-Fabriek, nationale strategie', icon: '🏛️', kleur: '#1E3A8A' },
                         { naam: 'SURF', omschrijving: 'AI-Hub, GPT-NL, onderwijs en ICT', icon: '🤝', kleur: '#0F766E' },
-                        { naam: 'NPULS', omschrijving: 'Digitalisering hoger onderwijs', icon: '📚', kleur: '#7C3AED' },
-                        { naam: 'AI Act (EUR-Lex)', omschrijving: 'EU compliance en regelgeving', icon: '⚖️', kleur: '#E91E8C' },
-                        { naam: 'The Gradient, Import AI', omschrijving: 'Internationale AI-ontwikkelingen', icon: '🌐', kleur: '#B45309' },
+                        { naam: 'Npuls', omschrijving: 'Digitalisering hoger onderwijs', icon: '📚', kleur: '#7C3AED' },
+                        { naam: 'EU en AI Act', omschrijving: 'Compliance, regelgeving en Europees AI-beleid', icon: '⚖️', kleur: '#E91E8C' },
+                        { naam: 'The Gradient, 80,000 Hours, Import AI', omschrijving: 'Internationale AI-ontwikkelingen', icon: '🌐', kleur: '#B45309' },
                       ].map(b => (
                         <div key={b.naam} className="flex items-start gap-2">
                           <span className="text-base flex-shrink-0">{b.icon}</span>
@@ -1348,6 +1357,17 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
               {
                 versie: APP_VERSIE, datum: APP_VERSIE_DATUM,
                 label: 'Huidige versie', labelKleur: 'bg-green-100 text-green-700',
+                items: [
+                  'Nieuws ophalen haalt nu ook Rijksoverheid, SURF, Npuls en EU/AI Act op, zoals de site al beloofde. Belangrijk voor inhoud en compliance.',
+                  'Duplicaat-detectie gerepareerd: bekende titels werden in een verkeerd formaat opgeslagen en kwamen nooit terug, waardoor items dubbel binnenkwamen.',
+                  'Alle beoordeelde berichten worden onthouden, ook niet-relevante, zodat ze niet elke run opnieuw beoordeeld worden.',
+                  'Nieuwsbeoordeling kent nu alle zes koerslijnen, inclusief Werkveld en Onderzoek.',
+                ],
+              },
+
+              {
+                versie: 'v2.3', datum: 'Juli 2026',
+                label: null, labelKleur: '',
                 items: [
                   'Bezoekersoverzicht laadt automatisch bij openen, met verdeling van bezoeken per onderdeel van de site.',
                   'Reset van de bezoekersteller gerepareerd: verkeerd opslagformaat kon het laden stil laten mislukken. Fouten zijn nu zichtbaar.',
