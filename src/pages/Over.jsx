@@ -105,6 +105,17 @@ export default function Over() {
           </p>
         </div>
 
+        {/* Hoe het werkt */}
+        <div className="bg-white rounded-2xl border border-gray-200 p-6 mb-8 shadow-sm">
+          <h2 className="font-bold text-nhl-blauw text-lg mb-3">Hoe het AI-Netwerk werkt</h2>
+          <p className="text-gray-600 text-sm leading-relaxed mb-3">
+            Het AI-Netwerk is een verbinder die overzicht en samenhang biedt, geen tweede inhoudelijke eigenaar. De inhoudelijke kaders voor toetsing, didactiek, AVG of onderzoeksintegriteit liggen bij de vakeigenaren, zoals het Centre for Teaching and Learning en OO&I. Het AI-Netwerk vat hun werk kort samen en verwijst expliciet door naar de oorspronkelijke bron, zodat er overzicht ontstaat zonder een tweede, mogelijk conflicterende regelbron.
+          </p>
+          <p className="text-gray-600 text-sm leading-relaxed">
+            Wat het AI-Netwerk onderscheidt van een gewone informatiepagina, is dat het rekent. De verplichtingen uit de EU AI Act zijn vastgelegd met hun deadline, en het systeem berekent continu of daaraan gekoppeld werk daadwerkelijk loopt. Diezelfde berekende basis voedt de agendavoorstellen voor de overleggen binnen het netwerk, van de stuurgroep tot de thema-overleggen, en signaleert wanneer nieuwe ontwikkelingen van buiten opvolging verdienen. Zo ondersteunt het AI-Netwerk niet alleen het overzicht, maar ook de daadwerkelijke aansturing van de AI-ontwikkelingen binnen NHL Stenden.
+          </p>
+        </div>
+
         {/* Kernteam */}
         <h2 className="font-bold text-nhl-blauw text-xl mb-5">Het kernteam</h2>
         <div className="grid md:grid-cols-3 gap-4 mb-6">

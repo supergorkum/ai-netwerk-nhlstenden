@@ -1369,6 +1369,14 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
                 versie: APP_VERSIE, datum: APP_VERSIE_DATUM,
                 label: 'Huidige versie', labelKleur: 'bg-green-100 text-green-700',
                 items: [
+                  'Over-pagina: nieuwe sectie "Hoe het AI-Netwerk werkt" tussen Onze missie en Het kernteam. Legt de verbinder-rol en de berekende basis van het systeem uit, en de verbinding met agendavoorstellen en signaal-detectie.',
+                ],
+              },
+
+              {
+                versie: 'v2.12', datum: 'Juli 2026',
+                label: null, labelKleur: '',
+                items: [
                   'Inzichten: kaarten met een AI Act signaal krijgen een eigen label ⚖️ AI Act naast 🆕 Nieuw en 🤖 Auto, met bij hover het gekoppelde artikel. Maakt de signaal-detectie uit Nieuws ophalen (sinds v2.10) ook zichtbaar op de site zelf.',
                 ],
               },
