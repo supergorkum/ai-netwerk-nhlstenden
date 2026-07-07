@@ -76,8 +76,8 @@ export default function Footer() {
               <span className="w-2 h-2 bg-nhl-roze rounded-full pulse-soft" />
               <span>Versie {APP_VERSIE.replace('v', '')}</span>
             </div>
-            <Link to="/dashboard" className="text-blue-400 hover:text-blue-200 transition-colors">
-              Dashboard →
+            <Link to="/beheer" className="text-blue-400 hover:text-blue-200 transition-colors">
+              Beheer →
             </Link>
           </div>
         </div>

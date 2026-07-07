@@ -1369,6 +1369,14 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
                 versie: APP_VERSIE, datum: APP_VERSIE_DATUM,
                 label: 'Huidige versie', labelKleur: 'bg-green-100 text-green-700',
                 items: [
+                  'Beheer-link in de footer hersteld: die verwees per abuis naar het Dashboard.',
+                ],
+              },
+
+              {
+                versie: 'v2.18', datum: APP_VERSIE_DATUM,
+                label: null, labelKleur: '',
+                items: [
                   'Rapport: /rapport was een volledig open route en is nu met dezelfde beheercode beveiligd als Beheer zelf.',
                   'Footer: link "Beheer" in de onderbalk vervangen door "Dashboard". De Beheer-route blijft bereikbaar via de URL, alleen de link in de footer is weg.',
                 ],
