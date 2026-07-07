@@ -480,8 +480,12 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
     setAnalyticsLaden(true)
     setAnalyticsFout(null)
     fetch('/.netlify/functions/storage?key=analytics-bezoeken')
-      .then(r => r.json())
-      .then(data => {
+      .then(async r => {
+        const body = await r.text()
+        let data
+        try { data = JSON.parse(body) } catch {
+          throw new Error(`de storage-function gaf geen geldige JSON terug (status ${r.status}): "${body.slice(0, 120)}"`)
+        }
         if (data.error) throw new Error(data.error)
         let parsed = []
         try {
@@ -610,7 +614,7 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
     { id: 'video', label: "Video's", n: (videos || []).filter(v => v.status === 'wachtrij').length > 0 ? `${(videos || []).filter(v => v.status === 'wachtrij').length} wachtrij` : (videos || []).length },
   ]
   const tabsRij2 = [
-    { id: 'bezoekers', label: '📈 Bezoekers', n: null },
+    { id: 'bezoekers', label: '📈 Activiteit', n: null },
     { id: 'pilots', label: 'Pilots', n: (pilots || []).length },
     { id: 'docs', label: 'Documenten', n: (docs || []).length },
     { id: 'nieuws', label: '📰 Nieuws ophalen', n: null },
@@ -1058,8 +1062,8 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
               <div>
                 <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
                   <div>
-                    <h2 className="text-lg font-bold text-nhl-blauw">Bezoekersoverzicht</h2>
-                    <p className="text-xs text-gray-400 mt-0.5">Paginabezoeken via de app, bijgehouden in Netlify Blobs.</p>
+                    <h2 className="text-lg font-bold text-nhl-blauw">Activiteit op het platform</h2>
+                    <p className="text-xs text-gray-400 mt-0.5">Bezoeken en de laatste aanpassingen op het AI-Netwerk, bijgehouden in Netlify Blobs.</p>
                   </div>
                   <div className="flex gap-2">
                     <button onClick={laadAnalytics} disabled={analyticsLaden}
@@ -1075,7 +1079,7 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
 
                 {analyticsFout && (
                   <div className="mb-4 bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-xs text-red-600">
-                    ⚠️ Bezoekersdata kon niet worden opgehaald: {analyticsFout}. Controleer de Netlify function logs onder Logs & metrics → Functions → storage.
+                    ⚠️ Activiteitsdata kon niet worden opgehaald: {analyticsFout}. Kijk in de Netlify function logs onder Logs & metrics → Functions → storage. Blijft dit terugkomen na de nieuwste deploy, herstel dan de opslag met de knop Reset teller en probeer opnieuw.
                   </div>
                 )}
 
@@ -1357,6 +1361,16 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
               {
                 versie: APP_VERSIE, datum: APP_VERSIE_DATUM,
                 label: 'Huidige versie', labelKleur: 'bg-green-100 text-green-700',
+                items: [
+                  'Storage-function gehard: geeft altijd geldige JSON terug en slaat elke waarde als tekst op. Daarmee is de terugkerende klasse formaat-fouten definitief afgesloten.',
+                  'Duidelijke diagnose in Beheer als de opslag toch een onverwacht antwoord geeft, met statuscode en hersteltip.',
+                  'Tab Bezoekers hernoemd naar Activiteit: het overzicht toont bezoeken en de laatste aanpassingen op het platform.',
+                ],
+              },
+
+              {
+                versie: 'v2.4', datum: 'Juli 2026',
+                label: null, labelKleur: '',
                 items: [
                   'Nieuws ophalen haalt nu ook Rijksoverheid, SURF, Npuls en EU/AI Act op, zoals de site al beloofde. Belangrijk voor inhoud en compliance.',
                   'Duplicaat-detectie gerepareerd: bekende titels werden in een verkeerd formaat opgeslagen en kwamen nooit terug, waardoor items dubbel binnenkwamen.',
