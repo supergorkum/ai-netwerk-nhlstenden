@@ -26,6 +26,10 @@
 #     "AI-beleid v2.0" in Rapport.jsx en data.js. Dat zijn versies van een
 #     beleidsdocument, niet van de webapp, en veranderen niet mee met
 #     APP_VERSIE.
+#   - Algemener: dit project gebruikt tot nu toe altijd v0.x voor concept-
+#     documenten (AI-Koers v0.1, het AMCE-pilotvoorstel v0.1), terwijl de
+#     app zelf bij v1.x en v2.x zit. Elk los "v0.<getal>" wordt daarom ook
+#     zonder naam-voor-naam uitzondering overgeslagen.
 
 set -uo pipefail
 
@@ -55,6 +59,7 @@ TREFFERS=$(grep -rnE "[Vv]ersie[^A-Za-z0-9]{0,3}[0-9]+\.[0-9]+|\bv[0-9]+\.[0-9]+
   | grep -v "/Beheer\.jsx:" \
   | grep -v "APP_VERSIE" \
   | grep -viE "AI-Koers v|AI-beleid v" \
+  | grep -vE "\bv0\.[0-9]+\b" \
   || true)
 
 if [ -z "$TREFFERS" ]; then

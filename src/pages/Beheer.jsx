@@ -1369,6 +1369,14 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
                 versie: APP_VERSIE, datum: APP_VERSIE_DATUM,
                 label: 'Huidige versie', labelKleur: 'bg-green-100 text-green-700',
                 items: [
+                  'Opgeruimd: src/components/Hero.jsx verwijderd. Ongebruikte component (nergens meer geimporteerd), toonde nog een eigen, losse versiebadge.',
+                ],
+              },
+
+              {
+                versie: 'v2.14', datum: 'Juli 2026',
+                label: null, labelKleur: '',
+                items: [
                   'Hero-badges op Start.jsx en Hero.jsx lazen een los, verouderd versienummer (2.1 respectievelijk 1.6, allebei niet de huidige versie). Beide lezen nu uit het centrale APP_VERSIE, net als de footer sinds v2.7.',
                   'Nieuw controlescript scripts/check-versie.sh: waarschuwt na de build als er ergens een los versienummer in de broncode staat dat niet uit APP_VERSIE komt.',
                 ],
