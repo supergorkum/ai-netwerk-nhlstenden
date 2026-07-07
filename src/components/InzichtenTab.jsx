@@ -149,7 +149,7 @@ export default function InzichtenTab({ inspiraties, setInspiraties }) {
           const st = getStemmen(b)
           const gestemd = eigenStemmen[b.id]
           return (
-          <div key={b.id} className="break-inside-avoid bg-white rounded-2xl p-5 border border-gray-200 card-hover">
+          <div key={b.id} className={`break-inside-avoid bg-white rounded-2xl p-5 border card-hover ${b.nieuw ? 'border-amber-400 ring-2 ring-amber-200' : 'border-gray-200'}`}>
             <div className="flex items-start justify-between mb-3 gap-2">
               <div className={`inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border font-medium ${catKleur[b.type] || 'bg-gray-50 text-gray-600 border-gray-200'}`}>
                 <span>{b.icon}</span><span>{b.typelabel}</span>

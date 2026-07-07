@@ -107,6 +107,18 @@ export default async (req) => {
   const fouten = []
   const alleItems = []
 
+  // Rapport per bron: is de bron echt bekeken, wat is er gezien en wat is er nieuw
+  const bronRapport = RSS_FEEDS.map(feed => ({
+    naam: feed.naam,
+    icon: feed.icon,
+    status: 'fout',
+    foutmelding: null,
+    opgehaald: 0,
+    alBekend: 0,
+    nieuw: 0,
+    nieuweItems: [],
+  }))
+
   const feedResults = await Promise.allSettled(
     RSS_FEEDS.map(async (feed) => {
       const feedUrlMet = feed.url + (feed.url.includes('?') ? '&' : '?') + '_t=' + Date.now()
@@ -125,17 +137,23 @@ export default async (req) => {
   for (let i = 0; i < feedResults.length; i++) {
     const result = feedResults[i]
     if (result.status === 'rejected') {
-      fouten.push(`${RSS_FEEDS[i].naam}: ${result.reason?.message?.slice(0, 50)}`)
+      const melding = result.reason?.message?.slice(0, 50) || 'onbekende fout'
+      bronRapport[i].foutmelding = melding
+      fouten.push(`${RSS_FEEDS[i].naam}: ${melding}`)
     } else {
+      bronRapport[i].status = 'bekeken'
+      bronRapport[i].opgehaald = result.value.items.length
       alleItems.push(result.value)
     }
   }
 
-  // Filter items waarvan de titel al bekend is — geen Anthropic call voor duplicates
-  const nieuweItems = alleItems.map(({ feed, items }) => ({
-    feed,
-    items: items.filter(item => !bekendeTitels.has(item.titel.toLowerCase().trim()))
-  })).filter(({ items }) => items.length > 0)
+  // Filter items waarvan de titel al bekend is, geen Anthropic call voor duplicates
+  const nieuweItems = alleItems.map(({ feed, items }) => {
+    const vers = items.filter(item => !bekendeTitels.has(item.titel.toLowerCase().trim()))
+    const rap = bronRapport.find(b => b.naam === feed.naam)
+    if (rap) rap.alBekend = items.length - vers.length
+    return { feed, items: vers }
+  }).filter(({ items }) => items.length > 0)
 
   const aantalGefilterd = alleItems.reduce((t, { items }) => t + items.length, 0) - nieuweItems.reduce((t, { items }) => t + items.length, 0)
 
@@ -150,12 +168,22 @@ export default async (req) => {
     .filter(r => r.status === 'fulfilled' && r.value !== null)
     .map(r => r.value)
 
+  // Per bron vastleggen wat er daadwerkelijk is toegevoegd en onder welk thema
+  for (const item of resultaten) {
+    const rap = bronRapport.find(b => b.naam === item.naam)
+    if (rap) {
+      rap.nieuw++
+      rap.nieuweItems.push({ titel: item.titel, thema: item.sporeDef ? item.sporeDef.titel : null })
+    }
+  }
+
   return new Response(JSON.stringify({
     ok: true,
     aantalNieuw: resultaten.length,
-    aantalGefilterd,          // hoeveel duplicates er uitgefilterd zijn
+    aantalGefilterd,
     geenNieuwNieuws: resultaten.length === 0 && aantalGefilterd > 0,
     items: resultaten,
+    bronnen: bronRapport,
     fouten: fouten.length > 0 ? fouten : undefined,
     tijdstip: new Date().toISOString(),
   }), { headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } })

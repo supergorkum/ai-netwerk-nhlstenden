@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { initiatieven as initData, sporen, lagen, BEHEER_CODE } from '../data'
+import { initiatieven as initData, sporen, lagen, BEHEER_CODE, APP_VERSIE, APP_VERSIE_DATUM } from '../data'
 import { exportJSON, importJSON } from '../storage'
 
 const NIEUWS_URL = '/.netlify/functions/nieuws-ophalen'
@@ -238,7 +238,7 @@ function NieuwsOphalen({ onNieuwItems, inspiraties = [] }) {
       </div>
       <div className="px-6 py-4 border-b border-gray-100 bg-gray-50">
         <p className="text-sm text-gray-600">
-          Haalt nieuws op van <strong>The Gradient</strong>, <strong>MIT Tech Review</strong>, <strong>VentureBeat</strong>, <strong>Import AI</strong> en anderen.
+          Haalt nieuws op van <strong>The Gradient</strong>, <strong>80,000 Hours</strong> en <strong>Import AI</strong>.
           De Anthropic AI beoordeelt elk artikel op relevantie voor NHL Stenden en schrijft een Nederlandse samenvatting.
           Relevante items worden direct toegevoegd aan <strong>Inzichten</strong>.
         </p>
@@ -251,61 +251,64 @@ function NieuwsOphalen({ onNieuwItems, inspiraties = [] }) {
           {status === 'klaar' && (
             <div className="space-y-2">
               {(() => {
-                const bronnen = ['The Gradient', 'Import AI', 'MIT Tech Review', 'VentureBeat']
-                const itemsPerBron = {}
-                ;(resultaat.items || []).forEach(item => {
-                  const bron = item.naam || 'Overig'
-                  if (!itemsPerBron[bron]) itemsPerBron[bron] = []
-                  itemsPerBron[bron].push(item)
-                })
+                const bronnen = resultaat.bronnen || []
                 return (
                   <div className="space-y-3">
-                    {resultaat.aantalNieuw > 0 && (
-                      <div className="text-xs font-semibold text-green-700 mb-1">
-                        ✓ {resultaat.aantalNieuw} nieuw item{resultaat.aantalNieuw !== 1 ? 's' : ''} toegevoegd aan Inzichten
-                      </div>
-                    )}
+                    <div className={`text-xs font-semibold mb-1 ${resultaat.aantalNieuw > 0 ? 'text-green-700' : 'text-gray-500'}`}>
+                      {resultaat.aantalNieuw > 0
+                        ? `✓ ${resultaat.aantalNieuw} nieuw item${resultaat.aantalNieuw !== 1 ? 's' : ''} toegevoegd aan Inzichten`
+                        : '✓ Alle bereikbare bronnen bekeken, geen nieuwe items toegevoegd'}
+                    </div>
                     {bronnen.map(bron => {
-                      const items = itemsPerBron[bron] || []
-                      const heeftNieuws = items.length > 0
+                      const bekeken = bron.status === 'bekeken'
+                      const heeftNieuw = bron.nieuw > 0
+                      const beoordeeld = bron.opgehaald - bron.alBekend
                       return (
-                        <div key={bron} className={`flex items-start gap-3 px-3 py-2 rounded-lg text-xs ${heeftNieuws ? 'bg-green-50' : 'bg-gray-50'}`}>
-                          <span className="mt-0.5 flex-shrink-0">{heeftNieuws ? '✅' : '⬜'}</span>
-                          <div className="flex-1 min-w-0">
-                            <div className={`font-semibold ${heeftNieuws ? 'text-green-700' : 'text-gray-400'}`}>{bron}</div>
-                            {heeftNieuws ? (
-                              <div className="text-gray-500 mt-0.5 truncate">{items[0].titel}{items.length > 1 ? ` +${items.length - 1} meer` : ''}</div>
-                            ) : (
-                              <div className="text-gray-400 mt-0.5">Geen nieuw nieuws</div>
-                            )}
+                        <div key={bron.naam} className={`px-3 py-2.5 rounded-lg text-xs border ${
+                          !bekeken ? 'bg-red-50 border-red-200' :
+                          heeftNieuw ? 'bg-green-50 border-green-200' :
+                          'bg-gray-50 border-gray-200'
+                        }`}>
+                          <div className="flex items-start gap-3">
+                            <span className="mt-0.5 flex-shrink-0">{!bekeken ? '❌' : heeftNieuw ? '✅' : '✔️'}</span>
+                            <div className="flex-1 min-w-0">
+                              <div className={`font-semibold ${!bekeken ? 'text-red-600' : heeftNieuw ? 'text-green-700' : 'text-gray-600'}`}>
+                                {bron.icon} {bron.naam}
+                                {bekeken && (
+                                  <span className="font-normal text-gray-400"> · bekeken, {bron.opgehaald} item{bron.opgehaald !== 1 ? 's' : ''} gezien</span>
+                                )}
+                              </div>
+                              {!bekeken && (
+                                <div className="text-red-500 mt-0.5">Niet bereikbaar: {bron.foutmelding || 'onbekende fout'}</div>
+                              )}
+                              {bekeken && !heeftNieuw && (
+                                <div className="text-gray-400 mt-0.5">
+                                  Geen verandering{bron.opgehaald > 0 ? `: ${bron.alBekend > 0 ? `${bron.alBekend} al bekend` : ''}${bron.alBekend > 0 && beoordeeld > 0 ? ', ' : ''}${beoordeeld > 0 ? `${beoordeeld} beoordeeld als niet relevant` : ''}` : ''}
+                                </div>
+                              )}
+                              {heeftNieuw && (
+                                <div className="mt-1 space-y-0.5">
+                                  {bron.nieuweItems.map((it, idx) => (
+                                    <div key={idx} className="text-gray-600">
+                                      🆕 {it.titel} → toegevoegd aan Inzichten{it.thema ? `, thema ${it.thema}` : ''}
+                                    </div>
+                                  ))}
+                                  {bron.alBekend > 0 && (
+                                    <div className="text-gray-400">{bron.alBekend} item{bron.alBekend !== 1 ? 's' : ''} al bekend, overgeslagen</div>
+                                  )}
+                                </div>
+                              )}
+                            </div>
                           </div>
                         </div>
                       )
                     })}
-                    {resultaat.fouten?.length > 0 && (
-                      <div className="text-xs text-red-400 mt-1">⚠️ {resultaat.fouten.join(', ')}</div>
+                    {bronnen.length === 0 && (
+                      <div className="text-xs text-gray-400">Geen bronrapport ontvangen. Controleer of de nieuwste versie van de nieuws-function is gedeployed.</div>
                     )}
                   </div>
                 )
               })()}
-              {false && (
-                <div className="bg-blue-50 border border-blue-100 rounded-xl px-4 py-3 flex items-start gap-3">
-                  <span className="text-lg flex-shrink-0">ℹ️</span>
-                  <div>
-                    <div className="text-sm font-semibold text-nhl-blauw mb-0.5">Geen nieuw nieuws</div>
-                    <p className="text-xs text-gray-500 leading-relaxed">
-                      {resultaat.aantalGefilterd > 0
-                        ? `Alle ${resultaat.aantalGefilterd} opgehaalde items staan al in Inzichten. Kom later terug voor nieuwe berichten.`
-                        : 'Er zijn geen relevante berichten gevonden voor NHL Stenden. Kom later terug.'}
-                    </p>
-                  </div>
-                </div>
-              )}
-              {resultaat.fouten?.length > 0 && (
-                <div className="text-xs text-amber-600 bg-amber-50 rounded-lg px-3 py-2">
-                  ⚠️ Niet alle feeds bereikbaar: {resultaat.fouten.join(' · ')}
-                </div>
-              )}
             </div>
           )}
           {status === 'fout' && (
@@ -1254,15 +1257,31 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
           <div className="flex items-center justify-between p-6 border-b border-gray-100 sticky top-0 bg-white">
             <div>
               <h2 className="font-bold text-nhl-blauw text-lg">📋 Changelog</h2>
-              <p className="text-xs text-gray-400 mt-0.5">Versiehistorie van de AI-HUB</p>
+              <p className="text-xs text-gray-400 mt-0.5">Versiehistorie van het AI-Netwerk · huidige versie {APP_VERSIE} ({APP_VERSIE_DATUM})</p>
             </div>
             <button onClick={() => setChangelogOpen(false)} className="text-gray-400 hover:text-gray-600 text-2xl leading-none">✕</button>
           </div>
           <div className="p-6 space-y-6">
             {[
               {
-                versie: 'v2.1', datum: 'Juni 2026',
+                versie: APP_VERSIE, datum: APP_VERSIE_DATUM,
                 label: 'Huidige versie', labelKleur: 'bg-green-100 text-green-700',
+                items: [
+                  'Roadmap omgekeerd: de verplichtingen uit de EU AI Act zijn het vertrekpunt, met stoplicht-signalering per verplichting.',
+                  'Sectie Eigen koers voor roadmap-items zonder AI Act verplichting.',
+                  'Dashboard toont per verplichting het signaal, het gekoppelde werk en de verantwoordelijken.',
+                  'Cloud backup schrijft nu echt naar Netlify Blobs. De tijdstempel van de laatste gelukte backup blijft zichtbaar na herlaad.',
+                  'Roadmap opgenomen in backup, download en herstel.',
+                  'Rapport herschreven langs de AI-Koers: koerslijnen, initiatieven per koerslijn, AI Act signalering en berekende prognose. NVAO verwijderd.',
+                  'Nieuws ophalen: per bron is zichtbaar of die echt bekeken is, wat er nieuw is en waar het is geland. Bronnenlijst gecorrigeerd.',
+                  'Nieuwe inzichten vallen op de site op met een amber rand.',
+                  'Centraal versienummer ingevoerd: APP_VERSIE in data.js is voortaan de enige plek waar de versie wordt bijgehouden.',
+                ],
+              },
+
+              {
+                versie: 'v2.1', datum: 'Juni 2026',
+                label: null, labelKleur: '',
                 items: [
                   "Startpagina herzien: drie kern-knoppen (AI-Netwerk, Thema's, Kader), losse Dashboard- en Kader-pagina.",
                   'Inzichten samengevoegd als tab binnen Initiatieven, met eigen kleuraccent.',
