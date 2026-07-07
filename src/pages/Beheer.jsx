@@ -1,10 +1,20 @@
 import { useState, useEffect, useCallback } from 'react'
 import { initiatieven as initData, sporen, lagen, BEHEER_CODE, APP_VERSIE, APP_VERSIE_DATUM } from '../data'
-import { exportJSON, importJSON } from '../storage'
+import { exportJSON, importJSON, logWijziging, haalWijzigingenOp } from '../storage'
 
 const NIEUWS_URL = '/.netlify/functions/nieuws-ophalen'
 const REFRESH_KEY = 'aihub-laatste-refresh'
 const BACKUP_KEY = 'aihub-backup-v1'
+
+// Indeling van paden naar onderdelen van de site, voor het bezoekersoverzicht
+const ONDERDELEN = [
+  { naam: 'Start', paden: ['/'] },
+  { naam: 'Verkennen', paden: ['/netwerk', '/themas', '/initiatieven', '/dashboard'] },
+  { naam: 'Kennis', paden: ['/geletterdheid', '/linkjes', '/agentic-ai', '/documentatie', '/video'] },
+  { naam: 'Beleid en kader', paden: ['/beleid', '/governance', '/kader', '/fundament', '/nvao'] },
+  { naam: 'Meedoen', paden: ['/meld', '/evenementen', '/pilots'] },
+  { naam: 'Over', paden: ['/over', '/wat-levert-het-op'] },
+]
 
 async function slaOpInCloud(data) {
   const payload = { ...data, backupDatum: new Date().toISOString() }
@@ -198,6 +208,7 @@ function NieuwsOphalen({ onNieuwItems, inspiraties = [] }) {
       localStorage.setItem(REFRESH_KEY, ts)
       if (data.items?.length > 0) {
         onNieuwItems(data.items)
+        logWijziging('Inzicht', `${data.items.length} nieuws-item${data.items.length !== 1 ? 's' : ''} automatisch toegevoegd`, '', '🤖')
         const nieuweTitels = data.items.map(i => i.titel).filter(Boolean)
         const alleTitels = [...new Set([...bekendeTitels, ...nieuweTitels])].slice(-200)
         fetch('/.netlify/functions/storage', {
@@ -448,6 +459,8 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
   const [actieveTab, setActieveTab] = useState('initiatieven')
   const [analytics, setAnalytics] = useState(null)
   const [analyticsLaden, setAnalyticsLaden] = useState(false)
+  const [analyticsFout, setAnalyticsFout] = useState(null)
+  const [wijzigingen, setWijzigingen] = useState(null)
 
   // Haal bij het openen de tijdstempel van de laatste gelukte cloud backup op
   useEffect(() => {
@@ -456,9 +469,11 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
 
   const laadAnalytics = () => {
     setAnalyticsLaden(true)
+    setAnalyticsFout(null)
     fetch('/.netlify/functions/storage?key=analytics-bezoeken')
       .then(r => r.json())
       .then(data => {
+        if (data.error) throw new Error(data.error)
         let parsed = []
         try {
           const raw = data.value ?? data
@@ -467,15 +482,25 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
         setAnalytics(parsed)
         setAnalyticsLaden(false)
       })
-      .catch(() => { setAnalyticsLaden(false) })
+      .catch(err => {
+        setAnalyticsFout(err?.message || 'onbekende fout')
+        setAnalytics([])
+        setAnalyticsLaden(false)
+      })
+    haalWijzigingenOp().then(setWijzigingen).catch(() => setWijzigingen([]))
   }
+
+  // Bezoekersdata automatisch laden zodra de tab opent, geen aparte knop meer nodig
+  useEffect(() => {
+    if (actieveTab === 'bezoekers' && analytics === null && !analyticsLaden) laadAnalytics()
+  }, [actieveTab])
 
   const resetAnalytics = () => {
     if (!window.confirm('Alle bezoekersdata wissen? Dit kan niet ongedaan worden gemaakt.')) return
     fetch('/.netlify/functions/storage', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ key: 'analytics-bezoeken', value: [] }),
+      body: JSON.stringify({ key: 'analytics-bezoeken', value: JSON.stringify([]) }),
     }).then(() => setAnalytics([]))
   }
 
@@ -506,6 +531,7 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
     if (geselecteerd.docs && previewData.docs) setDocs(previewData.docs)
     if (geselecteerd.inspiraties && previewData.inspiraties) setInspiraties(previewData.inspiraties)
     if (geselecteerd.roadmap && previewData.roadmap && setRoadmap) setRoadmap(previewData.roadmap)
+    logWijziging('Backup', previewBron === 'cloud' ? 'hersteld uit cloud' : 'hersteld uit bestand', '', '☁️')
     if (previewBron === 'cloud' && previewData.backupDatum) setCloudTijdstempel(previewData.backupDatum)
     setPreviewData(null)
     setPreviewBron(null)
@@ -519,6 +545,7 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
   }
 
   const slaInitiatiefOp = (gewijzigd) => {
+    logWijziging('Initiatief', 'bijgewerkt', gewijzigd.naam, '🚀')
     setAlleInitiatieven(prev => prev.map(i => i.id === gewijzigd.id ? gewijzigd : i))
   }
 
@@ -687,7 +714,7 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
             <div className="space-y-3">
               {alleInitiatieven.map(init => (
                 <InitiatiefRij key={init.id} init={init} onSave={slaInitiatiefOp}
-                  onDelete={(id) => { if (window.confirm('Verwijderen?')) setAlleInitiatieven(prev => prev.filter(i => i.id !== id)) }} />
+                  onDelete={(id) => { if (window.confirm('Verwijderen?')) { const init = alleInitiatieven.find(i => i.id === id); logWijziging('Initiatief', 'verwijderd', init ? init.naam : '', '🚀'); setAlleInitiatieven(prev => prev.filter(i => i.id !== id)) } }} />
               ))}
             </div>
           </div>
@@ -772,7 +799,7 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
                       <div className="font-medium text-nhl-blauw text-sm mb-1">{v.titel}</div>
                       <p className="text-gray-500 text-xs mb-3">{v.omschrijving}</p>
                       <div className="flex gap-2">
-                        <button onClick={() => { setVideos(prev => prev.map(x => x.id === v.id ? { ...x, status: 'goedgekeurd' } : x)); if (setActiefVideoId) setActiefVideoId(v.id) }}
+                        <button onClick={() => { logWijziging('Video', 'goedgekeurd', v.titel || '', '🎬'); setVideos(prev => prev.map(x => x.id === v.id ? { ...x, status: 'goedgekeurd' } : x)); if (setActiefVideoId) setActiefVideoId(v.id) }}
                           className="flex-1 bg-green-600 text-white text-xs py-2 rounded-lg font-medium">✓ Goedkeuren</button>
                         <button onClick={() => setVideos(prev => prev.filter(x => x.id !== v.id))}
                           className="flex-1 bg-red-100 text-red-600 text-xs py-2 rounded-lg font-medium">✕ Afwijzen</button>
@@ -812,7 +839,7 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
                       </div>
                       <div className="text-xs text-gray-400">{p.academie} · {p.platform} · {p.updates?.length || 0} updates</div>
                     </div>
-                    <button onClick={() => { if (window.confirm('Verwijderen?')) setPilots(prev => prev.filter(x => x.id !== p.id)) }} className="text-red-400 hover:text-red-600 text-xs flex-shrink-0">Verwijder</button>
+                    <button onClick={() => { if (window.confirm('Verwijderen?')) { logWijziging('Pilot', 'verwijderd', p.naam || '', '🧪'); setPilots(prev => prev.filter(x => x.id !== p.id)) } }} className="text-red-400 hover:text-red-600 text-xs flex-shrink-0">Verwijder</button>
                   </div>
                 ))}
               </div>
@@ -833,7 +860,7 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
                       <div className="font-medium text-nhl-blauw text-sm">{d.titel}</div>
                       <div className="text-xs text-gray-400">{d.type?.toUpperCase()} · {d.datum}</div>
                     </div>
-                    <button onClick={() => { if (window.confirm('Verwijderen?')) setDocs(prev => prev.filter(x => x.id !== d.id)) }} className="text-red-400 hover:text-red-600 text-xs">Verwijder</button>
+                    <button onClick={() => { if (window.confirm('Verwijderen?')) { logWijziging('Document', 'verwijderd', d.titel || d.naam || '', '📁'); setDocs(prev => prev.filter(x => x.id !== d.id)) } }} className="text-red-400 hover:text-red-600 text-xs">Verwijder</button>
                   </div>
                 ))}
               </div>
@@ -1037,13 +1064,15 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
                   </div>
                 </div>
 
+                {analyticsFout && (
+                  <div className="mb-4 bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-xs text-red-600">
+                    ⚠️ Bezoekersdata kon niet worden opgehaald: {analyticsFout}. Controleer de Netlify function logs onder Logs & metrics → Functions → storage.
+                  </div>
+                )}
+
                 {analytics === null && (
-                  <div className="text-center py-12">
-                    <button onClick={laadAnalytics}
-                      className="bg-nhl-blauw text-white px-6 py-2.5 rounded-xl font-semibold text-sm hover:bg-nhl-blauw-dark transition-colors">
-                      Bezoekersdata laden
-                    </button>
-                    <p className="text-xs text-gray-400 mt-3">Data wordt opgehaald uit Netlify Blobs.</p>
+                  <div className="text-center py-12 text-gray-400 text-sm">
+                    <span className="animate-spin inline-block mr-2">⟳</span> Bezoekersdata wordt geladen...
                   </div>
                 )}
 
@@ -1131,6 +1160,59 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
                           <div className="flex justify-between text-xs text-gray-300 mt-1">
                             <span>0u</span><span>12u</span><span>24u</span>
                           </div>
+                        </div>
+                      </div>
+
+                      <div className="grid md:grid-cols-2 gap-5">
+                        <div className="bg-white rounded-2xl border border-gray-100 p-5">
+                          <div className="font-bold text-nhl-blauw mb-4 text-sm">Bezoeken per onderdeel</div>
+                          {(() => {
+                            const telling = ONDERDELEN.map(o => ({
+                              naam: o.naam,
+                              n: analytics.filter(b => o.paden.includes(b.pad)).length,
+                            }))
+                            const rest = analytics.length - telling.reduce((t, o) => t + o.n, 0)
+                            if (rest > 0) telling.push({ naam: 'Overig', n: rest })
+                            const max = Math.max(...telling.map(t => t.n), 1)
+                            return (
+                              <div className="space-y-2">
+                                {telling.filter(t => t.n > 0).sort((a, b) => b.n - a.n).map(t => (
+                                  <div key={t.naam} className="flex items-center gap-3">
+                                    <div className="flex-1 min-w-0">
+                                      <div className="text-xs font-medium text-gray-700">{t.naam}</div>
+                                      <div className="h-1.5 bg-gray-100 rounded-full mt-1">
+                                        <div className="h-1.5 bg-nhl-roze rounded-full transition-all" style={{ width: `${(t.n / max) * 100}%` }} />
+                                      </div>
+                                    </div>
+                                    <span className="text-xs font-bold text-nhl-blauw flex-shrink-0">{t.n}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            )
+                          })()}
+                        </div>
+
+                        <div className="bg-white rounded-2xl border border-gray-100 p-5">
+                          <div className="font-bold text-nhl-blauw mb-4 text-sm">Laatste aanpassingen</div>
+                          {wijzigingen === null && <div className="text-xs text-gray-400">Laden...</div>}
+                          {Array.isArray(wijzigingen) && wijzigingen.length === 0 && (
+                            <div className="text-xs text-gray-400">Nog geen aanpassingen geregistreerd. Vanaf deze versie wordt elke toevoeging, wijziging of verwijdering hier bijgehouden.</div>
+                          )}
+                          {Array.isArray(wijzigingen) && wijzigingen.length > 0 && (
+                            <div className="space-y-1.5 max-h-56 overflow-y-auto">
+                              {wijzigingen.slice(0, 25).map((w, i) => (
+                                <div key={i} className="flex items-start gap-2 text-xs py-1 border-b border-gray-50 last:border-0">
+                                  <span className="flex-shrink-0">{w.icon || '✏️'}</span>
+                                  <div className="flex-1 min-w-0">
+                                    <span className="font-medium text-nhl-blauw">{w.onderdeel}</span>
+                                    <span className="text-gray-500"> · {w.actie}</span>
+                                    {w.titel && <span className="text-gray-500">: {w.titel}</span>}
+                                  </div>
+                                  <span className="text-gray-300 flex-shrink-0">{w.tijd}</span>
+                                </div>
+                              ))}
+                            </div>
+                          )}
                         </div>
                       </div>
 
@@ -1266,6 +1348,16 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
               {
                 versie: APP_VERSIE, datum: APP_VERSIE_DATUM,
                 label: 'Huidige versie', labelKleur: 'bg-green-100 text-green-700',
+                items: [
+                  'Bezoekersoverzicht laadt automatisch bij openen, met verdeling van bezoeken per onderdeel van de site.',
+                  'Reset van de bezoekersteller gerepareerd: verkeerd opslagformaat kon het laden stil laten mislukken. Fouten zijn nu zichtbaar.',
+                  'Wijzigingen-log: elke toevoeging, wijziging of verwijdering (initiatieven, roadmap, inzichten, pilots, video, documenten, backup-herstel) is zichtbaar in Beheer onder Bezoekers.',
+                ],
+              },
+
+              {
+                versie: 'v2.2', datum: 'Juli 2026',
+                label: null, labelKleur: '',
                 items: [
                   'Roadmap omgekeerd: de verplichtingen uit de EU AI Act zijn het vertrekpunt, met stoplicht-signalering per verplichting.',
                   'Sectie Eigen koers voor roadmap-items zonder AI Act verplichting.',

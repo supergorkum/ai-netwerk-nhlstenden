@@ -21,6 +21,28 @@ export async function saveData(key, value) {
   } catch { return false }
 }
 
+// Wijzigingen-log: houdt bij wat er is toegevoegd, bijgewerkt of verwijderd,
+// zodat moderatoren in Beheer kunnen zien wat er op de site is gebeurd.
+const WIJZIGINGEN_KEY = 'wijzigingen-log'
+
+export async function logWijziging(onderdeel, actie, titel = '', icon = '✏️') {
+  try {
+    const bestaand = (await loadData(WIJZIGINGEN_KEY)) || []
+    const nu = new Date()
+    const nieuw = [{
+      onderdeel, actie, titel, icon,
+      tijd: nu.toLocaleString('nl-NL', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }),
+      ts: nu.getTime(),
+    }, ...(Array.isArray(bestaand) ? bestaand : [])].slice(0, 100)
+    await saveData(WIJZIGINGEN_KEY, nieuw)
+  } catch { /* loggen mag nooit de actie zelf blokkeren */ }
+}
+
+export async function haalWijzigingenOp() {
+  const data = await loadData(WIJZIGINGEN_KEY)
+  return Array.isArray(data) ? data : []
+}
+
 export async function exportJSON(data, filename) {
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
   const url = URL.createObjectURL(blob)

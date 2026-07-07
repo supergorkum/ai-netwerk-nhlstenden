@@ -4,6 +4,7 @@ import { useNavigate, useLocation, useSearchParams } from 'react-router-dom'
 import { initiatieven, sporen, AI_ACT_ITEMS, SIGNAAL_CONFIG, verplichtingSignaal } from '../data'
 import InzichtenTab from '../components/InzichtenTab'
 import BetrokkenenWidget, { haalBetrokkenenOp } from '../components/BetrokkenenWidget'
+import { logWijziging } from '../storage'
 
 const statusConfig = {
   actief:            { label: 'Actief',          kleur: 'bg-green-100 text-green-700' },
@@ -121,6 +122,7 @@ export default function Initiatieven({ roadmap, setRoadmap, inspiraties, setInsp
       pendingAfgerond: false,
       pendingReopen: false,
     }, ...prev])
+    logWijziging('Roadmap', 'item toegevoegd', form.titel, '🗺️')
     setToegevoegd(true)
   }
 
@@ -140,10 +142,13 @@ export default function Initiatieven({ roadmap, setRoadmap, inspiraties, setInsp
       nieuw: true,
     }
     setExtraInitiatieven(prev => [nieuw, ...prev])
+    logWijziging('Initiatief', 'aangemeld', initForm.naam, '🚀')
     setInitToegevoegd(true)
   }
 
   const wisselStatus = (id) => {
+    const huidigItem = (roadmap || []).find(i => i.id === id)
+    if (huidigItem && huidigItem.status !== 'afgerond') logWijziging('Roadmap', 'status bijgewerkt', huidigItem.titel, '🗺️')
     setRoadmap(prev => prev.map(item => {
       if (item.id !== id) return item
       if (item.pendingAfgerond || item.pendingReopen) return item

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { sporen, lagen } from '../data'
+import { logWijziging } from '../storage'
 
 const INSPIRATIE_TYPES = [
   { id: 'ontwikkeling', label: 'Interessante ontwikkeling', icon: '🌐', uitleg: 'Een trend, nieuws of inzicht uit de AI-wereld dat relevant is voor NHL Stenden.' },
@@ -89,6 +90,7 @@ export default function InzichtenTab({ inspiraties, setInspiraties }) {
       nieuw: true,
     }
     setInspiraties(prev => [nieuw, ...prev])
+    logWijziging('Inzicht', 'gedeeld', form.titel || nieuw.typelabel, '💡')
     setVerstuurd(true)
     const isAiAct = (parseInt(form.spoor) === 3) || form.trefwoorden.some(t => t.toLowerCase().includes('ai act') || t.toLowerCase().includes('compliance'))
     if (isAiAct) {
