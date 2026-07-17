@@ -1472,6 +1472,14 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
                 versie: APP_VERSIE, datum: APP_VERSIE_DATUM,
                 label: 'Huidige versie', labelKleur: 'bg-green-100 text-green-700',
                 items: [
+                  'Startpagina: opvallende banner direct onder de hero die naar /ai-koers linkt. Dit was het ontbrekende toegangspunt naar de presentatiemodus, die tot nu toe nergens was aan te klikken.',
+                ],
+              },
+
+              {
+                versie: 'v2.24', datum: 'Juli 2026',
+                label: null, labelKleur: '',
+                items: [
                   'Beheer: reset-knop bij AI Koers Feedback, om alle duimpjes en feedback in één keer te wissen. Handig om vrij te testen en daarna schoon te beginnen voor de echte presentatie.',
                 ],
               },

@@ -267,6 +267,17 @@ export default function Start({ videos = [], pilots = [], evenementen = [], beri
         </div>
       </section>
 
+      {/* AI-Koers presentatie: toegangspunt naar de presentatiemodus */}
+      <Link to="/ai-koers" className="block bg-nhl-roze/10 hover:bg-nhl-roze/15 border-b border-nhl-roze/20 transition-colors">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center gap-3">
+          <span className="text-sm">🎤</span>
+          <span className="text-xs text-nhl-roze font-semibold uppercase tracking-wide flex-shrink-0">AI-Koers presentatie</span>
+          <span className="text-gray-300">·</span>
+          <span className="text-sm font-medium text-nhl-roze">Doe mee: bekijk de koers en geef per pagina je duimpje en feedback</span>
+          <span className="ml-auto text-xs text-nhl-roze font-medium flex-shrink-0">Meedoen →</span>
+        </div>
+      </Link>
+
       {/* Eerstvolgende evenement */}
       {(() => {
         const nu = new Date()
