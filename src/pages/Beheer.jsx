@@ -1489,6 +1489,15 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
                 versie: APP_VERSIE, datum: APP_VERSIE_DATUM,
                 label: 'Huidige versie', labelKleur: 'bg-green-100 text-green-700',
                 items: [
+                  'AI-Koers poster: het echte NHL Stenden logo toegepast (het oude tekst-nagebouwde kader vervangen door het echte logobestand, met een naadloos gereconstrueerde achtergrond).',
+                ],
+              },
+
+              {
+                versie: 'v2.43', datum: 'Juli 2026',
+                label: null, labelKleur: '',
+                items: [
+
                   'AI-Koers document: het tekst-nagebouwde "NHL STENDEN"-kader op de omslag vervangen door het echte logobestand, ingebakken als data-URI. Werkt in het document, de PDF-export en de website (presentatiemodus en documentpagina), zonder los bestandspad.',
                 ],
               },
