@@ -1489,6 +1489,15 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
                 versie: APP_VERSIE, datum: APP_VERSIE_DATUM,
                 label: 'Huidige versie', labelKleur: 'bg-green-100 text-green-700',
                 items: [
+                  'Bugfix: /initiatieven crashte volledig wit als een item een tekst had als "ambities"-veld in plaats van een lijst (de bestaande terugval ving dit niet op, want een tekst is ook "waar"). Nu een expliciete Array.isArray-check, ook toegepast op een vergelijkbare plek bij AI Act-koppelingen.',
+                ],
+              },
+
+              {
+                versie: 'v2.39', datum: 'Juli 2026',
+                label: null, labelKleur: '',
+                items: [
+
                   'AI-Koers rapport flink verrijkt: sentiment-overzicht van alle paginas in een oogopslag, betrokkenheidsindicator, uitgelichte (geverifieerde) citaten uit de feedback, en inzicht per rol (docent/student/management/overig).',
                   'AI-Koers documentpagina: klein versielabel toegevoegd ("Versie v0.4d").',
                 ],

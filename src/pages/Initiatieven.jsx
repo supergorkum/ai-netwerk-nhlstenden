@@ -335,7 +335,7 @@ export default function Initiatieven({ roadmap, setRoadmap, inspiraties, setInsp
                         </div>
                         <div className="font-bold text-nhl-blauw mb-2 leading-snug">{init.naam}</div>
                         <p className="text-gray-500 text-sm leading-relaxed flex-1 mb-3">{init.omschrijving}</p>
-                        {(init.ambities || []).length > 0 && (
+                        {Array.isArray(init.ambities) && init.ambities.length > 0 && (
                           <div className="flex flex-wrap gap-1 mb-2">
                             {init.ambities.map(a => (
                               <span key={a} className="text-xs bg-nhl-blauw/10 text-nhl-blauw px-2 py-0.5 rounded-full">
@@ -459,7 +459,7 @@ export default function Initiatieven({ roadmap, setRoadmap, inspiraties, setInsp
                 const sc = SIGNAAL_CONFIG[signaal.kleur]
                 const gekoppeldeItems = actieveItems.filter(r => r.aiActKoppeling === vp.id)
                 const afgerondGekoppeld = afgerondItems.filter(r => r.aiActKoppeling === vp.id)
-                const initGekoppeld = (vp.gekoppeldAan || []).map(id => initiatieven.find(i => i.id === id)).filter(Boolean)
+                const initGekoppeld = (Array.isArray(vp.gekoppeldAan) ? vp.gekoppeldAan : []).map(id => initiatieven.find(i => i.id === id)).filter(Boolean)
                 return (
                   <div key={vp.id} className={`rounded-2xl border-2 bg-white overflow-hidden ${sc.border}`}>
                     <div className={`px-5 py-4 ${sc.bg}`}>
