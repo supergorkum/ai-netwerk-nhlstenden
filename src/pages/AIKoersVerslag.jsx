@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { BEHEER_CODE } from '../data'
 
 const ROL_LABEL = { docent: 'Docent', student: 'Student', management: 'Management', overig: 'Overig', onbekend: 'Onbekend' }
@@ -23,13 +23,19 @@ export default function AIKoersVerslag() {
   }
 
   const [rapport, setRapport] = useState(null)
+  const [status, setStatus] = useState(null) // 'bezig' | 'klaar' | 'fout'
   const [laadFout, setLaadFout] = useState(null)
-  const [laden, setLaden] = useState(false)
+  const [gestartOp, setGestartOp] = useState(null)
+  const peilTimer = useRef(null)
 
-  const laadRapport = () => {
-    setLaden(true)
+  const opruimenPeiling = () => {
+    if (peilTimer.current) { clearTimeout(peilTimer.current); peilTimer.current = null }
+  }
+
+  const laadRapport = (vernieuw = false) => {
+    opruimenPeiling()
     setLaadFout(null)
-    fetch('/.netlify/functions/ai-koers-rapport')
+    fetch(`/.netlify/functions/ai-koers-rapport${vernieuw ? '?vernieuw=1' : ''}`)
       .then(async r => {
         const body = await r.text()
         let data
@@ -37,17 +43,25 @@ export default function AIKoersVerslag() {
           throw new Error(`de rapport-function gaf geen geldige JSON terug (status ${r.status})`)
         }
         if (data.error) throw new Error(data.error)
-        setRapport(data)
-        setLaden(false)
+
+        setStatus(data.status)
+        if (data.status === 'bezig') {
+          setGestartOp(data.gestartOp || null)
+          peilTimer.current = setTimeout(() => laadRapport(false), 3000)
+        } else if (data.status === 'klaar') {
+          setRapport(data.rapport)
+        } else if (data.status === 'fout') {
+          setLaadFout(data.foutmelding || 'onbekende fout')
+        }
       })
       .catch(err => {
         setLaadFout(err?.message || 'onbekende fout')
-        setLaden(false)
       })
   }
 
   useEffect(() => {
-    if (toegang) laadRapport()
+    if (toegang) laadRapport(false)
+    return opruimenPeiling
   }, [toegang])
 
   useEffect(() => {
@@ -121,8 +135,8 @@ export default function AIKoersVerslag() {
       `}</style>
 
       <div className="no-print">
-        <button className="btn-ververs" onClick={laadRapport} disabled={laden}>{laden ? 'Bezig...' : '🔄 Vernieuwen'}</button>
-        <button className="btn-print" onClick={() => window.print()}>🖨️ Afdrukken / Opslaan als PDF</button>
+        <button className="btn-ververs" onClick={() => laadRapport(true)} disabled={status === 'bezig'}>{status === 'bezig' ? 'Bezig...' : '🔄 Vernieuwen'}</button>
+        <button className="btn-print" onClick={() => window.print()} disabled={!rapport}>🖨️ Afdrukken / Opslaan als PDF</button>
       </div>
 
       <div className="verslag">
@@ -135,13 +149,20 @@ export default function AIKoersVerslag() {
         {laadFout && (
           <div className="leeg">
             Kon het rapport niet laden: {laadFout}
-            <br /><button className="btn-ververs" style={{ marginTop: 10 }} onClick={laadRapport}>Opnieuw proberen</button>
+            <br /><button className="btn-ververs" style={{ marginTop: 10 }} onClick={() => laadRapport(true)}>Opnieuw proberen</button>
           </div>
         )}
 
-        {laden && !rapport && <div className="leeg">Bezig met analyseren van alle reacties, dit duurt een paar tellen...</div>}
+        {!laadFout && status === 'bezig' && (
+          <div className="leeg">
+            Bezig met analyseren van alle reacties met AI, dit kan een paar minuten duren...
+            <br />Deze pagina ververst zichzelf automatisch zodra het rapport klaar is.
+          </div>
+        )}
 
-        {!laadFout && rapport && (
+        {!laadFout && status !== 'bezig' && status !== 'klaar' && <div className="leeg">Laden...</div>}
+
+        {!laadFout && status === 'klaar' && rapport && (
           <>
             {/* Managementsamenvatting */}
             <div className="sectie-titel">Managementsamenvatting</div>

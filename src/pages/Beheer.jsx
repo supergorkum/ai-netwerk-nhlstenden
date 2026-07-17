@@ -1021,7 +1021,7 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
                     </button>
                     <button onClick={() => window.open('/ai-koers-verslag', '_blank')}
                       className="bg-nhl-blauw hover:bg-nhl-blauw/90 text-white text-xs font-semibold px-3 py-2 rounded-lg">
-                      📄 Rijk rapport openen
+                      📄 Rapport openen
                     </button>
                     <button onClick={resetAikoersFeedback}
                       className="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 text-xs font-semibold px-3 py-2 rounded-lg">
@@ -1480,6 +1480,15 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
               {
                 versie: APP_VERSIE, datum: APP_VERSIE_DATUM,
                 label: 'Huidige versie', labelKleur: 'bg-green-100 text-green-700',
+                items: [
+                  'AI-Koers rapport: de zware AI-analyse draait nu als achtergrondtaak (tot 15 minuten) in plaats van in een synchrone function-aanroep, die soms vastliep op een tijdslimiet (status 502). De pagina peilt nu elke paar seconden of het rapport klaar is.',
+                  'Beheer: knop heet weer gewoon "Rapport openen".',
+                ],
+              },
+
+              {
+                versie: 'v2.31', datum: 'Juli 2026',
+                label: null, labelKleur: '',
                 items: [
                   'AI-Koers rapport volledig herbouwd: managementsamenvatting, cijferdashboard (bezoekers, feedbackgevers, duimpjes, reacties), opvallende thema\'s, per pagina de kern van inhoud en feedback met sentiment-kleurcodering, objectief berekende aandachtspunten en concrete vervolgstappen. Wordt bij elke opening opnieuw met Claude geanalyseerd op de meest actuele data.',
                   'AI-Koers: bezoekregistratie los van feedback, zodat het rapport kan tonen hoeveel mensen de presentatie hebben geopend tegenover hoeveel er daadwerkelijk feedback gaven.',
