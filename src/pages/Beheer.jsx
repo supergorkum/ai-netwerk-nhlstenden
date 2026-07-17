@@ -1489,6 +1489,14 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
                 versie: APP_VERSIE, datum: APP_VERSIE_DATUM,
                 label: 'Huidige versie', labelKleur: 'bg-green-100 text-green-700',
                 items: [
+                  'AI-Koers PDF vervangen door de definitieve, aangeleverde versie (was eerder zelf gegenereerd via print-to-PDF). Poster en presentatie waren al identiek aan wat live stond.',
+                ],
+              },
+
+              {
+                versie: 'v2.36', datum: 'Juli 2026',
+                label: null, labelKleur: '',
+                items: [
                   'Nieuw: /ai-koers-document, het volledige koersdocument als rustig doorbladerbare webpagina, met drie downloadkaarten bovenaan (PDF, poster, presentatie). Het menu-item "AI Koers" wijst hier nu naartoe; de roze "Meedoen"-banner op de Startpagina blijft naar de presentatiemodus (/ai-koers) verwijzen.',
                 ],
               },
