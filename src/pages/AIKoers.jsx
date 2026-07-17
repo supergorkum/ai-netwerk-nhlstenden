@@ -153,9 +153,17 @@ export default function AIKoers() {
           subtitle="Blader mee door de koers en geef per pagina je reactie."
         />
         <div className="max-w-3xl mx-auto px-4 sm:px-6 py-10">
-          <p className="text-gray-600 text-sm leading-relaxed mb-6 text-center">
+          <p className="text-gray-600 text-sm leading-relaxed mb-1 text-center">
             {paginas.length} pagina's. Klik op Presenteren om te beginnen, gebruik daarna de pijltoetsen of de knoppen om te bladeren.
           </p>
+          {rol && (
+            <p className="text-gray-400 text-xs text-center mb-6">
+              Ingesteld als: <span className="font-medium text-gray-500">{ROLLEN.find(r => r.id === rol)?.label || rol}</span>
+              {' · '}
+              <button onClick={() => setRolVragen(true)} className="text-nhl-roze hover:underline">niet jij? wijzig</button>
+            </p>
+          )}
+          {!rol && <div className="mb-6" />}
           <div className="grid sm:grid-cols-3 gap-4 mb-8">
             <div className="sm:col-span-2 bg-white border border-gray-200 rounded-2xl p-6 text-left">
               <div className="font-bold text-nhl-blauw text-sm mb-3">Zo werkt het reageren per pagina</div>
@@ -233,9 +241,11 @@ export default function AIKoers() {
                   const tekst = feedbackPerPagina[i]
                   if (!stem && !tekst) return null
                   return (
-                    <div key={i} className="bg-white border border-gray-200 rounded-xl p-4 flex items-start gap-3">
-                      <div className="font-bold text-nhl-blauw text-sm flex-shrink-0 w-20">Pagina {i + 1}</div>
+                    <div key={i} className="bg-white border border-gray-200 rounded-xl p-4 flex items-start gap-4">
+                      <img src={`/ai-koers/thumbs/pagina-${i}.png`} alt={`Pagina ${i + 1}`}
+                        className="w-24 h-16 object-cover rounded-lg border border-gray-100 flex-shrink-0" />
                       <div className="flex-1">
+                        <div className="font-bold text-nhl-blauw text-sm mb-1">Pagina {i + 1}</div>
                         {stem && <span className="text-lg mr-2">{stem === 'up' ? '👍' : '👎'}</span>}
                         {tekst && <div className="text-sm text-gray-600 mt-1">{tekst}</div>}
                       </div>
@@ -302,6 +312,7 @@ html, body { margin: 0; padding: 0; overflow: hidden; }
     var beschikbaar = window.innerHeight;
     huidigeSchaal = beschikbaar > 0 && inhoudHoogte > beschikbaar ? beschikbaar / inhoudHoogte : 1;
     wrap.style.transform = huidigeSchaal < 1 ? 'scale(' + huidigeSchaal + ')' : 'none';
+    lensInner.style.width = wrap.offsetWidth + 'px';
     lensInner.innerHTML = wrap.innerHTML;
   }
   window.addEventListener('load', pasIn);

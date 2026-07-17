@@ -1472,6 +1472,16 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
                 versie: APP_VERSIE, datum: APP_VERSIE_DATUM,
                 label: 'Huidige versie', labelKleur: 'bg-green-100 text-green-700',
                 items: [
+                  'AI-Koers presentatie: bugfix vergrootglas, de inhoud in de lens verschrompelde zonder vaste breedte waardoor die compleet anders werd opgemaakt. Nu gefixt met dezelfde breedte als het origineel.',
+                  'AI-Koers presentatie: "niet jij? wijzig"-link bij de rolvraag op het startscherm.',
+                  'AI-Koers presentatie: miniatuurafbeelding per pagina in het eindoverzicht.',
+                ],
+              },
+
+              {
+                versie: 'v2.28', datum: 'Juli 2026',
+                label: null, labelKleur: '',
+                items: [
                   'AI-Koers presentatie: vergrootglas bij hover, voor pagina\'s die net iets te klein aanvoelen.',
                   'AI-Koers presentatie: bij de laatste pagina toont Volgende nu een eindoverzicht van gegeven duimpjes en feedback, met een knop om af te ronden en terug te keren naar de hoofdpagina.',
                   'AI-Koers presentatie: posterkaartje naast de uitleg op het startscherm, met een link om de poster te downloaden.',
