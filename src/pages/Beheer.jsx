@@ -1023,10 +1023,6 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
                       className="bg-nhl-blauw hover:bg-nhl-blauw/90 text-white text-xs font-semibold px-3 py-2 rounded-lg">
                       📄 Rapport openen
                     </button>
-                    <button onClick={resetAikoersFeedback}
-                      className="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 text-xs font-semibold px-3 py-2 rounded-lg">
-                      🗑️ Reset
-                    </button>
                   </div>
                 </div>
 
@@ -1451,6 +1447,18 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
                 </label>
               </div>
             </div>
+
+            <div className="bg-red-50 border border-red-200 rounded-2xl p-5">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-xl">⚠️</span>
+                <h3 className="font-bold text-red-700">AI-Koers feedback resetten</h3>
+              </div>
+              <p className="text-red-600 text-sm mb-4">Wist alle opgeslagen duimpjes en tekstreacties van de AI-Koers presentatie in één keer. Onomkeerbaar. Gebruik dit om na het testen schoon te beginnen voor de echte presentatie.</p>
+              <button onClick={resetAikoersFeedback}
+                className="bg-white hover:bg-red-100 text-red-600 border border-red-300 text-sm font-semibold px-4 py-2.5 rounded-xl">
+                🗑️ Reset AI-Koers feedback
+              </button>
+            </div>
           </div>
         )}
       </div>
@@ -1480,6 +1488,14 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
               {
                 versie: APP_VERSIE, datum: APP_VERSIE_DATUM,
                 label: 'Huidige versie', labelKleur: 'bg-green-100 text-green-700',
+                items: [
+                  'AI-Koers Feedback: de Reset-knop (wist alle duimpjes en feedback, onomkeerbaar) stond te dicht bij de dagelijkse knoppen. Verplaatst naar de tab Backup en Restore, in een apart gemarkeerd blok.',
+                ],
+              },
+
+              {
+                versie: 'v2.34', datum: 'Juli 2026',
+                label: null, labelKleur: '',
                 items: [
                   '"AI Koers" toegevoegd als eigen, opvallend item in de navigatiebalk (desktop en mobiel), niet weggestopt in een pulldown. Laatste ontbrekende schakel van de AI-Koers presentatiemodus.',
                 ],
