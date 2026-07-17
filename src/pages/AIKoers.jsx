@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import GradientHeader from '../components/GradientHeader'
 
-const DOC_URL = '/ai-koers/NHL-Stenden-AI-Koers-v0_4-concept-restyle.html'
+const DOC_URL = '/ai-koers/paginas.json'
 const VISITOR_KEY = 'ai-koers-visitor-id'
 const ROL_KEY = 'ai-koers-rol'
 
@@ -37,14 +37,10 @@ export default function AIKoers() {
 
   useEffect(() => {
     fetch(DOC_URL)
-      .then(r => { if (!r.ok) throw new Error('niet gevonden'); return r.text() })
-      .then(html => {
-        const styleMatch = html.match(/<style>([\s\S]*?)<\/style>/)
-        const bodyMatch = html.match(/<body>([\s\S]*?)<\/body>/)
-        if (!bodyMatch) throw new Error('geen body gevonden')
-        const delen = bodyMatch[1].split('<div class="page-break"></div>')
-        setStijl(styleMatch ? styleMatch[1] : '')
-        setPaginas(delen)
+      .then(r => { if (!r.ok) throw new Error('niet gevonden'); return r.json() })
+      .then(data => {
+        setStijl(data.stijl || '')
+        setPaginas(data.paginas || [])
       })
       .catch(() => setLaadFout(true))
   }, [])
@@ -136,15 +132,33 @@ export default function AIKoers() {
           title="Slimmer leren, sterker werken en verantwoord innoveren"
           subtitle="Blader mee door de koers en geef per pagina je reactie."
         />
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-10 text-center">
-          <p className="text-gray-600 text-sm leading-relaxed mb-8">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-10">
+          <p className="text-gray-600 text-sm leading-relaxed mb-6 text-center">
             {paginas.length} pagina's. Klik op Presenteren om te beginnen, gebruik daarna de pijltoetsen of de knoppen om te bladeren.
-            Bij elke pagina kun je een duimpje omhoog of omlaag geven en losse feedback achterlaten.
           </p>
-          <button onClick={startPresenteren}
-            className="bg-nhl-blauw hover:bg-nhl-blauw/90 text-white font-semibold px-8 py-4 rounded-xl text-base transition-colors">
-            ▶ Presenteren
-          </button>
+          <div className="bg-white border border-gray-200 rounded-2xl p-6 mb-8 text-left">
+            <div className="font-bold text-nhl-blauw text-sm mb-3">Zo werkt het reageren per pagina</div>
+            <div className="space-y-2.5 text-sm text-gray-600 leading-relaxed">
+              <div className="flex items-start gap-2.5">
+                <span className="text-lg leading-none">👍👎</span>
+                <span>Geef bij elke pagina een duimpje omhoog of omlaag. Je mag van gedachten veranderen, de laatste keuze telt.</span>
+              </div>
+              <div className="flex items-start gap-2.5">
+                <span className="text-lg leading-none">💬</span>
+                <span>Klik op Feedback om een tekstveld te openen, typ je reactie en druk op Opslaan.</span>
+              </div>
+              <div className="flex items-start gap-2.5">
+                <span className="text-lg leading-none">→</span>
+                <span>Klaar met een pagina? Druk op Volgende om door te gaan. Je duimpje en feedback blijven staan, ook als je later teruggaat.</span>
+              </div>
+            </div>
+          </div>
+          <div className="text-center">
+            <button onClick={startPresenteren}
+              className="bg-nhl-blauw hover:bg-nhl-blauw/90 text-white font-semibold px-8 py-4 rounded-xl text-base transition-colors">
+              ▶ Presenteren
+            </button>
+          </div>
         </div>
 
         {rolVragen && (
@@ -171,13 +185,15 @@ export default function AIKoers() {
   const huidigeStem = stemPerPagina[index]
   return (
     <div className="fixed inset-0 bg-gray-900 flex flex-col z-40">
-      <div className="flex-1 overflow-hidden relative">
-        <iframe
-          ref={iframeRef}
-          title={`AI-Koers pagina ${index + 1}`}
-          srcDoc={`<!DOCTYPE html><html><head><meta charset="UTF-8"><style>${stijl}</style></head><body>${paginas[index]}</body></html>`}
-          className="w-full h-full border-0 bg-white"
-        />
+      <div className="flex-1 overflow-hidden relative p-3 sm:p-6">
+        <div className="w-full h-full bg-white rounded-xl shadow-2xl overflow-hidden">
+          <iframe
+            ref={iframeRef}
+            title={`AI-Koers pagina ${index + 1}`}
+            srcDoc={`<!DOCTYPE html><html><head><meta charset="UTF-8"><style>${stijl}</style></head><body>${paginas[index]}</body></html>`}
+            className="w-full h-full border-0 bg-white"
+          />
+        </div>
       </div>
 
       {/* Navigatiebalk onderaan */}
