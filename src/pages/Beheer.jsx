@@ -1369,6 +1369,22 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
                 versie: APP_VERSIE, datum: APP_VERSIE_DATUM,
                 label: 'Huidige versie', labelKleur: 'bg-green-100 text-green-700',
                 items: [
+                  'Fundament: nieuwe sectie "AI-Koers 2026 tot 2030" met de poster, en knoppen om het volledige document te bekijken en de presentatie en poster te downloaden.',
+                ],
+              },
+
+              {
+                versie: 'v2.21', datum: 'Juli 2026',
+                label: null, labelKleur: '',
+                items: [
+                  'App.jsx: de site-brede toegangscode ("Geheim") is verwijderd. Het AI-Netwerk is nu direct toegankelijk, zonder aparte inlogstap vooraf.',
+                ],
+              },
+
+              {
+                versie: 'v2.20', datum: 'Juli 2026',
+                label: null, labelKleur: '',
+                items: [
                   'De publieke Rapport-kaart verwijst nu naar het Dashboard: levende voortgang voor bezoekers. Het rapport blijft bereikbaar via Beheer.',
                 ],
               },

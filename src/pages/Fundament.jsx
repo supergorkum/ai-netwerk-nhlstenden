@@ -305,6 +305,41 @@ export default function Fundament() {
           </div>
         </div>
 
+        {/* AI-Koers document */}
+        <div className="mb-12">
+          <div className="text-center mb-8">
+            <div className="section-label mb-2">AI-Koers 2026 tot 2030</div>
+            <h2 className="text-2xl font-bold text-nhl-blauw mb-3">Slimmer leren, sterker werken en verantwoord innoveren</h2>
+            <p className="text-gray-500 text-sm max-w-2xl mx-auto">Het volledige koersdocument, de bijbehorende presentatie en de poster in één overzicht.</p>
+          </div>
+          <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden grid sm:grid-cols-2">
+            <div className="bg-nhl-blauw/5 flex items-center justify-center p-6">
+              <img src="/ai-koers/NHL-Stenden-AI-Koers-Poster-A2-preview.png" alt="NHL Stenden AI-Koers poster"
+                className="rounded-xl shadow-md max-h-96 object-contain" />
+            </div>
+            <div className="p-6 sm:p-8 flex flex-col justify-center">
+              <p className="text-gray-600 text-sm leading-relaxed mb-5">
+                Zes koerslijnen, één richting: hoe NHL Stenden AI inzet voor leren, werken en onderzoek, verantwoord en met de student als maatstaf.
+              </p>
+              <div className="space-y-3">
+                <a href="/ai-koers/NHL-Stenden-AI-Koers-v0_4-concept-restyle.html" target="_blank" rel="noopener noreferrer"
+                  className="w-full flex items-center justify-center gap-2 bg-nhl-blauw hover:bg-nhl-blauw/90 text-white font-semibold py-3 rounded-xl text-sm transition-colors">
+                  📖 Bekijk het volledige document
+                </a>
+                <a href="/ai-koers/NHL-Stenden-AI-Koers-presentatie.pptx" download
+                  className="w-full flex items-center justify-center gap-2 bg-white border border-nhl-blauw text-nhl-blauw hover:bg-blue-50 font-semibold py-3 rounded-xl text-sm transition-colors">
+                  📊 Download presentatie (.pptx)
+                </a>
+                <a href="/ai-koers/NHL-Stenden-AI-Koers-Poster-A2-preview.png" download
+                  className="w-full flex items-center justify-center gap-2 bg-white border border-nhl-blauw text-nhl-blauw hover:bg-blue-50 font-semibold py-3 rounded-xl text-sm transition-colors">
+                  🖼️ Download poster (A2)
+                </a>
+              </div>
+              <p className="text-xs text-gray-400 mt-4">Concept v0.4, juli 2026</p>
+            </div>
+          </div>
+        </div>
+
         {/* CTA */}
         <div className="grid sm:grid-cols-3 gap-4">
           {[

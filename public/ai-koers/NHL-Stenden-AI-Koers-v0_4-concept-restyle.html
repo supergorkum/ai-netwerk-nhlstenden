@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NHL Stenden AI-Koers 2026 tot 2030 | Versie 0.4 concept restyle</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&display=swap');
+
+  :root {
+    --nhl-blauw:  #003DA5;
+    --nhl-paars:  #8C1D82;
+
+    /* Exact thema-kleuren van de AI-Netwerk website */
+    --t1: #1E3A8A;        /* AI & Leren */
+    --t1-licht: #E8EFF8;
+    --t2: #0F766E;        /* AI & Werken: teal-groen */
+    --t2-licht: #E4F3EF;
+    --t3: #E91E8C;        /* AI & Verantwoordelijkheid */
+    --t3-licht: #FCE4F0;
+    --t4: #7C3AED;        /* AI & Geletterdheid: paars */
+    --t4-licht: #F2E8F9;
+    --t5: #B45309;        /* AI & Werkveld: oranje-bruin */
+    --t5-licht: #FAEEE9;
+    --t6: #0E7490;        /* AI & Onderzoek: donker teal */
+    --t6-licht: #E4F0F4;
+
+    --grijs-licht: #F5F6F8;
+    --grijs-mid:   #E0E4ED;
+    --grijs-tekst: #4A5568;
+    --body-tekst:  #1A2340;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito Sans', 'Calibri', sans-serif;
+    font-size: 15px;
+    line-height: 1.72;
+    color: var(--body-tekst);
+    background: #fff;
+  }
+
+  /* COVER */
+  .cover {
+    background: var(--nhl-blauw);
+    min-height: 100vh;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    position: relative;
+    overflow: hidden;
+  }
+  .cover-geo {
+    position: absolute; top: 0; right: 0;
+    width: 420px; height: 420px; pointer-events: none;
+  }
+  .cover-geo svg { width: 100%; height: 100%; }
+  .cover-paars {
+    position: absolute; top: 0; left: 0;
+    width: 260px; height: 260px;
+    background: var(--nhl-paars);
+    clip-path: polygon(0 0, 100% 0, 0 100%);
+  }
+  .cover-dots {
+    position: absolute; bottom: 60px; left: 60px;
+    display: grid; grid-template-columns: repeat(4, 18px); gap: 10px;
+  }
+  .cover-dots span {
+    width: 18px; height: 18px; border-radius: 50%;
+    background: rgba(255,255,255,0.28); display: block;
+  }
+  .cover-dots span:nth-child(4),
+  .cover-dots span:nth-child(8) { opacity: 0; }
+  .cover-logo { padding: 40px 60px; position: relative; z-index: 10; }
+  .nhl-logo {
+    display: inline-flex; flex-direction: column;
+    border: 2.5px solid white; padding: 10px 14px; line-height: 1.1;
+  }
+  .nhl-logo-nhl { font-weight: 900; font-size: 22px; color: white; letter-spacing: 0.05em; }
+  .nhl-logo-stenden { font-weight: 400; font-size: 13px; color: white; letter-spacing: 0.2em; text-transform: uppercase; }
+  .cover-body {
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 0 60px 0 300px; position: relative; z-index: 10;
+  }
+  .cover-supra { font-size: 11px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(255,255,255,0.55); margin-bottom: 14px; }
+  .cover-titel { font-size: 66px; font-weight: 900; color: white; line-height: 1.0; margin-bottom: 12px; }
+  .cover-titel-accent { color: #7BB8FF; }
+  .cover-subtitel { font-size: 19px; font-weight: 300; color: rgba(255,255,255,0.7); margin-bottom: 44px; line-height: 1.45; }
+  .cover-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+  .cover-pill {
+    background: rgba(255,255,255,0.11); border: 1px solid rgba(255,255,255,0.22);
+    color: rgba(255,255,255,0.88); font-size: 12px; font-weight: 700;
+    padding: 5px 13px; border-radius: 3px; letter-spacing: 0.03em;
+  }
+  .cover-footer {
+    padding: 22px 60px; display: flex; justify-content: space-between; align-items: center;
+    color: rgba(255,255,255,0.38); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+    border-top: 1px solid rgba(255,255,255,0.1); position: relative; z-index: 10;
+  }
+  .cover-versie { background: var(--nhl-paars); color: white; padding: 4px 12px; border-radius: 2px; font-size: 11px; font-weight: 700; }
+
+  /* DOCUMENT */
+  .document { max-width: 920px; margin: 0 auto; padding: 80px 64px; }
+  .sectie-label { font-size: 10px; font-weight: 800; letter-spacing: 0.22em; text-transform: uppercase; color: var(--nhl-paars); margin-bottom: 8px; }
+  h1 { font-size: 38px; font-weight: 900; color: var(--nhl-blauw); line-height: 1.15; margin-bottom: 28px; }
+  h2 { font-size: 25px; font-weight: 800; color: var(--nhl-blauw); line-height: 1.25; margin-bottom: 14px; margin-top: 48px; }
+  h3 { font-size: 13px; font-weight: 800; color: var(--nhl-blauw); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 12px; margin-top: 28px; }
+  p { margin-bottom: 16px; }
+  .lead { font-size: 19px; font-weight: 300; color: var(--nhl-blauw); line-height: 1.65; margin-bottom: 32px; }
+  .divider { height: 4px; background: linear-gradient(90deg, var(--nhl-paars) 0%, var(--nhl-blauw) 55%, transparent 100%); margin: 60px 0; border-radius: 2px; }
+
+  /* MANIFEST */
+  .manifest {
+    background: linear-gradient(150deg, #002B75 0%, var(--nhl-blauw) 55%, #0A4BB8 100%);
+    border-radius: 8px; padding: 52px 54px; margin: 44px 0; color: white;
+    position: relative; overflow: hidden;
+  }
+  .manifest::before {
+    content: ''; position: absolute; top: -70px; right: -70px; width: 260px; height: 260px;
+    background: var(--nhl-paars); clip-path: polygon(100% 0, 100% 100%, 0 100%); opacity: 0.32;
+  }
+  .manifest-supra { font-size: 10px; font-weight: 800; letter-spacing: 0.24em; text-transform: uppercase; color: rgba(255,255,255,0.55); margin-bottom: 10px; }
+  .manifest h2 { color: white; margin-top: 0; font-size: 30px; margin-bottom: 26px; }
+  .manifest-punten { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 26px; position: relative; z-index: 2; }
+  .manifest-punt { display: flex; gap: 13px; align-items: flex-start; }
+  .manifest-nr {
+    flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%;
+    border: 1.5px solid rgba(255,255,255,0.45); color: white;
+    font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center; margin-top: 2px;
+  }
+  .manifest-punt h5 { font-size: 14px; font-weight: 800; color: white; margin-bottom: 4px; }
+  .manifest-punt p { font-size: 12.5px; color: rgba(255,255,255,0.75); line-height: 1.6; margin-bottom: 0; }
+  .manifest-band { margin: 34px 0 0; position: relative; z-index: 2; }
+  .manifest-band-label { font-size: 10px; font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.5); margin-bottom: 12px; }
+  .ambitie-rij { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-top: 1px solid rgba(255,255,255,0.14); }
+  .ambitie-rij:last-child { border-bottom: 1px solid rgba(255,255,255,0.14); }
+  .ambitie-chip { flex-shrink: 0; width: 128px; text-align: center; font-size: 10px; font-weight: 800; letter-spacing: 0.04em; color: white; padding: 4px 8px; border-radius: 3px; }
+  .ambitie-tekst { font-size: 13.5px; font-weight: 700; color: white; font-style: italic; }
+  .manifest-belofte { margin-top: 30px; padding-top: 24px; border-top: 2px solid rgba(255,255,255,0.25); position: relative; z-index: 2; }
+  .manifest-belofte p { font-size: 19px; font-weight: 900; color: white; line-height: 1.4; margin-bottom: 0; }
+
+  /* BRONNEN PER KOERSLIJN */
+  .thema-bronnen { margin-top: 18px; padding: 13px 16px; background: var(--grijs-licht); border: 1px solid var(--grijs-mid); border-radius: 5px; }
+  .thema-bronnen h6 { font-size: 10px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--grijs-tekst); margin-bottom: 7px; }
+  .thema-bronnen ul { list-style: none; margin: 0; padding: 0; }
+  .thema-bronnen li { font-size: 12px; color: var(--grijs-tekst); padding: 2.5px 0; padding-left: 16px; position: relative; }
+  .thema-bronnen li::before { content: '\2197'; position: absolute; left: 0; color: var(--nhl-paars); font-weight: 800; }
+  .thema-bronnen .tb-noot { font-size: 11px; color: #8A93A6; margin-top: 7px; margin-bottom: 0; font-style: italic; }
+
+  /* VIJFLAGENSTAPEL */
+  .lagen-stack { margin: 30px 0; }
+  .laag-rij { display: flex; align-items: center; gap: 14px; padding: 11px 16px; border: 1px solid var(--grijs-mid); border-radius: 5px; margin-bottom: 6px; background: white; }
+  .laag-nr { flex-shrink: 0; width: 30px; height: 30px; border-radius: 6px; color: white; font-size: 14px; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+  .laag-naam { font-size: 13.5px; font-weight: 800; color: var(--nhl-blauw); min-width: 230px; }
+  .laag-oms { font-size: 12px; color: var(--grijs-tekst); flex: 1; line-height: 1.5; }
+  .laag-eig { flex-shrink: 0; font-size: 10.5px; font-weight: 700; color: var(--nhl-paars); background: #F7EBF5; border: 1px solid #E8CFE3; padding: 3px 9px; border-radius: 3px; }
+
+  /* WERKWIJZE STAPPEN */
+  .stappen { margin: 26px 0; }
+  .stap-rij { display: flex; gap: 14px; align-items: flex-start; margin-bottom: 12px; }
+  .stap-nr { flex-shrink: 0; width: 28px; height: 28px; border-radius: 50%; background: var(--nhl-blauw); color: white; font-size: 12.5px; font-weight: 800; display: flex; align-items: center; justify-content: center; margin-top: 2px; }
+  .stap-body { flex: 1; background: var(--grijs-licht); border: 1px solid var(--grijs-mid); border-radius: 5px; padding: 11px 15px; }
+  .stap-body h5 { font-size: 13px; font-weight: 800; color: var(--nhl-blauw); margin-bottom: 3px; }
+  .stap-body p { font-size: 12.5px; color: var(--grijs-tekst); line-height: 1.6; margin-bottom: 0; }
+
+  /* KEUZES-PAGINA (Ons vertrekpunt) */
+  .keuzes-box {
+    background: linear-gradient(150deg, #002B75 0%, var(--nhl-blauw) 60%, #0A4BB8 100%);
+    border-radius: 8px; padding: 46px 50px; margin: 36px 0; color: white;
+    position: relative; overflow: hidden;
+  }
+  .keuzes-box::after { content:''; position:absolute; bottom:-70px; left:-70px; width:240px; height:240px; background:var(--nhl-paars); clip-path:polygon(0 0, 100% 100%, 0 100%); opacity:0.28; }
+  .keuzes-box .sectie-label { color: rgba(255,255,255,0.5); }
+  .keuzes-box h2 { color: white; font-size: 27px; margin: 6px 0 8px; }
+  .keuzes-intro { font-size: 15px; color: rgba(255,255,255,0.75); margin-bottom: 28px; }
+  .keuzes-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; position: relative; z-index: 2; }
+  .keuze-kaart { background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.18); border-radius: 6px; padding: 20px 18px; }
+  .keuze-nr { font-size: 13px; font-weight: 900; color: #C9A8E8; letter-spacing: 0.12em; margin-bottom: 8px; }
+  .keuze-kaart h4 { font-size: 15px; font-weight: 800; color: white; margin-bottom: 8px; }
+  .keuze-kaart p { font-size: 12.5px; color: rgba(255,255,255,0.75); line-height: 1.65; margin-bottom: 0; }
+  .lagen-strip-kop { margin: 26px 0 12px; font-size: 13.5px; color: rgba(255,255,255,0.85); font-weight: 700; position: relative; z-index: 2; }
+  .lagen-strip { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; position: relative; z-index: 2; }
+  .laag-chip { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.25); border-radius: 4px; padding: 7px 11px; font-size: 11.5px; color: white; }
+  .laag-chip b { color: #C9A8E8; margin-right: 5px; }
+  .laag-pijl { color: rgba(255,255,255,0.45); font-weight: 800; }
+  .keuzes-slot { margin: 22px 0 0; padding-top: 18px; border-top: 1px solid rgba(255,255,255,0.2); font-size: 16px; font-weight: 800; color: white; position: relative; z-index: 2; }
+
+  /* KOERSLIJN-SPREADS (v0.4 restyle) */
+  .kspread { position: relative; padding: 6px 2px 0; margin: 26px 0 10px; }
+  .kspread-ghost {
+    position: absolute; top: -34px; right: -4px; font-size: 190px; font-weight: 900;
+    color: var(--kl); opacity: 0.07; line-height: 1; letter-spacing: -0.05em; z-index: 0;
+  }
+  .kspread-kicker { font-size: 11px; font-weight: 800; letter-spacing: 0.22em; text-transform: uppercase; color: var(--kl); margin-bottom: 13px; position: relative; z-index: 2; }
+  .kspread-ambitie { font-size: 28px; font-weight: 900; color: var(--kl-donker); line-height: 1.28; max-width: 660px; position: relative; z-index: 2; }
+  .kspread-sub { font-size: 13px; color: #8A93A6; font-style: italic; margin-top: 9px; position: relative; z-index: 2; }
+  .kspread-lijn { width: 64px; height: 5px; background: var(--kl); margin: 19px 0 17px; border-radius: 2px; }
+  .kspread-lead { font-size: 14.5px; line-height: 1.75; color: var(--grijs-tekst); max-width: 710px; position: relative; z-index: 2; }
+  .kspread-keuzelabel { font-size: 11px; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase; color: var(--kl); margin: 22px 0 4px; }
+  .kspread-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 36px; }
+  .kspread-keuze { border-top: 2px solid var(--kl); padding: 11px 0 13px; font-size: 12.5px; line-height: 1.62; color: var(--grijs-tekst); }
+  .kspread-keuze strong { color: var(--kl-donker); }
+  .kspread-meet { display: flex; align-items: center; gap: 16px; margin-top: 12px; background: var(--kl-tint); border-left: 5px solid var(--kl); border-radius: 0 5px 5px 0; padding: 13px 18px; }
+  .kspread-meet-label { flex-shrink: 0; font-size: 17px; font-weight: 900; color: var(--kl); letter-spacing: 0.03em; }
+  .kspread-meet-tekst { font-size: 13px; color: var(--kl-donker); line-height: 1.55; font-weight: 600; }
+  .kspread-bron { margin-top: 11px; font-size: 11px; color: #98A1B3; }
+  .kspread-bron b { color: #6B7280; font-weight: 800; text-transform: uppercase; font-size: 9.5px; letter-spacing: 0.12em; margin-right: 6px; }
+
+  /* SPREAD-FAMILIE: inhoud, omgeving, betekenis, tijdlijn */
+  .sp-kicker { font-size: 11px; font-weight: 800; letter-spacing: 0.22em; text-transform: uppercase; color: var(--nhl-blauw); margin-bottom: 13px; }
+  .sp-lijn { width: 64px; height: 5px; background: var(--nhl-blauw); margin: 18px 0 16px; border-radius: 2px; }
+
+  .toc2-titel { font-size: 34px; font-weight: 900; color: var(--nhl-blauw); line-height: 1.15; }
+  .toc2-lead { font-size: 14px; line-height: 1.75; color: var(--grijs-tekst); max-width: 710px; margin-bottom: 8px; }
+  .toc2-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 44px; margin-top: 22px; }
+  .toc2-item { border-top: 1px solid var(--grijs-mid); padding: 10px 0; display: flex; gap: 14px; align-items: baseline; font-size: 13.5px; font-weight: 700; color: #1A2340; }
+  .toc2-nr { font-size: 11px; font-weight: 900; color: var(--nhl-paars); letter-spacing: 0.06em; }
+
+  .stat2-rij { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 36px; margin: 26px 0 10px; }
+  .stat2 { border-top: 2px solid var(--s); padding-top: 12px; }
+  .stat2-getal { font-size: 44px; font-weight: 900; color: var(--s); line-height: 1; letter-spacing: -0.02em; display: block; }
+  .stat2-label { font-size: 12.5px; color: var(--grijs-tekst); line-height: 1.5; margin-top: 8px; display: block; }
+  .stat2-bron { font-size: 10px; color: #98A1B3; margin-top: 6px; display: block; }
+
+  .omg2-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 36px; margin: 18px 0 6px; }
+  .omg2 { border-top: 2px solid var(--s); padding: 11px 0 13px; }
+  .omg2 h4 { font-size: 11px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: var(--s); margin-bottom: 7px; }
+  .omg2 p { font-size: 12.5px; line-height: 1.62; color: var(--grijs-tekst); margin-bottom: 0; }
+
+  .jou-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0 34px; margin: 30px 0 10px; }
+  .jou { border-top: 2px solid var(--s); padding: 13px 0; }
+  .jou h4 { font-size: 11px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: var(--s); margin-bottom: 9px; }
+  .jou p { font-size: 13px; line-height: 1.68; color: var(--grijs-tekst); margin-bottom: 0; }
+
+  .golf-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0 30px; margin-top: 22px; }
+  .golf { border-top: 2px solid var(--nhl-blauw); padding-top: 14px; }
+  .golf-jaar { font-size: 26px; font-weight: 900; color: var(--nhl-blauw); line-height: 1; }
+  .golf-fase { font-size: 11px; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase; color: var(--nhl-paars); margin: 5px 0 14px; }
+  .golf-item { padding: 7px 0; border-top: 1px solid var(--grijs-mid); }
+  .golf-thema { font-size: 9.5px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; display: block; margin-bottom: 2px; }
+  .golf-item p { font-size: 11.5px; line-height: 1.5; color: var(--grijs-tekst); margin: 0; }
+  .golf.eind .golf-item p { font-weight: 700; color: #1A2340; }
+
+  /* VOETVISUALS */
+  .voetvisual { margin-top: 30px; break-inside: avoid; page-break-inside: avoid; }
+  @media print {
+    .vv-s { margin-top: 64px; }
+    .vv-g { margin-top: 72px; }
+    .vv-j { margin-top: 64px; }
+    .vv-t { margin-top: 64px; }
+  }
+  .vv-kicker { font-size: 10px; font-weight: 800; letter-spacing: 0.22em; text-transform: uppercase; color: #98A1B3; margin-bottom: 14px; text-align: center; }
+  .vv-noot { font-size: 11px; color: #98A1B3; text-align: center; margin: 12px 0 0; font-style: italic; }
+
+  /* Route van elk experiment */
+  .route-strip { display: flex; align-items: center; justify-content: center; gap: 9px; flex-wrap: wrap; }
+  .route-stap { border: 1.5px solid var(--nhl-blauw); color: var(--nhl-blauw); border-radius: 4px; padding: 7px 14px; font-size: 11.5px; font-weight: 800; }
+  .route-stap.vol { background: var(--nhl-blauw); color: white; }
+  .route-pijl { color: #B9C2D0; font-weight: 800; }
+
+  /* Een programma, zeven lijnen */
+  .prog-visual { max-width: 640px; margin: 0 auto; }
+  .prog-top { background: var(--nhl-blauw); color: white; text-align: center; font-size: 13px; font-weight: 800; letter-spacing: 0.06em; padding: 10px; border-radius: 5px; }
+  .prog-verbind { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; padding: 0 10px; }
+  .prog-verbind span { height: 12px; border-left: 2px solid #C9D2E0; margin-left: 50%; }
+  .prog-lijnen { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
+  .prog-lijn { color: white; text-align: center; font-size: 9px; font-weight: 800; letter-spacing: 0.03em; padding: 9px 3px; border-radius: 4px; line-height: 1.35; }
+  .prog-basis { background: var(--nhl-paars); color: white; text-align: center; font-size: 11px; font-weight: 800; letter-spacing: 0.05em; padding: 8px; border-radius: 5px; margin-top: 8px; }
+
+  /* Convergentie: zes lijnen, een maatstaf */
+  .maatstaf-visual { text-align: center; }
+  .maatstaf-visual svg { width: 100%; max-width: 680px; height: auto; }
+
+  /* Horizonband tijdlijn */
+  .horizon-band { height: 9px; border-radius: 5px; background: linear-gradient(90deg, #1E3A8A 0%, #0F766E 20%, #E91E8C 40%, #7C3AED 60%, #B45309 80%, #0E7490 100%); }
+  .horizon-jaren { display: flex; justify-content: space-between; margin-top: 8px; padding: 0 2px; }
+  .horizon-jaren span { font-size: 11px; font-weight: 800; color: var(--nhl-blauw); }
+  .horizon-jaren span.eind { color: var(--nhl-paars); }
+
+  /* TOC */
+  .toc { border: 2px solid var(--nhl-blauw); border-radius: 4px; overflow: hidden; margin: 44px 0; display: grid; grid-template-columns: 1fr 1fr; }
+  .toc-header { grid-column: 1/-1; background: var(--nhl-blauw); color: white; padding: 13px 24px; font-size: 11px; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase; }
+  .toc-item { display: flex; align-items: flex-start; gap: 12px; padding: 10px 22px; border-bottom: 1px solid var(--grijs-mid); font-size: 13.5px; color: var(--nhl-blauw); font-weight: 600; }
+  .toc-item:nth-child(odd) { background: var(--grijs-licht); }
+  .toc-nr { font-size: 10px; font-weight: 800; color: var(--nhl-paars); min-width: 18px; padding-top: 2px; }
+
+  /* STATS */
+  .stat-rij { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; margin: 40px 0; border-radius: 6px; overflow: hidden; }
+  .stat-blok { background: var(--nhl-blauw); color: white; padding: 26px 20px; text-align: center; }
+  .stat-blok:nth-child(2) { background: var(--nhl-paars); }
+  .stat-blok:nth-child(3) { background: #1A3A7A; }
+  .stat-getal { display: block; font-size: 50px; font-weight: 900; line-height: 1; margin-bottom: 8px; }
+  .stat-label { display: block; font-size: 13px; color: rgba(255,255,255,0.85); line-height: 1.4; margin-bottom: 6px; }
+  .stat-bron { display: block; font-size: 10px; color: rgba(255,255,255,0.4); font-style: italic; }
+
+  /* OMGEVING */
+  .omgeving-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 28px 0; }
+  .omgeving-card { background: var(--grijs-licht); border-left: 4px solid var(--nhl-blauw); padding: 20px 22px; border-radius: 0 5px 5px 0; }
+  .omgeving-card.paars { border-left-color: var(--nhl-paars); }
+  .omgeving-card.groen { border-left-color: var(--t2); }
+  .omgeving-card.teal { border-left-color: var(--t6); }
+  .omgeving-card h4 { font-size: 11px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--grijs-tekst); margin-bottom: 8px; }
+  .omgeving-card p { font-size: 13.5px; margin-bottom: 0; line-height: 1.6; }
+
+  /* EXTERN KADER */
+  .extern-kader { border: 1.5px solid #C7D2FE; background: #F0F4FF; border-radius: 5px; padding: 22px 26px; margin: 20px 0; }
+  .extern-tag { display: inline-block; background: var(--nhl-blauw); color: white; font-size: 9.5px; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; padding: 2px 9px; border-radius: 2px; margin-bottom: 9px; }
+  .extern-kader h4 { font-size: 14.5px; font-weight: 700; color: var(--nhl-blauw); margin-bottom: 7px; margin-top: 0; text-transform: none; letter-spacing: normal; }
+  .extern-kader p { font-size: 13.5px; color: #2D3748; margin-bottom: 0; }
+
+  /* FUNDAMENT */
+  .fundament-box { background: var(--nhl-blauw); border-radius: 8px; padding: 44px 50px; margin: 36px 0; position: relative; overflow: hidden; }
+  .fundament-box::before { content: ''; position: absolute; top: -80px; right: -80px; width: 280px; height: 280px; background: var(--nhl-paars); clip-path: polygon(100% 0, 100% 100%, 0 100%); opacity: 0.3; }
+  .fundament-box .sectie-label { color: rgba(255,255,255,0.5); }
+  .fundament-box h2 { color: white; margin-top: 0; font-size: 27px; }
+  .fundament-intro { font-size: 15px; color: rgba(255,255,255,0.78); line-height: 1.7; margin-bottom: 32px; }
+  .pijlers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; position: relative; z-index: 2; }
+  .pijler { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); border-radius: 6px; padding: 20px 18px; }
+  .pijler-icon { font-size: 24px; margin-bottom: 10px; display: block; }
+  .pijler h4 { font-size: 14px; font-weight: 800; color: white; margin-bottom: 7px; }
+  .pijler p { font-size: 13px; color: rgba(255,255,255,0.7); line-height: 1.6; margin-bottom: 0; }
+
+  /* NETWERK SVG */
+  .netwerk-schema { margin: 44px 0; background: var(--grijs-licht); border-radius: 8px; padding: 28px; text-align: center; }
+  .netwerk-schema svg { width: 100%; max-width: 780px; }
+
+  /* KOERSLIJN */
+  .koerslijn { margin: 48px 0; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 16px rgba(0,51,165,0.09); }
+  .koerslijn-header { padding: 26px 34px; display: flex; align-items: flex-start; gap: 18px; }
+  .koerslijn-nr { font-size: 50px; font-weight: 900; opacity: 0.16; line-height: 1; min-width: 60px; color: white; }
+  .koerslijn-header-txt h2 { color: white; margin: 0 0 6px; font-size: 23px; }
+  .koerslijn-vraag { font-size: 13px; font-style: italic; color: rgba(255,255,255,0.72); line-height: 1.5; }
+  .koerslijn-body { background: white; padding: 30px 34px; }
+  .koerslijn-body p { font-size: 14px; line-height: 1.75; }
+
+  /* KERNAMBITIE */
+  .kernambitie { margin: 0 0 22px; border-radius: 4px; overflow: hidden; }
+  .kernambitie-kop { display: flex; align-items: center; gap: 9px; padding: 9px 16px; background: var(--grijs-licht); border-bottom: 1px solid var(--grijs-mid); }
+  .kernambitie-kop-label { font-size: 10px; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase; }
+  .kernambitie-tekst { padding: 15px 18px; font-size: 17px; font-weight: 800; line-height: 1.45; color: white; }
+
+  /* AMBITIES */
+  .doel-label { font-size: 10px; font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase; color: var(--grijs-tekst); margin-top: 22px; margin-bottom: 12px; display: block; }
+  .ambities { list-style: none; margin: 0 0 18px; }
+  .ambities li { display: flex; align-items: flex-start; gap: 11px; padding: 8px 0; border-bottom: 1px solid var(--grijs-mid); font-size: 13.5px; line-height: 1.6; }
+  .ambities li:last-child { border-bottom: none; }
+  .adot { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; font-size: 10px; color: white; font-weight: 800; }
+
+  /* INDICATOR */
+  .indicator { margin-top: 20px; padding: 13px 17px; border-radius: 4px; display: flex; align-items: flex-start; gap: 13px; }
+  .ind-icon { font-size: 18px; flex-shrink: 0; }
+  .ind-label { font-size: 10px; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 3px; display: block; }
+
+  /* SANDBOX SECTIE */
+  .sandbox-box { background: linear-gradient(135deg, #0D2B52 0%, #1E3A8A 100%); border-radius: 8px; padding: 44px 50px; margin: 36px 0; position: relative; overflow: hidden; }
+  .sandbox-box::before { content: ''; position: absolute; bottom: -60px; right: -60px; width: 250px; height: 250px; background: var(--nhl-paars); clip-path: polygon(100% 0, 100% 100%, 0 100%); opacity: 0.25; }
+  .sandbox-box .sectie-label { color: rgba(255,255,255,0.5); }
+  .sandbox-box h2 { color: white; margin-top: 0; font-size: 27px; }
+  .sandbox-intro { font-size: 15px; color: rgba(255,255,255,0.8); line-height: 1.7; margin-bottom: 32px; }
+  .sandbox-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; position: relative; z-index: 2; margin-top: 28px; }
+  .sandbox-kaart { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); border-radius: 6px; padding: 22px 20px; }
+  .sandbox-kaart h4 { font-size: 14px; font-weight: 800; color: white; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+  .sandbox-kaart p { font-size: 13px; color: rgba(255,255,255,0.72); line-height: 1.6; margin-bottom: 0; }
+  .sandbox-principes { list-style: none; margin: 24px 0 0; position: relative; z-index: 2; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  .sandbox-principe { background: rgba(255,255,255,0.06); border-top: 3px solid var(--nhl-paars); border-radius: 0 0 5px 5px; padding: 14px 16px; }
+  .sandbox-principe h5 { color: white; font-size: 13px; font-weight: 800; margin-bottom: 5px; }
+  .sandbox-principe p { color: rgba(255,255,255,0.68); font-size: 12px; margin-bottom: 0; line-height: 1.55; }
+
+  /* GOVERNANCE */
+  .gov-lagen { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; border-radius: 6px; overflow: hidden; margin: 26px 0; }
+  .gov-laag { background: white; border-top: 4px solid var(--nhl-blauw); padding: 20px 16px; text-align: center; }
+  .gov-laag:nth-child(2) { border-top-color: var(--nhl-paars); }
+  .gov-laag:nth-child(3) { border-top-color: var(--t2); }
+  .gov-icon { font-size: 28px; margin-bottom: 9px; display: block; }
+  .gov-laag h4 { font-size: 13.5px; font-weight: 800; color: var(--nhl-blauw); margin-bottom: 6px; }
+  .gov-laag p { font-size: 12.5px; color: var(--grijs-tekst); margin-bottom: 0; line-height: 1.5; }
+
+  .gov-netwerk-diagram { margin: 32px 0; background: var(--grijs-licht); border-radius: 8px; padding: 28px; text-align: center; }
+  .gov-netwerk-diagram svg { width: 100%; max-width: 820px; }
+
+  .gov-tabel { width: 100%; border-collapse: collapse; margin: 26px 0; font-size: 13px; }
+  .gov-tabel th { background: var(--nhl-blauw); color: white; padding: 10px 15px; text-align: left; font-weight: 700; font-size: 11.5px; letter-spacing: 0.05em; }
+  .gov-tabel td { padding: 9px 15px; border-bottom: 1px solid var(--grijs-mid); vertical-align: top; line-height: 1.5; }
+  .gov-tabel tr:nth-child(even) td { background: var(--grijs-licht); }
+  .t-chip { display: inline-block; border-radius: 3px; padding: 2px 7px; color: white; font-size: 11px; font-weight: 700; }
+
+  /* TIJDLIJN */
+  .tijdlijn { margin: 36px 0; border-radius: 6px; overflow: hidden; }
+  .tl-header { display: grid; grid-template-columns: 105px 1fr 1fr 1fr; gap: 2px; margin-bottom: 2px; }
+  .tl-hcel { background: var(--nhl-blauw); color: rgba(255,255,255,0.82); font-size: 11px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; padding: 9px 13px; text-align: center; }
+  .tl-rij { display: grid; grid-template-columns: 105px 1fr 1fr 1fr; gap: 2px; margin-bottom: 2px; }
+  .tl-jaar { color: white; font-weight: 800; font-size: 12.5px; padding: 13px 8px; text-align: center; display: flex; align-items: center; justify-content: center; line-height: 1.3; }
+  .tl-cel { background: var(--grijs-licht); padding: 11px 13px; font-size: 12.5px; line-height: 1.5; color: var(--grijs-tekst); }
+  .tl-cel.doel { background: #EEF3FF; color: var(--nhl-blauw); font-weight: 600; }
+
+  /* GOVERNANCE AANVULLING */
+  .gov-aanvulling { background: #F8F9FF; border: 1px solid #C7D2FE; border-radius: 6px; padding: 28px 32px; margin: 24px 0; }
+  .gov-aanvulling h4 { font-size: 14px; font-weight: 800; color: var(--nhl-blauw); margin-bottom: 10px; margin-top: 0; text-transform: none; letter-spacing: normal; }
+  .gov-aanvulling p { font-size: 13.5px; line-height: 1.7; margin-bottom: 10px; }
+  .gov-aanvulling p:last-child { margin-bottom: 0; }
+
+  /* BRON NOOT */
+  .bron-noot { background: var(--grijs-licht); border-left: 3px solid var(--grijs-mid); padding: 13px 17px; font-size: 11.5px; color: var(--grijs-tekst); font-style: italic; line-height: 1.6; margin: 22px 0; border-radius: 0 4px 4px 0; }
+
+  /* BRONNEN */
+  .bronnen-blok { background: var(--grijs-licht); border-radius: 6px; padding: 30px 34px; margin: 48px 0 24px; }
+  .bronnen-blok h3 { margin-top: 0; }
+  .bronnen-lijst { list-style: none; }
+  .bronnen-lijst li { font-size: 12px; color: var(--grijs-tekst); padding: 5px 0; border-bottom: 1px solid var(--grijs-mid); line-height: 1.55; }
+  .bronnen-lijst li:last-child { border-bottom: none; }
+  .bchip { display: inline-block; background: var(--nhl-blauw); color: white; font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 2px; margin-right: 7px; letter-spacing: 0.05em; vertical-align: middle; }
+
+  /* COLOFON */
+  .colofon { background: var(--nhl-blauw); border-radius: 6px; padding: 34px 38px; margin-top: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 38px; }
+  .colofon h4 { font-size: 10px; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(255,255,255,0.45); margin-bottom: 11px; }
+  .colofon p, .colofon li { font-size: 13px; color: rgba(255,255,255,0.8); line-height: 1.6; }
+  .colofon ul { list-style: none; }
+  .colofon ul li::before { content: ''; margin-right: 8px; color: var(--nhl-paars); }
+
+  /* Page breaks for print */
+  .page-break {
+    page-break-before: always;
+    break-before: page;
+    height: 0;
+    display: block;
+  }
+  @media screen {
+    .page-break {
+      height: 80px;
+      border-top: 2px solid var(--grijs-mid);
+      margin: 60px 0 40px;
+    }
+  }
+
+  /* Paginering: samenhangende blokken blijven op een pagina */
+  .manifest, .toc, .leeswijzer, .keuzes-box, .keuze-kaart, .lagen-strip,
+  .extern-kader, .omgeving-card, .stat-rij, .bron-noot,
+  .fundament-box, .pijler,
+  .netwerk-schema, .lagen-stack, .laag-rij,
+  .kernambitie, .ambities li, .indicator, .thema-bronnen,
+  .kspread-keuze, .kspread-meet, .kspread-bron,
+  .stat2, .omg2, .jou, .golf-item, .toc2-item,
+  .sandbox-kaart, .sandbox-grid, .sandbox-principes, .sandbox-principe,
+  .gov-lagen, .gov-laag, .gov-netwerk-diagram, .gov-tabel, .gov-tabel tr,
+  .stap-rij, .voorstel-kader,
+  .tijdlijn, .tl-rij, .bronnen-blok li, .colofon {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  h1, h2, h3, .sectie-label, .doel-label {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+  p { orphans: 3; widows: 3; }
+
+  @media print {
+    .divider { display: none; }
+    .manifest { padding: 36px 42px; margin: 24px 0; }
+    .manifest h2 { font-size: 26px; margin-bottom: 18px; }
+    .manifest-punten { gap: 13px 22px; }
+    .manifest-punt p { font-size: 11.5px; line-height: 1.55; }
+    .manifest-band { margin-top: 24px; }
+    .ambitie-rij { padding: 6px 0; }
+    .ambitie-tekst { font-size: 12.5px; }
+    .manifest-belofte { margin-top: 20px; padding-top: 16px; }
+    .manifest-belofte p { font-size: 17px; }
+
+    /* Sandboxhoofdstuk op een pagina */
+    .sandbox-box { padding: 28px 34px; margin: 16px 0; }
+    .sandbox-box h2 { font-size: 22px; margin-bottom: 10px; }
+    .sandbox-intro { font-size: 12.5px; margin-bottom: 14px; line-height: 1.55; }
+    .sandbox-grid { gap: 12px; margin-top: 12px; }
+    .sandbox-kaart { padding: 14px 15px; }
+    .sandbox-kaart p { font-size: 11px; line-height: 1.5; }
+    .sandbox-principes { margin-top: 14px; gap: 9px; }
+    .sandbox-principe { padding: 10px 12px; }
+    .sandbox-principe h5 { font-size: 11.5px; }
+    .sandbox-principe p { font-size: 10.5px; line-height: 1.45; }
+
+    /* Koerslijn op een pagina, inclusief bronnenvoet */
+    .koerslijn { margin: 10px 0; box-shadow: none; }
+    .koerslijn-header { padding: 18px 26px; }
+    .koerslijn-body { padding: 20px 26px; }
+    .koerslijn-body p { font-size: 12.5px; line-height: 1.6; }
+    .kernambitie-tekst { font-size: 15px; padding: 12px 18px; }
+    .ambities { margin-bottom: 12px; }
+    .ambities li { font-size: 12px; line-height: 1.5; padding: 6px 0; }
+    .indicator { padding: 12px 15px; }
+    .indicator span { font-size: 12px !important; }
+    .thema-bronnen { margin-top: 12px; padding: 10px 14px; }
+    .thema-bronnen li { font-size: 11px; padding: 1.5px 0 1.5px 15px; }
+    .thema-bronnen .tb-noot { font-size: 10px; margin-top: 5px; }
+
+    /* Fundament en statistieken iets compacter */
+    .fundament-box { padding: 30px 36px; }
+    .pijler p { font-size: 11.5px; line-height: 1.55; }
+
+    /* Omgevingsanalyse op een pagina */
+    .stat-rij { margin: 20px 0; }
+    .stat-blok { padding: 16px 14px; }
+    .omgeving-grid { gap: 10px; margin: 16px 0; }
+    .omgeving-card { padding: 13px 16px; }
+    .omgeving-card p { font-size: 11px; line-height: 1.5; }
+    .extern-kader { padding: 13px 18px; margin: 12px 0; }
+    .extern-kader p { font-size: 11px; line-height: 1.5; }
+    .extern-kader h4 { font-size: 13px; }
+    .bron-noot { font-size: 9.5px; margin-top: 12px; }
+
+    /* Vijflagenmodel en netwerkschema samen op een pagina */
+    .lagen-stack { margin: 18px 0; }
+    .laag-rij { padding: 8px 13px; margin-bottom: 5px; }
+    .laag-naam { font-size: 12px; min-width: 190px; }
+    .laag-oms { font-size: 10.5px; line-height: 1.45; }
+    .laag-eig { font-size: 9.5px; }
+    .netwerk-schema { margin: 14px 0; }
+    .netwerk-schema svg { max-height: 400px; width: 100%; }
+
+    /* Bronnen en colofon samen op de slotpagina */
+    .bronnen-blok { padding: 18px 22px; }
+    .bronnen-lijst li { font-size: 10.5px; padding: 3px 0; line-height: 1.5; }
+    .colofon { padding: 22px 26px; margin-top: 14px; gap: 26px; }
+    .colofon p, .colofon li { font-size: 10.5px; line-height: 1.5; }
+  }
+
+  /* LEESWIJZER */
+  .leeswijzer { background: var(--grijs-licht); border-left: 4px solid var(--nhl-paars); border-radius: 0 5px 5px 0; padding: 20px 26px; margin: 0 0 36px; }
+  .leeswijzer h5 { font-size: 10px; font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase; color: var(--nhl-paars); margin-bottom: 9px; }
+  .leeswijzer p { font-size: 13px; color: var(--grijs-tekst); line-height: 1.7; margin-bottom: 9px; }
+  .leeswijzer p:last-child { margin-bottom: 0; }
+
+  /* VOORSTELKADER */
+  .voorstel-kader { border: 2px solid var(--nhl-paars); border-radius: 6px; overflow: hidden; margin: 28px 0; }
+  .voorstel-kader .vk-kop { background: var(--nhl-paars); color: white; padding: 9px 20px; font-size: 10px; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase; }
+  .voorstel-kader .vk-body { padding: 18px 22px; }
+  .voorstel-kader .vk-body p { font-size: 13.5px; line-height: 1.7; }
+  .voorstel-kader .vk-body p:last-child { margin-bottom: 0; }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <div class="cover-geo">
+    <svg viewBox="0 0 420 420" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="420,0 420,260 160,0" fill="#8C1D82" opacity="0.65"/>
+      <polygon points="420,0 420,160 260,0" fill="#6A1575" opacity="0.55"/>
+    </svg>
+  </div>
+  <div class="cover-paars"></div>
+  <div class="cover-dots">
+    <span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span><span></span>
+  </div>
+  <div class="cover-logo">
+    <div class="nhl-logo">
+      <span class="nhl-logo-nhl">NHL</span>
+      <span class="nhl-logo-stenden">STENDEN</span>
+    </div>
+  </div>
+  <div class="cover-body">
+    <div class="cover-supra">Transitieprogramma Digitalisering</div>
+    <div class="cover-titel">NHL Stenden<br><span class="cover-titel-accent">AI-Koers</span></div>
+    <div class="cover-subtitel">Richting, samenhang en menselijke maat<br>in een door AI veranderende wereld</div>
+    <div class="cover-pills">
+      <span class="cover-pill">AI &amp; Leren</span>
+      <span class="cover-pill">AI &amp; Werken</span>
+      <span class="cover-pill">AI &amp; Verantwoordelijkheid</span>
+      <span class="cover-pill">AI &amp; Geletterdheid</span>
+      <span class="cover-pill">AI &amp; Werkveld</span>
+      <span class="cover-pill">AI &amp; Onderzoek</span>
+    </div>
+  </div>
+  <div class="cover-footer">
+    <span>Kwartiermaker Digitale Samenhang</span>
+    <span class="cover-versie">Versie 0.4 concept restyle &nbsp;|&nbsp; Juli 2026</span>
+    <span>2026 tot 2030</span>
+  </div>
+</div>
+
+<!-- DOCUMENT -->
+<div class="document">
+
+  <div class="sp-kicker">NHL Stenden AI-Koers &middot; 2026 tot 2030</div>
+  <div class="toc2-titel">Inhoud</div>
+  <div class="sp-lijn"></div>
+  <p class="toc2-lead">Dit document beschrijft de AI-Koers van NHL Stenden voor 2026 tot 2030: de uitwerking van de veranderlijn AI uit de Digitale Koers 2030. De kern bestaat uit zes koerslijnen, elk met een kernambitie, doelen en een indicator voor 2030. De uitvoering wordt uitgewerkt in het Programmaplan AI, een apart document.</p>
+  <p class="toc2-lead">Dit is versie 0.4 (concept restyle), een consultatieversie voor het gesprek met academies, diensten, medezeggenschap en bestuur. Reacties worden verwerkt richting versie 1.0, ter vaststelling door de Stuurgroep Transitieprogramma.</p>
+  <div class="toc2-grid">
+    <div class="toc2-item"><span class="toc2-nr">01</span>Manifest</div>
+    <div class="toc2-item"><span class="toc2-nr">02</span>Woord vooraf</div>
+    <div class="toc2-item"><span class="toc2-nr">03</span>Omgevingsanalyse</div>
+    <div class="toc2-item"><span class="toc2-nr">04</span>Ons vertrekpunt</div>
+    <div class="toc2-item"><span class="toc2-nr">05</span>AI &amp; Leren</div>
+    <div class="toc2-item"><span class="toc2-nr">06</span>AI &amp; Werken</div>
+    <div class="toc2-item"><span class="toc2-nr">07</span>AI &amp; Verantwoordelijkheid</div>
+    <div class="toc2-item"><span class="toc2-nr">08</span>AI &amp; Geletterdheid</div>
+    <div class="toc2-item"><span class="toc2-nr">09</span>AI &amp; Werkveld</div>
+    <div class="toc2-item"><span class="toc2-nr">10</span>AI &amp; Onderzoek</div>
+    <div class="toc2-item"><span class="toc2-nr">11</span>Veilig, transparant en experimenteren</div>
+    <div class="toc2-item"><span class="toc2-nr">12</span>Governance en realisatie</div>
+    <div class="toc2-item"><span class="toc2-nr">13</span>Wat betekent dit voor jou</div>
+    <div class="toc2-item"><span class="toc2-nr">14</span>Tijdlijn en bronnen</div>
+  </div>
+
+  <!-- 01 MANIFEST -->
+  <div class="page-break"></div>
+  <div class="sectie-label">01 &nbsp; Manifest</div>
+
+  <div class="manifest">
+    <div class="manifest-supra">Het manifest van de AI-Koers</div>
+    <h2>Waar wij voor staan</h2>
+    <p style="font-size:14px;color:rgba(255,255,255,0.75);margin:-14px 0 24px;position:relative;z-index:2;">Voordat we de koers uitwerken, spreken we uit waar wij in geloven. Zes uitgangspunten die alles dragen wat volgt.</p>
+    <div class="manifest-punten">
+      <div class="manifest-punt">
+        <span class="manifest-nr">1</span>
+        <div>
+          <h5>Mensen eerst</h5>
+          <p>Echte digitale verandering begint bij mensen: bij hoe zij leren, werken en samenwerken. AI is waardevol als mensen begrijpen wat ze doen, waarom ze het doen en daar eigenaarschap bij ervaren. De lerende staat centraal, ook in digitalisering.</p>
+        </div>
+      </div>
+      <div class="manifest-punt">
+        <span class="manifest-nr">2</span>
+        <div>
+          <h5>Verantwoord en transparant</h5>
+          <p>We zijn open over welke AI we inzetten, waarom, en met welke risico's. Publieke kernwaarden zijn leidend: rechtvaardigheid, autonomie en menselijkheid. AI-governance is een morele positie en een bestuurlijke verplichting.</p>
+        </div>
+      </div>
+      <div class="manifest-punt">
+        <span class="manifest-nr">3</span>
+        <div>
+          <h5>Samenhang boven eilanden</h5>
+          <p>Duurzame verandering ontstaat uit verbonden initiatieven. De zes koerslijnen vormen samen &eacute;&eacute;n koers, geen zes losse beleidsthema's. Het AI-Netwerk is het instrument van die samenhang.</p>
+        </div>
+      </div>
+      <div class="manifest-punt">
+        <span class="manifest-nr">4</span>
+        <div>
+          <h5>Verbinden, niet overnemen</h5>
+          <p>Het AI-Netwerk verbindt en verwijst. De inhoud blijft bij de vakeigenaren: het CTL voor toetsing en didactiek, OO&amp;I voor onderwijs en onderzoek. Wij vatten kort samen en wijzen altijd de weg naar de originele bron.</p>
+        </div>
+      </div>
+      <div class="manifest-punt">
+        <span class="manifest-nr">5</span>
+        <div>
+          <h5>Veilig experimenteren</h5>
+          <p>We proberen AI bewust uit: in een sandbox, met privacy by design, menselijk toezicht, volledige documentatie en een stoprecht. Vertrouwen vraagt om actieve keuzes, elke dag opnieuw.</p>
+        </div>
+      </div>
+      <div class="manifest-punt">
+        <span class="manifest-nr">6</span>
+        <div>
+          <h5>De student is de maatstaf</h5>
+          <p>We meten deze koers af aan wat studenten, medewerkers en de regio er elke dag van merken. Niet aan het aantal tools dat we invoeren, maar aan het verschil dat mensen ervaren.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="manifest-band">
+      <div class="manifest-band-label">Zes koerslijnen, zes kernambities</div>
+      <div class="ambitie-rij"><span class="ambitie-chip" style="background:#1E3A8A;">AI &amp; Leren</span><span class="ambitie-tekst">"AI versterkt leren: meer succes, minder uitval."</span></div>
+      <div class="ambitie-rij"><span class="ambitie-chip" style="background:#0F766E;">AI &amp; Werken</span><span class="ambitie-tekst">"AI neemt werk uit handen, zodat mensen het verschil maken."</span></div>
+      <div class="ambitie-rij"><span class="ambitie-chip" style="background:#E91E8C;">AI &amp; Verantw.</span><span class="ambitie-tekst">"AI met transparantie, controle en vertrouwen."</span></div>
+      <div class="ambitie-rij"><span class="ambitie-chip" style="background:#7C3AED;">AI &amp; Geletterdheid</span><span class="ambitie-tekst">"Iedereen AI-vaardig, niemand afhankelijk."</span></div>
+      <div class="ambitie-rij"><span class="ambitie-chip" style="background:#B45309;">AI &amp; Werkveld</span><span class="ambitie-tekst">"Samen met het werkveld versnellen we innovatie."</span></div>
+      <div class="ambitie-rij"><span class="ambitie-chip" style="background:#0E7490;">AI &amp; Onderzoek</span><span class="ambitie-tekst">"AI-onderzoek met impact: praktisch, relevant en toekomstgericht."</span></div>
+    </div>
+
+    <div class="manifest-belofte">
+      <p>"AI bij NHL Stenden: slimmer leren, sterker werken en verantwoord innoveren."</p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- 02 WOORD VOORAF -->
+  <div class="page-break"></div>
+  <div class="sectie-label">02 &nbsp; Woord vooraf</div>
+  <h1>Koers kiezen in een veranderende wereld</h1>
+  <p class="lead">AI verandert hoe mensen leren, werken en samenwerken. Als hogeschool kunnen we die verschuiving niet buiten de deur houden, maar we kunnen haar wel bewust vormgeven.</p>
+  <p>Deze AI-Koers is onze keuze voor 2026 tot 2030. Wij varen deze koers niet omdat technologie ons dwingt, maar omdat wij zelf willen bepalen hoe AI ons onderwijs, ons onderzoek en ons werk versterkt. De koers werkt de Digitale Koers 2030 uit, die AI neerzet als samenhangende veranderlijn: centrale kaders waar nodig, veilige experimenteerruimte waar mogelijk. De publieke kernwaarden en het sturingsmodel uit die Digitale Koers zijn ook hier ons kompas.</p>
+
+  <div style="border:2px solid var(--nhl-blauw);border-radius:5px;overflow:hidden;margin:28px 0;">
+    <div style="background:var(--nhl-blauw);color:white;padding:10px 20px;font-size:10px;font-weight:800;letter-spacing:0.18em;text-transform:uppercase;">De positie van dit document</div>
+    <div style="display:grid;grid-template-columns:1fr auto 1fr auto 1fr auto 1fr;align-items:stretch;padding:16px 20px;gap:8px;">
+      <div style="background:var(--grijs-licht);border:1px solid var(--grijs-mid);border-radius:4px;padding:10px 12px;">
+        <div style="font-size:12px;font-weight:800;color:var(--nhl-blauw);">Strategisch Instellingsplan 2025-2030</div>
+        <div style="font-size:11px;color:var(--grijs-tekst);margin-top:3px;">De strategische koers van NHL Stenden</div>
+      </div>
+      <div style="align-self:center;color:var(--nhl-paars);font-weight:800;">&#8594;</div>
+      <div style="background:var(--grijs-licht);border:1px solid var(--grijs-mid);border-radius:4px;padding:10px 12px;">
+        <div style="font-size:12px;font-weight:800;color:var(--nhl-blauw);">Digitale Koers 2030</div>
+        <div style="font-size:11px;color:var(--grijs-tekst);margin-top:3px;">Vier digitale ambities; AI als samenhangende veranderlijn</div>
+      </div>
+      <div style="align-self:center;color:var(--nhl-paars);font-weight:800;">&#8594;</div>
+      <div style="background:#EDF3FC;border:1.5px solid var(--nhl-blauw);border-radius:4px;padding:10px 12px;">
+        <div style="font-size:12px;font-weight:800;color:var(--nhl-blauw);">AI-Koers (dit document)</div>
+        <div style="font-size:11px;color:var(--grijs-tekst);margin-top:3px;">De uitwerking van die veranderlijn in zes koerslijnen</div>
+      </div>
+      <div style="align-self:center;color:var(--nhl-paars);font-weight:800;">&#8594;</div>
+      <div style="background:var(--grijs-licht);border:1px solid var(--grijs-mid);border-radius:4px;padding:10px 12px;">
+        <div style="font-size:12px;font-weight:800;color:var(--nhl-blauw);">AI-Netwerk</div>
+        <div style="font-size:11px;color:var(--grijs-tekst);margin-top:3px;">Het uitvoerings- en verbindingsinstrument</div>
+      </div>
+    </div>
+  </div>
+  <p>Dit is geen beleidsdocument vol regels, maar een uitgesproken richting: een keuze over wie wij zijn en waar wij heen willen. Zes koerslijnen dragen die keuze; de uitvoering krijgt vorm in het Programmaplan AI.</p>
+
+  <div class="divider"></div>
+
+  <!-- 02 OMGEVINGSANALYSE -->
+  <div class="page-break"></div>
+  <div class="sectie-label">03 &nbsp; Omgevingsanalyse</div>
+  <h1>De wereld om ons heen</h1>
+  <p class="lead">We plaatsen onze koers bewust in de bredere context van wat landelijk en internationaal speelt.</p>
+
+  <div class="stat2-rij">
+    <div class="stat2" style="--s:#003DA5;">
+      <span class="stat2-getal">96%</span>
+      <span class="stat2-label">van studenten en docenten gebruikt generatieve AI actief</span>
+      <span class="stat2-bron">Open Universiteit / Regieorgaan GenAI, 2024</span>
+    </div>
+    <div class="stat2" style="--s:#8C1D82;">
+      <span class="stat2-getal">2/3</span>
+      <span class="stat2-label">van hogescholen en universiteiten heeft inmiddels een formeel AI-beleid</span>
+      <span class="stat2-bron">UNESCO, 2025</span>
+    </div>
+    <div class="stat2" style="--s:#1E3A8A;">
+      <span class="stat2-getal">56%</span>
+      <span class="stat2-label">hogere beloning voor medewerkers met aantoonbare AI-vaardigheden</span>
+      <span class="stat2-bron">WEF / PwC Global AI Jobs Barometer, 2025</span>
+    </div>
+  </div>
+
+  <div class="omg2-grid">
+    <div class="omg2" style="--s:#003DA5;">
+      <h4>Europese AI Act</h4>
+      <p>Verplichtingen rond AI-geletterdheid gelden sinds februari 2025 en AI in het onderwijs is hoog-risico. NHL Stenden is rechtstreeks geraakt, en draagt extra zware verplichtingen als aanbieder zodra ze zelf AI-systemen bouwt voor studentbeslissingen.</p>
+    </div>
+    <div class="omg2" style="--s:#8C1D82;">
+      <h4>Npuls en SURF EduGenAI</h4>
+      <p>Via het Nationaal Groeifonds investeert de overheid ruim 560 miljoen euro in digitalisering van mbo, hbo en wo. NHL Stenden is medeondertekenaar van de drie Npuls-sectorbeloften: leren zonder drempels, doorlopend het beste onderwijs, en AI en data waarde(n)vol inzetten. Deze AI-Koers is de instellingsinvulling van die derde belofte. EduGenAI biedt een veilig nationaal platform voor generatieve AI, verwacht breed beschikbaar eind 2026.</p>
+    </div>
+    <div class="omg2" style="--s:#0F766E;">
+      <h4>Peers en benchmarks</h4>
+      <p>Utrecht bouwt een volledig AI-governanceframework, de Hanzehogeschool werkt met een community-aanpak, HAN en Leiden ontwikkelden toetsingstoolkits. NHL Stenden leert van deze peers en kiest bewust voor een netwerkbenadering.</p>
+    </div>
+    <div class="omg2" style="--s:#0E7490;">
+      <h4>Regionale positie Noord-Nederland</h4>
+      <p>NHL Stenden is met het lectoraat Computer Vision &amp; Data Science en het I'M A.I.-initiatief een erkend regionaal AI-kenniscentrum. Die positie vraagt ook institutioneel leiderschap op AI-vraagstukken in de regio, in samenwerking met Frisius MC, Innovatie Cluster Drachten en het MKB.</p>
+    </div>
+  </div>
+
+  <p>Het internationale beeld wijst dezelfde kant op. De UNESCO competentieframeworks voor AI in het onderwijs (2024) zetten mensgerichte AI als wereldwijde norm: AI als ondersteuning van menselijk denken, niet als vervanging. En het WEF Future of Jobs Report 2025 laat zien dat AI-vaardigheden tot 2030 de snelst groeiende vraag op de arbeidsmarkt vormen. Daaruit volgt de dubbele opdracht van NHL Stenden: studenten voorbereiden op een AI-gedreven arbeidsmarkt en medewerkers bewust begeleiden in de transitie.</p>
+
+  <div class="bron-noot">
+    <strong>Bronvermelding statistieken:</strong> Open Universiteit / Regieorgaan GenAI (n=164 studenten + 45 docenten, juni-juli 2024) &middot; UNESCO survey hoger onderwijs AI-beleid (2025) &middot; WEF/PwC Global AI Jobs Barometer 2025 &middot; EU AI-verordening 2024/1689 (in werking 2 februari 2025).
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- 04 ONS VERTREKPUNT -->
+  <div class="keuzes-box">
+    <div class="page-break"></div>
+  <div class="sectie-label">04 &nbsp; Ons vertrekpunt</div>
+    <h2>Drie keuzes dragen deze koers</h2>
+    <p class="keuzes-intro">Wij beginnen niet bij nul, en wij beginnen niet alleen.</p>
+
+    <div class="keuzes-grid">
+      <div class="keuze-kaart">
+        <div class="keuze-nr">I</div>
+        <h4>Wij bouwen op wat er al is</h4>
+        <p>Het AI-Netwerk verbindt medewerkers, docenten, onderzoekers en studenten rond AI. Zes spreektafels dragen de zes koerslijnen. Geen nieuwe structuur, maar een netwerk dat al bestaat en werkt.</p>
+      </div>
+      <div class="keuze-kaart">
+        <div class="keuze-nr">II</div>
+        <h4>Wij verbinden, wij nemen niet over</h4>
+        <p>Toetsing en didactiek horen bij het CTL en de examencommissies; onderwijs- en onderzoekskaders bij OO&amp;I. E&eacute;n waarheid per onderwerp, bij &eacute;&eacute;n eigenaar. Wij verwijzen naar de bron, zichtbaar in de bronvermeldingen per koerslijn.</p>
+      </div>
+      <div class="keuze-kaart">
+        <div class="keuze-nr">III</div>
+        <h4>Wij kiezen de landelijke weg</h4>
+        <p>Deze koers is onze invulling van de Npuls-belofte AI en data waarde(n)vol inzetten. Wij standaardiseren op wat landelijk komt (AI-GO, EduGenAI, het algoritmeregister) en zetten eigen energie in op wat ons onderscheidt.</p>
+      </div>
+    </div>
+
+    <div class="lagen-strip-kop">En wij ordenen AI in vijf lagen, zodat helder is wie waarvoor verantwoordelijk is:</div>
+    <div class="lagen-strip">
+      <span class="laag-chip"><b>1</b> Energie &amp; Infrastructuur</span>
+      <span class="laag-pijl">&#8594;</span>
+      <span class="laag-chip"><b>2</b> Chips &amp; Hardware</span>
+      <span class="laag-pijl">&#8594;</span>
+      <span class="laag-chip"><b>3</b> Onderwijs, Onderzoek &amp; Data</span>
+      <span class="laag-pijl">&#8594;</span>
+      <span class="laag-chip"><b>4</b> Platforms &amp; Applicaties</span>
+      <span class="laag-pijl">&#8594;</span>
+      <span class="laag-chip"><b>5</b> Gebruik &amp; Toepassingen</span>
+    </div>
+    <p class="keuzes-slot">Eerst organiseren, dan automatiseren. Zes thema's, vijf lagen, &eacute;&eacute;n kompas.</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- KL1 LEREN -->
+  <div class="page-break"></div>
+  <div class="sectie-label">05 &nbsp; Koerslijn 1</div>
+  <div class="kspread" style="--kl:#1E3A8A; --kl-donker:#142A63; --kl-tint:#E8EFF8;">
+    <div class="kspread-ghost">01</div>
+    <div class="kspread-kicker">Koerslijn 01 &nbsp;&middot;&nbsp; AI &amp; Leren</div>
+    <div class="kspread-ambitie">"AI versterkt leren: meer succes, minder uitval."</div>
+    <div class="kspread-sub">Onderwijs, didactiek, studiesucces en voorbereiding op de arbeidsmarkt.</div>
+    <div class="kspread-lijn"></div>
+    <p class="kspread-lead">Onze koers is helder: AI versterkt het onderwijs en vervangt de docent niet. Wij zetten AI in waar het leren sterker maakt, van adaptieve feedback tot vroegsignalering van uitval, zodat elke student meer kans krijgt op studiesucces. Kritisch denken, samenwerken en ethisch handelen blijven de kern. En toetsregels schrijven wij hier bewust niet: die horen bij het CTL en de examencommissies.</p>
+    <div class="kspread-keuzelabel">Dit kiezen wij tot 2030</div>
+    <div class="kspread-grid">
+      <div class="kspread-keuze">Elk domein kiest positie: <strong>AI in het leerproces</strong> wordt vastgelegd in het OER, als pedagogische keuze, niet als verbod.</div>
+      <div class="kspread-keuze">Wij laten <strong>AI-bestendige toetsvormen</strong> ontstaan waar ze horen: onder regie van CTL en examencommissies. Het AI-Netwerk deelt de praktijk.</div>
+      <div class="kspread-keuze">Wij kiezen <strong>SURF EduGenAI</strong> als ons veilige platform voor generatieve AI, ingericht per opleiding.</div>
+      <div class="kspread-keuze">Wij starten gerichte <strong>pilots met AI-ondersteunde begeleiding en vroegsignalering</strong> en rekenen ze af op leeruitkomsten.</div>
+    </div>
+    <div class="kspread-meet">
+      <span class="kspread-meet-label">2030</span>
+      <span class="kspread-meet-tekst">Elke opleiding heeft een gedocumenteerde en zichtbare positie op AI in het leerproces, opgenomen in OER en opleidingsgids.</span>
+    </div>
+    <div class="kspread-bron"><b>Inhoudelijke bronnen (vakeigenaar: CTL)</b> CTL: AI &amp; Toetsing, richtlijnen en beoordelen &middot; AI in het onderwijs &middot; AI in je studie</div>
+  </div>
+
+  <!-- KL2 WERKEN -->
+  <div class="page-break"></div>
+  <div class="sectie-label">06 &nbsp; Koerslijn 2</div>
+  <div class="kspread" style="--kl:#0F766E; --kl-donker:#0A4F4A; --kl-tint:#E4F3EF;">
+    <div class="kspread-ghost">02</div>
+    <div class="kspread-kicker">Koerslijn 02 &nbsp;&middot;&nbsp; AI &amp; Werken</div>
+    <div class="kspread-ambitie">"AI neemt werk uit handen, zodat mensen het verschil maken."</div>
+    <div class="kspread-sub">Procesverbetering, bedrijfsvoering en nieuwe werkwijzen bij diensten.</div>
+    <div class="kspread-lijn"></div>
+    <p class="kspread-lead">Wij laten AI het werk doen dat mensen klein houdt: administratieve lasten, repetitieve taken, complexe planning. Zo ontstaat ruimte voor wat echt telt: contact, oordeel en inhoud. Wij worden wendbaarder zonder de menselijke maat te verliezen.</p>
+    <div class="kspread-keuzelabel">Dit kiezen wij tot 2030</div>
+    <div class="kspread-grid">
+      <div class="kspread-keuze">Wij brengen <strong>AI in bedrijfsprocessen</strong> via pilots, en bedden alleen in wat zijn meerwaarde bewijst.</div>
+      <div class="kspread-keuze">Wij kopen in via een <strong>expliciet afwegingskader</strong>: digitale soevereiniteit en AI Act-compliance wegen altijd mee.</div>
+      <div class="kspread-keuze">Wij meten periodiek <strong>werkdruk en werktevredenheid</strong> en sturen bij zodra AI complexiteit oplevert in plaats van verlichting.</div>
+      <div class="kspread-keuze">Wij delen succesvolle werkwijzen <strong>actief</strong>, zodat de hele instelling leert van individuele teams.</div>
+    </div>
+    <div class="kspread-meet">
+      <span class="kspread-meet-label">2030</span>
+      <span class="kspread-meet-tekst">Minimaal vijf bedrijfsprocessen aantoonbaar verbeterd met AI-inzet, gedocumenteerd en beschikbaar voor leeruitwisseling.</span>
+    </div>
+  </div>
+
+  <!-- KL3 VERANTWOORDELIJKHEID -->
+  <div class="page-break"></div>
+  <div class="sectie-label">07 &nbsp; Koerslijn 3</div>
+  <div class="kspread" style="--kl:#E91E8C; --kl-donker:#A81264; --kl-tint:#FCE4F0;">
+    <div class="kspread-ghost">03</div>
+    <div class="kspread-kicker">Koerslijn 03 &nbsp;&middot;&nbsp; AI &amp; Verantwoordelijkheid</div>
+    <div class="kspread-ambitie">"AI met transparantie, controle en vertrouwen."</div>
+    <div class="kspread-sub">Governance, AI Act, soevereiniteit en eigenaarschap.</div>
+    <div class="kspread-lijn"></div>
+    <p class="kspread-lead">Wij zetten geen AI in zonder grip op wat het doet. Bouwen wij zelf AI-systemen die besluiten over studenten ondersteunen, dan dragen wij zware verplichtingen rond transparantie, menselijk toezicht en documentatie; en ook bij bestaande tools als Copilot of ChatGPT horen altijd een verwerkersovereenkomst, een privacytoets en openheid. Met het AI-beleid v2.0 is de eerste stap gezet; de governancestructuur bouwen wij nu. Vertrouwen is voor ons een actieve keuze, elke dag opnieuw.</p>
+    <div class="kspread-keuzelabel">Dit kiezen wij tot 2030</div>
+    <div class="kspread-grid">
+      <div class="kspread-keuze">Wij richten een <strong>AI-governancestructuur</strong> in met heldere verantwoordelijkheden en periodieke rapportage aan CvB en medezeggenschap.</div>
+      <div class="kspread-keuze">Wij classificeren <strong>alle toepassingen conform de EU AI Act</strong>; hoog-risico systemen gaan niet in gebruik zonder compliancecheck en DPIA.</div>
+      <div class="kspread-keuze">Wij leggen in een <strong>ethisch waardenkompas</strong> en een Acceptable AI Use Policy vast wat wij wel en niet doen, inclusief het verbod op ongecontroleerde besluitvorming over studenten.</div>
+      <div class="kspread-keuze">Wij trainen iedereen die AI inkoopt of inzet in <strong>privacy- en securityrisico's</strong>; de Regulatory Sandbox begeleidt juridisch complexe toepassingen.</div>
+    </div>
+    <div class="kspread-meet">
+      <span class="kspread-meet-label">2030</span>
+      <span class="kspread-meet-tekst">Gevalideerde AI-governancestructuur. Jaarlijkse rapportage aan CvB en medezeggenschapsorganen over AI-risico's, compliance en soevereiniteitsafwegingen.</span>
+    </div>
+    <div class="kspread-bron"><b>Inhoudelijke bronnen (vakeigenaar: CTL)</b> CTL: verantwoord gebruik voor medewerkers (AI in het onderwijs) en studenten (AI in je studie)</div>
+  </div>
+
+  <!-- KL4 GELETTERDHEID -->
+  <div class="page-break"></div>
+  <div class="sectie-label">08 &nbsp; Koerslijn 4</div>
+  <div class="kspread" style="--kl:#7C3AED; --kl-donker:#56279E; --kl-tint:#F2E8F9;">
+    <div class="kspread-ghost">04</div>
+    <div class="kspread-kicker">Koerslijn 04 &nbsp;&middot;&nbsp; AI &amp; Geletterdheid</div>
+    <div class="kspread-ambitie">"Iedereen AI-vaardig, niemand afhankelijk."</div>
+    <div class="kspread-sub">Digitale vaardigheden, bewustwording en kritisch denkvermogen.</div>
+    <div class="kspread-lijn"></div>
+    <p class="kspread-lead">Wij maken AI-geletterdheid een basisvaardigheid voor iedereen: AI begrijpen, beoordelen en bewust inzetten, passend bij ieders rol. Kritisch denken en digitale weerbaarheid horen daarbij, want vaardigheid mag nooit omslaan in blinde afhankelijkheid.</p>
+    <div class="kspread-keuzelabel">Dit kiezen wij tot 2030</div>
+    <div class="kspread-grid">
+      <div class="kspread-keuze">Wij stellen een <strong>instellingsbreed basisprofiel AI-geletterdheid</strong> vast op basis van AI-GO, met leerroutes per rol via CTL en MyAcademy.</div>
+      <div class="kspread-keuze">Wij ondersteunen docenten <strong>gericht</strong>: peer learning, praktijkvoorbeelden en risicobewustzijn via onder andere ARDA.</div>
+      <div class="kspread-keuze">Wij sluiten aan bij <strong>nationale initiatieven</strong> (Npuls, SURF) en dragen bij waar onze expertise meerwaarde heeft.</div>
+      <div class="kspread-keuze">Wij verankeren AI-geletterdheid in <strong>onboarding, professionalisering en het curriculum</strong> van alle opleidingen.</div>
+    </div>
+    <div class="kspread-meet">
+      <span class="kspread-meet-label">2030</span>
+      <span class="kspread-meet-tekst">80% van de medewerkers heeft het vastgestelde basisniveau AI-geletterdheid bereikt. Studenten worden bij aanvang actief geïnformeerd over AI-geletterdheid als beroepscompetentie.</span>
+    </div>
+    <div class="kspread-bron"><b>Inhoudelijke bronnen (vakeigenaren: CTL en Npuls)</b> CTL: professionalisering en MyAcademy &middot; Npuls: AI-GO raamwerk (npuls.nl)</div>
+  </div>
+
+  <!-- KL5 WERKVELD -->
+  <div class="page-break"></div>
+  <div class="sectie-label">09 &nbsp; Koerslijn 5</div>
+  <div class="kspread" style="--kl:#B45309; --kl-donker:#7C3906; --kl-tint:#FAEEE9;">
+    <div class="kspread-ghost">05</div>
+    <div class="kspread-kicker">Koerslijn 05 &nbsp;&middot;&nbsp; AI &amp; Werkveld</div>
+    <div class="kspread-ambitie">"Samen met het werkveld versnellen we innovatie."</div>
+    <div class="kspread-sub">Regionale samenwerking, co-creatie en kennisoverdracht.</div>
+    <div class="kspread-lijn"></div>
+    <p class="kspread-lead">Wij staan midden in de regio, en dat willen wij laten merken. Onze studenten en docenten werken aan echte AI-vraagstukken uit de Friese en Noord-Nederlandse praktijk: het werkveld krijgt kennis en talent, de opleiding krijgt praktijkverdieping. Met de Friese AI-propositie (met Frisius MC en Firda) en de opschaling van twintig jaar Vision Technology expertise geven wij die samenwerking nu al vorm.</p>
+    <div class="kspread-keuzelabel">Dit kiezen wij tot 2030</div>
+    <div class="kspread-grid">
+      <div class="kspread-keuze">Wij bedden <strong>AI-competenties structureel in</strong> in alle opleidingsprofielen, afgestemd met werkveldcommissies en regionale partners.</div>
+      <div class="kspread-keuze">Wij leren <strong>samen met werkgevers</strong> wat AI betekent voor specifieke beroepen in Noord-Nederland.</div>
+      <div class="kspread-keuze">Wij faciliteren stages en afstudeeropdrachten rond AI <strong>actief</strong>, met kennisoverdracht naar het MKB als expliciete opgave.</div>
+      <div class="kspread-keuze">Wij investeren in <strong>living labs</strong>: leeromgevingen waar studenten met regionale partners aan echte AI-vraagstukken werken.</div>
+    </div>
+    <div class="kspread-meet">
+      <span class="kspread-meet-label">2030</span>
+      <span class="kspread-meet-tekst">Elk domein heeft AI-competenties verankerd in ten minste één kernonderdeel van het curriculum, in aantoonbare afstemming met het beroepenveld.</span>
+    </div>
+  </div>
+
+  <!-- KL6 ONDERZOEK -->
+  <div class="page-break"></div>
+  <div class="sectie-label">10 &nbsp; Koerslijn 6</div>
+  <div class="kspread" style="--kl:#0E7490; --kl-donker:#0A4F63; --kl-tint:#E4F0F4;">
+    <div class="kspread-ghost">06</div>
+    <div class="kspread-kicker">Koerslijn 06 &nbsp;&middot;&nbsp; AI &amp; Onderzoek</div>
+    <div class="kspread-ambitie">"AI-onderzoek met impact: praktisch, relevant en toekomstgericht."</div>
+    <div class="kspread-sub">Lectoraten, onderzoeksintegriteit en digitale soevereiniteit in onderzoek.</div>
+    <div class="kspread-lijn"></div>
+    <p class="kspread-lead">Wij omarmen AI als onderzoeksinstrument: sneller analyseren, slimmer verbanden leggen, opschalen. Tegelijk stellen wij zelf de vragen die AI oproept over integriteit, kennisveiligheid en digitale soevereiniteit, zeker nu onderzoeksdata steeds vaker op buitenlandse cloudinfrastructuur staat; Programma Bach onderstreept dat die transitie ook ons onderzoek raakt. Wij pakken beide kanten op: AI als instrument &eacute;n als vraagstuk.</p>
+    <div class="kspread-keuzelabel">Dit kiezen wij tot 2030</div>
+    <div class="kspread-grid">
+      <div class="kspread-keuze">Wij organiseren de <strong>verbinding tussen AI-onderzoek en de andere koerslijnen</strong>; inzichten stromen naar onderwijs en beleid.</div>
+      <div class="kspread-keuze">Wij halen lectoren en onderzoekers <strong>het AI-Netwerk in</strong> en versterken zo de kennisfunctie van de instelling.</div>
+      <div class="kspread-keuze">Wij doen <strong>AI-ondersteund onderzoek</strong> transparant en conform de ERA Living Guidelines, gedragen door een centraal dataplatform.</div>
+      <div class="kspread-keuze">Wij positioneren NHL Stenden als <strong>zichtbare AI-kennispartner in Noord-Nederland</strong> en sluiten aan bij Programma Bach.</div>
+    </div>
+    <div class="kspread-meet">
+      <span class="kspread-meet-label">2030</span>
+      <span class="kspread-meet-tekst">Minimaal twee lectoraten participeren actief in het AI-Netwerk. NHL Stenden heeft een zichtbare rol als AI-kennispartner in de regio.</span>
+    </div>
+    <div class="kspread-bron"><b>Inhoudelijke bronnen (vakeigenaren: OO&amp;I en CTL)</b> OO&amp;I en lectoraten: onderzoekskaders &middot; CTL: AI in het onderwijs (lectoraat Computer Vision &amp; Data Science)</div>
+  </div>
+
+  <!-- 11 SANDBOX / VEILIG EXPERIMENTEREN -->
+  <div class="sandbox-box">
+    <div class="page-break"></div>
+  <div class="sectie-label">11 &nbsp; Veilig experimenteren</div>
+    <h2>Veilig, transparant en experimenteren onder toezicht</h2>
+    <p class="sandbox-intro">NHL Stenden wil AI niet alleen begrijpen maar ook bewust uitproberen, binnen georganiseerde experimenteerruimte en onder zes vaste waarborgen.</p>
+
+    <div class="sandbox-grid">
+      <div class="sandbox-kaart">
+        <h4>&#x1F9EA; Technische sandbox</h4>
+        <p>Een afgeschermde omgeving waar medewerkers, docenten en studenten AI-toepassingen testen op gesimuleerde of geanonimiseerde data, zonder dat echte studenten of bedrijfsprocessen in het geding zijn.</p>
+      </div>
+      <div class="sandbox-kaart">
+        <h4>&#x2696;&#xFE0F; Regulatory sandbox</h4>
+        <p>Voor AI-toepassingen in hoog-risico domeinen, zoals vroegsignalering van uitval of geautomatiseerde feedback, biedt de landelijke AI Regulatory Sandbox een juridisch begeleidingstraject: toetsing aan de EU AI Act, de AVG en ons ethisch waardenkompas, voordat ingebruikname plaatsvindt.</p>
+      </div>
+    </div>
+
+    <div class="sandbox-principes">
+      <div class="sandbox-principe">
+        <h5>&#x1F512; Privacy by design</h5>
+        <p>Geen echte studentdata in pilots tenzij via vastgesteld DPIA-proces. Anonimisering en pseudonimisering als standaard.</p>
+      </div>
+      <div class="sandbox-principe">
+        <h5>&#x1F440; Menselijk toezicht</h5>
+        <p>AI neemt geen autonome besluiten over studenten zonder menselijke verificatie. Elke geautomatiseerde output heeft een menselijk vangnet.</p>
+      </div>
+      <div class="sandbox-principe">
+        <h5>&#x1F4CB; Transparantie</h5>
+        <p>Studenten en medewerkers worden geïnformeerd wanneer AI een rol speelt in processen die hen raken. Geen verborgen algoritmen.</p>
+      </div>
+      <div class="sandbox-principe">
+        <h5>&#x1F4C2; Documentatie</h5>
+        <p>Elke pilot wordt gedocumenteerd: doel, dataset, uitkomst, geleerde lessen. Het AI-Netwerk beheert een centrale kennisbank van pilotresultaten.</p>
+      </div>
+      <div class="sandbox-principe">
+        <h5>&#x1F6D1; Stoprecht</h5>
+        <p>Elke pilot heeft een exit-criterium. Als ongewenste effecten optreden, bijv. bias in uitkomsten, wordt de pilot direct gestaakt en geëvalueerd.</p>
+      </div>
+      <div class="sandbox-principe">
+        <h5>&#x1F33F; Digitale autonomie</h5>
+        <p>Data blijft bij voorkeur onder Europese jurisdictie. Cloudkeuzes worden getoetst op digitale autonomie en afhankelijkheidsrisico's.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="voetvisual vv-s">
+    <div class="vv-kicker">De route van elk experiment</div>
+    <div class="route-strip">
+      <span class="route-stap">Idee</span><span class="route-pijl">&#8594;</span>
+      <span class="route-stap">Intake</span><span class="route-pijl">&#8594;</span>
+      <span class="route-stap">Classificatie</span><span class="route-pijl">&#8594;</span>
+      <span class="route-stap">Sandbox</span><span class="route-pijl">&#8594;</span>
+      <span class="route-stap">Evaluatie</span><span class="route-pijl">&#8594;</span>
+      <span class="route-stap vol">Uitrol</span>
+    </div>
+    <p class="vv-noot">De volledige werkwijze staat in het Programmaplan AI.</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- 12 GOVERNANCE -->
+  <div class="page-break"></div>
+  <div class="sectie-label">12 &nbsp; Governance en realisatie</div>
+  <h1>Hoe de AI-Koers wordt gerealiseerd</h1>
+  <p class="lead">De AI-Koers wordt gerealiseerd via het sturingsmodel uit de Digitale Koers 2030: niet primair sturen op technologie, maar op de bijdrage die AI levert aan de strategische doelen van NHL Stenden.</p>
+
+  <p>Keuzes over AI-toepassingen, data en werkprocessen vinden plaats binnen heldere governance. Strategische doelen vormen het vertrekpunt; portfoliosturing zorgt voor prioritering. Architectuurprincipes, informatiebeleid en kaders voor informatiebeveiliging borgen de samenhang. CvB, onderwijs, onderzoek, bedrijfsvoering en IV-organisatie dragen gezamenlijk verantwoordelijkheid.</p>
+
+  <div class="gov-lagen">
+    <div class="gov-laag">
+      <span class="gov-icon">&#x1F3DB;</span>
+      <h4>College van Bestuur</h4>
+      <p>Stelt de koers vast, ontvangt de jaarrapportage en beslist over significante investeringen en risicoacceptatie.</p>
+    </div>
+    <div class="gov-laag">
+      <span class="gov-icon">&#x1F52D;</span>
+      <h4>Stuurgroep Transitieprogramma</h4>
+      <p>Opdrachtgever van het Programma AI. Bewaakt de uitvoering, prioriteert middelen en rapporteert aan het CvB.</p>
+    </div>
+    <div class="gov-laag">
+      <span class="gov-icon">&#x1F310;</span>
+      <h4>AI-Netwerk</h4>
+      <p>Verbindt de zes spreektafels, deelt kennis, faciliteert pilots en signaleert knelpunten aan de Stuurgroep.</p>
+    </div>
+  </div>
+
+  <h3>Hoe we de governance inrichten</h3>
+  <p>We kiezen een hybride model: centrale richting en kaders vanuit de Stuurgroep, decentraal eigenaarschap bij academies en diensten, met de Kwartiermaker Digitale Samenhang als verbindende schakel en de FG en CISO als adviseurs. De uitvoering vraagt een bewuste investering in AI compliance-capaciteit, waaronder een AI officer en een data manager.</p>
+
+  <h3>Van koers naar programma</h3>
+  <p>Een koers geeft richting, maar richting zonder opdracht, capaciteit en middelen blijft een intentie. De Digitale Koers 2030 benoemt daarom het actiethema Verantwoorde AI: een AI-programma dat voorziet in beleid, governance en tools. Wij richten dat programma nu in.</p>
+
+  <div class="voorstel-kader">
+    <div class="vk-kop">Onze keuze: het Programma AI</div>
+    <div class="vk-body">
+      <p>Wij richten binnen het Transitieprogramma Digitalisering het <strong>Programma AI</strong> in als uitvoeringsvorm van deze koers, met de Stuurgroep als opdrachtgever en de programmaleiding bij de Kwartiermaker Digitale Samenhang. De zes koerslijnen vormen de programmalijnen; governance, compliance en de sandboxes vormen de dragende zevende lijn. Het AI-Netwerk blijft het verbindings- en uitvoeringsinstrument; het programma voegt opdracht, financiering en verantwoording toe. De inrichting, inclusief capaciteit en middelen per koerslijn, staat in het <strong>Programmaplan AI</strong>.</p>
+    </div>
+  </div>
+
+  <h3>Verantwoording</h3>
+  <p>Elk AI-initiatief doorloopt een vaste route van intake en risicoclassificatie tot pilot, evaluatie en registratie; geautomatiseerde besluitvorming die studenten raakt is altijd hoog-risico en kent altijd een menselijk toezichtspunt. Het AI-Netwerk bewaakt de verplichtingen uit de EU AI Act met een signaalsystematiek en genereert de voortgangsrapportage: per kwartaal aan de Stuurgroep, jaarlijks samenvattend aan CvB en HMR. De HMR wordt betrokken bij vaststelling en jaarlijkse herijking van deze koers. De volledige werkwijze, het overlegritme en het eigenaarschap per thema staan in het Programmaplan AI.</p>
+
+  <div class="voetvisual vv-g">
+    <div class="vv-kicker">E&eacute;n programma, zeven lijnen</div>
+    <div class="prog-visual">
+      <div class="prog-top">Programma AI &nbsp;&middot;&nbsp; Stuurgroep Transitieprogramma als opdrachtgever</div>
+      <div class="prog-verbind"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+      <div class="prog-lijnen">
+        <div class="prog-lijn" style="background:#1E3A8A;">AI &amp;<br>Leren</div>
+        <div class="prog-lijn" style="background:#0F766E;">AI &amp;<br>Werken</div>
+        <div class="prog-lijn" style="background:#E91E8C;">AI &amp;<br>Verantw.</div>
+        <div class="prog-lijn" style="background:#7C3AED;">AI &amp;<br>Gelett.</div>
+        <div class="prog-lijn" style="background:#B45309;">AI &amp;<br>Werkveld</div>
+        <div class="prog-lijn" style="background:#0E7490;">AI &amp;<br>Onderzoek</div>
+      </div>
+      <div class="prog-basis">Dragende lijn: governance, compliance &amp; sandboxes</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- STUDENT AFSLUITING -->
+  <div class="page-break"></div>
+  <div class="sectie-label">13 &nbsp; Wat betekent dit voor jou</div>
+  <h1>AI bij NHL Stenden: slimmer leren, sterker werken en verantwoord innoveren</h1>
+
+  <p class="lead">De zes koerslijnen vertalen zich uiteindelijk naar wat een student elke dag merkt. Dat is de maatstaf.</p>
+
+  <div class="jou-grid">
+    <div class="jou" style="--s:#1E3A8A;">
+      <h4>Als student merk je</h4>
+      <p>Dat je opleiding een helder standpunt heeft over AI: wanneer het mag, wanneer niet, en hoe je het goed gebruikt. AI helpt je leren, niet denken voor je.</p>
+    </div>
+    <div class="jou" style="--s:#0F766E;">
+      <h4>Als medewerker merk je</h4>
+      <p>Dat herhaalbare taken lichter worden, en dat je meer tijd overhoudt voor wat je vak onderscheidend maakt: contact, oordeel en inhoud. Niet zonder jou, maar met jou als regisseur van AI in je werk.</p>
+    </div>
+    <div class="jou" style="--s:#E91E8C;">
+      <h4>Als regio merk je</h4>
+      <p>Dat NHL Stenden professionals aflevert die begrijpen wanneer en waarom je AI inzet, en die bijdragen aan verantwoorde innovatie in de Noord-Nederlandse praktijk.</p>
+    </div>
+  </div>
+
+  <div class="voetvisual maatstaf-visual vv-j">
+    <div class="vv-kicker">Zes koerslijnen, &eacute;&eacute;n maatstaf</div>
+    <svg viewBox="0 0 680 190" xmlns="http://www.w3.org/2000/svg">
+      <path d="M 20 20 C 240 20, 380 90, 520 95" stroke="#1E3A8A" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+      <path d="M 20 50 C 240 50, 380 92, 520 95" stroke="#0F766E" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+      <path d="M 20 80 C 240 80, 380 94, 520 95" stroke="#E91E8C" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+      <path d="M 20 110 C 240 110, 380 96, 520 95" stroke="#7C3AED" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+      <path d="M 20 140 C 240 140, 380 98, 520 95" stroke="#B45309" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+      <path d="M 20 170 C 240 170, 380 100, 520 95" stroke="#0E7490" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+      <circle cx="562" cy="95" r="42" fill="#003DA5"/>
+      <circle cx="562" cy="95" r="42" fill="none" stroke="#8C1D82" stroke-width="2.5" stroke-dasharray="4 5"/>
+      <text x="562" y="91" text-anchor="middle" fill="white" font-size="13" font-weight="800" font-family="'Nunito Sans','Segoe UI',sans-serif">de student</text>
+      <text x="562" y="107" text-anchor="middle" fill="rgba(255,255,255,0.75)" font-size="9.5" font-weight="700" font-family="'Nunito Sans','Segoe UI',sans-serif">elke dag</text>
+    </svg>
+  </div>
+
+  <div class="page-break"></div>
+  <div class="sectie-label">14 &nbsp; Tijdlijn</div>
+  <h1>2026 tot 2030</h1>
+
+  <div class="golf-grid">
+    <div class="golf">
+      <div class="golf-jaar">2026</div>
+      <div class="golf-fase">Funderen</div>
+      <div class="golf-item"><span class="golf-thema" style="color:#1E3A8A;">AI & Leren</span><p>AI-positie per domein formuleren. Start EduGenAI pilot</p></div>
+      <div class="golf-item"><span class="golf-thema" style="color:#0F766E;">AI & Werken</span><p>Kansprocessen in kaart. Afwegingskader opstellen</p></div>
+      <div class="golf-item"><span class="golf-thema" style="color:#E91E8C;">AI & Verantw.</span><p>AI-beleid v2.0 live. Governancestructuur. AI Act-classificatie. DPIA-proces</p></div>
+      <div class="golf-item"><span class="golf-thema" style="color:#7C3AED;">AI & Geletterdheid</span><p>Basisprofiel op basis AI-GO!. ARDA AI-modules live. Eerste scholingsronde</p></div>
+      <div class="golf-item"><span class="golf-thema" style="color:#B45309;">AI & Werkveld</span><p>AI-competenties per domein. Werkveldconsultatie</p></div>
+      <div class="golf-item"><span class="golf-thema" style="color:#0E7490;">AI & Onderzoek</span><p>Lectoraten verbinden. Kennisagenda. Dataplatform</p></div>
+      <div class="golf-item"><span class="golf-thema" style="color:#003DA5;">Sandbox</span><p>Technische sandbox inrichten. Regulatory sandbox operationeel (augustus 2026)</p></div>
+    </div>
+    <div class="golf">
+      <div class="golf-jaar">2027-28</div>
+      <div class="golf-fase">Uitbouwen</div>
+      <div class="golf-item"><span class="golf-thema" style="color:#1E3A8A;">AI & Leren</span><p>AI-bestendige toetsvormen uitrollen. Kennisdeling via Netwerk</p></div>
+      <div class="golf-item"><span class="golf-thema" style="color:#0F766E;">AI & Werken</span><p>Pilots evalueren. Schaalbare cases selecteren</p></div>
+      <div class="golf-item"><span class="golf-thema" style="color:#E91E8C;">AI & Verantw.</span><p>Compliance per toepassing. Regulatory sandbox operationeel</p></div>
+      <div class="golf-item"><span class="golf-thema" style="color:#7C3AED;">AI & Geletterdheid</span><p>Verdiepingspaden per rol. Meting uitvoeren</p></div>
+      <div class="golf-item"><span class="golf-thema" style="color:#B45309;">AI & Werkveld</span><p>Eerste opleidingen verankeren AI in curriculum</p></div>
+      <div class="golf-item"><span class="golf-thema" style="color:#0E7490;">AI & Onderzoek</span><p>Regionale positionering. AI in onderzoeksproces</p></div>
+      <div class="golf-item"><span class="golf-thema" style="color:#003DA5;">Sandbox</span><p>Intake-procedure live. Eerste pilots door beide sandboxes</p></div>
+    </div>
+    <div class="golf eind">
+      <div class="golf-jaar">2029-30</div>
+      <div class="golf-fase">Verankeren</div>
+      <div class="golf-item"><span class="golf-thema" style="color:#1E3A8A;">AI & Leren</span><p>Alle OER's bevatten AI-positie</p></div>
+      <div class="golf-item"><span class="golf-thema" style="color:#0F766E;">AI & Werken</span><p>5+ processen verbeterd en gedocumenteerd</p></div>
+      <div class="golf-item"><span class="golf-thema" style="color:#E91E8C;">AI & Verantw.</span><p>Jaarrapportage CvB. Gevalideerd framework</p></div>
+      <div class="golf-item"><span class="golf-thema" style="color:#7C3AED;">AI & Geletterdheid</span><p>80% medewerkers basisniveau bereikt</p></div>
+      <div class="golf-item"><span class="golf-thema" style="color:#B45309;">AI & Werkveld</span><p>Elk domein: AI in kernonderdeel</p></div>
+      <div class="golf-item"><span class="golf-thema" style="color:#0E7490;">AI & Onderzoek</span><p>2+ lectoraten actief. Regionale rol zichtbaar</p></div>
+      <div class="golf-item"><span class="golf-thema" style="color:#003DA5;">Sandbox</span><p>Kennisbank pilotresultaten actief en gedeeld</p></div>
+    </div>
+  </div>
+
+  <div class="voetvisual vv-t">
+    <div class="horizon-band"></div>
+    <div class="horizon-jaren"><span>2026</span><span>2027</span><span>2028</span><span>2029</span><span class="eind">2030</span></div>
+    <div class="vv-kicker" style="margin-top:12px;">Drie golven, &eacute;&eacute;n horizon</div>
+  </div>
+
+  <!-- BRONNEN -->
+  <div class="page-break"></div>
+  <div class="bronnen-blok">
+    <h3>Bronnen en referenties</h3>
+    <ul class="bronnen-lijst">
+      <li><span class="bchip">EU</span><strong>EU AI Act: Verordening (EU) 2024/1689</strong>. In werking 1 augustus 2024; geletterdheidsverplichtingen per 2 februari 2025. eur-lex.europa.eu</li>
+      <li><span class="bchip">UNESCO</span><strong>Guidance for Generative AI in Education and Research</strong> (Miao &amp; Holmes, 2023). UNESCO: Paris.</li>
+      <li><span class="bchip">UNESCO</span><strong>AI Competency Framework for Teachers / Students</strong> (UNESCO, 2024). Digital Learning Week 2024.</li>
+      <li><span class="bchip">WEF</span><strong>Future of Jobs Report 2025</strong>. World Economic Forum, January 2025. weforum.org</li>
+      <li><span class="bchip">PwC</span><strong>Global AI Jobs Barometer 2025</strong>. 56% salarispremie AI-vaardigen. pwc.com</li>
+      <li><span class="bchip">OU</span><strong>Onderzoek AI-gebruik Open Universiteit</strong> (Dr. Maryam Alqassab / Regieorgaan GenAI, 2024). n=164 studenten + 45 docenten.</li>
+      <li><span class="bchip">Npuls</span><strong>AI-GO! Raamwerk AI-Geletterdheid</strong> (Npuls, 2025). Sectorbreed referentiekader mbo/hbo/wo.</li>
+      <li><span class="bchip">Npuls</span><strong>Sectorbelofte AI en data waarde(n)vol inzetten</strong> (Npuls). Vier onderwerpen: AI- en datageletterdheid, voorzieningen AI en data (EduGenAI, CEDA), verantwoord gebruik (referentiekader, algoritmeregister), inzicht en strategie. npuls.nl</li>
+      <li><span class="bchip">SURF</span><strong>EduGenAI</strong>. Veilig platform generatieve AI in onderwijs. Pilot 2025-2026. surf.nl</li>
+      <li><span class="bchip">ERA</span><strong>Living Guidelines on Responsible Use of GenAI in Research</strong> (European Research Area Forum, 2024).</li>
+      <li><span class="bchip">NHLS</span><strong>Digitale Koers 2030 NHL Stenden</strong> (concept v8, 18 juni 2026). Vier digitale ambities; positioneert AI als samenhangende veranderlijn en bevat het sturingsmodel en waardenkader waarop deze AI-Koers voortbouwt.</li>
+      <li><span class="bchip">FG/CISO</span><strong>Bespreeknotitie AI-Governance strategie NHL Stenden</strong> (Floor May en Elske Posthuma, 22 juni 2026). Interne notitie.</li>
+      <li><span class="bchip">NHLS</span><strong>NHL Stenden AI-beleid v2.0</strong> (2026). Gepubliceerd in Nederlands en Engels, inclusief intakeproces en risicomatrix.</li>
+      <li><span class="bchip">Bach</span><strong>Programma Bach</strong>. Nationaal onderwijsversterkingsprogramma voor digitale autonomie en soevereiniteit, Universiteit van het Noorden. universiteitvanhetnoorden.nl</li>
+      <li><span class="bchip">CTL</span><strong>Center for Teaching and Learning NHL Stenden</strong>. AI in het onderwijs, AI &amp; toetsing, AI in je studie. Intranetpagina's, leidend voor toetsing en didactiek.</li>
+    </ul>
+  </div>
+
+  <!-- COLOFON -->
+  <div class="colofon">
+    <div>
+      <h4>Over dit document</h4>
+      <p>Versie 0.4 (concept restyle) van de NHL Stenden AI-Koers (juli 2026), opgesteld door de Kwartiermaker Digitale Samenhang als onderdeel van het Transitieprogramma Digitalisering. Grondslag voor bestuurlijk gesprek en brede consultatie.</p>
+      <br>
+      <p><strong>Gewijzigd ten opzichte van versie 0.2b:</strong> redactieslag op advies van de Stuurgroep (circa veertig procent korter, elke kernboodschap eenmaal, uitvoering naar het Programmaplan AI) en een restyle van de koerslijnpagina's: kernambitie als statement, keuzes als raster, indicator als meetlat.</p>
+      <br>
+      <p><strong>Ter besluitvorming:</strong> Stuurgroep Transitieprogramma, inclusief de inrichting van het Programma AI</p>
+      <p><strong>Behandeld in CvB:</strong> P.M.</p>
+      <p><strong>Volgende herijking:</strong> Januari 2027</p>
+    </div>
+    <div>
+      <h4>Gerelateerde documenten</h4>
+      <ul>
+        <li>Strategisch Instellingsplan NHL Stenden 2025-2030</li>
+        <li>Programmaplan AI (aanzet, werkdocument)</li>
+        <li>Digitale Koers 2030 NHL Stenden (concept v8, juni 2026)</li>
+        <li>AI-Netwerk NHL Stenden (ai-netwerk-nhlstenden.netlify.app)</li>
+        <li>NHL Stenden AI-beleid v2.0 (NL en EN)</li>
+        <li>CTL: AI in het onderwijs, AI &amp; toetsing, AI in je studie (intranet)</li>
+        <li>Bespreeknotitie AI-Governance strategie (FG/CISO, juni 2026)</li>
+        <li>EU AI Act - verordening 2024/1689</li>
+        <li>Npuls AI-GO! Raamwerk AI-Geletterdheid</li>
+        <li>UNESCO AI Competency Frameworks 2024</li>
+        <li>SURF EduGenAI beleidskader</li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
