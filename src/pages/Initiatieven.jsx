@@ -346,7 +346,7 @@ export default function Initiatieven({ roadmap, setRoadmap, inspiraties, setInsp
                         )}
                         <div className="flex flex-wrap gap-1.5 mt-auto pt-3 border-t border-gray-100">
                           {spoor && <span className="text-xs px-2 py-0.5 rounded-full text-white font-medium" style={{ backgroundColor: spoor.kleur }}>{spoor.icon} {spoor.titel}</span>}
-                          {init.tags?.map(t => <span key={t} className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded">{t}</span>)}
+                          {(Array.isArray(init.tags) ? init.tags : []).map(t => <span key={t} className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded">{t}</span>)}
                         </div>
                         {init.link && (
                           <a href={init.link} target="_blank" rel="noopener noreferrer"
