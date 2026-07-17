@@ -25,6 +25,7 @@ const ROLLEN = [
 export default function AIKoers() {
   const navigate = useNavigate()
   const [paginas, setPaginas] = useState(null)
+  const [titels, setTitels] = useState([])
   const [stijl, setStijl] = useState('')
   const [laadFout, setLaadFout] = useState(false)
   const [modus, setModus] = useState('overzicht') // 'overzicht' | 'presenteren' | 'afronden'
@@ -45,6 +46,7 @@ export default function AIKoers() {
       .then(data => {
         setStijl(data.stijl || '')
         setPaginas(data.paginas || [])
+        setTitels(data.titels || [])
       })
       .catch(() => setLaadFout(true))
   }, [])
@@ -108,7 +110,7 @@ export default function AIKoers() {
 
   const rondAf = () => {
     setVerzonden(true)
-    setTimeout(() => navigate('/'), 1200)
+    setTimeout(() => navigate('/'), 2000)
   }
 
   useEffect(() => {
@@ -227,48 +229,49 @@ export default function AIKoers() {
           subtitle="Controleer je reacties voordat je afrondt."
         />
         <div className="max-w-2xl mx-auto px-4 sm:px-6 py-10">
-          {verzonden ? (
-            <div className="text-center py-12">
-              <div className="text-4xl mb-3">✅</div>
-              <div className="font-bold text-nhl-blauw text-lg mb-1">Opgeslagen, bedankt voor je reacties!</div>
-              <p className="text-gray-500 text-sm">Je gaat zo terug naar de hoofdpagina...</p>
-            </div>
-          ) : (
-            <>
-              <div className="space-y-2 mb-8">
-                {paginas.map((_, i) => {
-                  const stem = stemPerPagina[i]
-                  const tekst = feedbackPerPagina[i]
-                  if (!stem && !tekst) return null
-                  return (
-                    <div key={i} className="bg-white border border-gray-200 rounded-xl p-4 flex items-start gap-4">
-                      <img src={`/ai-koers/thumbs/pagina-${i}.png`} alt={`Pagina ${i + 1}`}
-                        className="w-24 h-16 object-cover rounded-lg border border-gray-100 flex-shrink-0" />
-                      <div className="flex-1">
-                        <div className="font-bold text-nhl-blauw text-sm mb-1">Pagina {i + 1}</div>
-                        {stem && <span className="text-lg mr-2">{stem === 'up' ? '👍' : '👎'}</span>}
-                        {tekst && <div className="text-sm text-gray-600 mt-1">{tekst}</div>}
-                      </div>
-                    </div>
-                  )
-                })}
-                {Object.keys(stemPerPagina).length === 0 && Object.keys(feedbackPerPagina).length === 0 && (
-                  <div className="text-center text-gray-400 text-sm italic py-6">
-                    Je hebt nog geen duimpje of feedback gegeven. Dat mag, je kunt gewoon afronden.
+          <div className="space-y-2 mb-8">
+            {paginas.map((_, i) => {
+              const stem = stemPerPagina[i]
+              const tekst = feedbackPerPagina[i]
+              if (!stem && !tekst) return null
+              return (
+                <div key={i} className="bg-white border border-gray-200 rounded-xl p-4 flex items-start gap-4">
+                  <img src={`/ai-koers/thumbs/pagina-${i}.png`} alt={`Pagina ${i + 1}`}
+                    className="w-16 h-16 object-cover rounded-lg border border-gray-100 flex-shrink-0" />
+                  <div className="flex-1">
+                    <div className="text-xs text-gray-400 font-medium">Pagina {i + 1}</div>
+                    <div className="font-bold text-nhl-blauw text-sm mb-1">{titels[i] || `Pagina ${i + 1}`}</div>
+                    {stem && <span className="text-lg mr-2">{stem === 'up' ? '👍' : '👎'}</span>}
+                    {tekst && <div className="text-sm text-gray-600 mt-1">{tekst}</div>}
                   </div>
-                )}
+                </div>
+              )
+            })}
+            {Object.keys(stemPerPagina).length === 0 && Object.keys(feedbackPerPagina).length === 0 && (
+              <div className="text-center text-gray-400 text-sm italic py-6">
+                Je hebt nog geen duimpje of feedback gegeven. Dat mag, je kunt gewoon afronden.
               </div>
-              <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                <button onClick={() => setModus('presenteren')}
-                  className="text-gray-500 hover:text-gray-700 text-sm px-4 py-3">
-                  ← Nog een keer bekijken
-                </button>
-                <button onClick={rondAf}
-                  className="bg-nhl-blauw hover:bg-nhl-blauw/90 text-white font-semibold px-8 py-3 rounded-xl text-base transition-colors">
-                  Verzenden en afronden
-                </button>
+            )}
+          </div>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <button onClick={() => setModus('presenteren')}
+              className="text-gray-500 hover:text-gray-700 text-sm px-4 py-3">
+              ← Nog een keer bekijken
+            </button>
+            <button onClick={rondAf}
+              className="bg-nhl-blauw hover:bg-nhl-blauw/90 text-white font-semibold px-8 py-3 rounded-xl text-base transition-colors">
+              Verzenden en afronden
+            </button>
+          </div>
+
+          {verzonden && (
+            <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4">
+              <div className="bg-white rounded-2xl p-8 w-full max-w-sm text-center">
+                <div className="text-5xl mb-3">✅</div>
+                <div className="font-bold text-nhl-blauw text-lg mb-1">Dank voor je feedback!</div>
+                <p className="text-gray-500 text-sm">Je gaat zo terug naar de hoofdpagina...</p>
               </div>
-            </>
+            </div>
           )}
         </div>
       </div>
