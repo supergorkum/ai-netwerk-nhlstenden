@@ -98,13 +98,17 @@ export default function AIKoers() {
   useEffect(() => {
     if (modus !== 'presenteren') return
     const onKey = (e) => {
+      // Niet navigeren terwijl iemand in het feedback-tekstvak typt: een
+      // spatie of pijltoets hoort dan gewoon tekst te worden, niet de
+      // pagina te verspringen.
+      if (feedbackOpen) return
       if (e.key === 'ArrowRight' || e.key === ' ') volgende()
       if (e.key === 'ArrowLeft') vorige()
       if (e.key === 'Escape') setModus('overzicht')
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [modus, paginas])
+  }, [modus, paginas, feedbackOpen])
 
   if (laadFout) {
     return (
@@ -190,7 +194,28 @@ export default function AIKoers() {
           <iframe
             ref={iframeRef}
             title={`AI-Koers pagina ${index + 1}`}
-            srcDoc={`<!DOCTYPE html><html><head><meta charset="UTF-8"><style>${stijl}</style></head><body>${paginas[index]}</body></html>`}
+            srcDoc={`<!DOCTYPE html><html><head><meta charset="UTF-8"><style>${stijl}
+html, body { margin: 0; padding: 0; overflow: hidden; }
+#ai-koers-wrap { transform-origin: top center; }
+</style></head><body>
+<div id="ai-koers-wrap">${paginas[index]}</div>
+<script>
+(function () {
+  function pasIn() {
+    var wrap = document.getElementById('ai-koers-wrap');
+    if (!wrap) return;
+    wrap.style.transform = 'none';
+    var inhoudHoogte = wrap.scrollHeight;
+    var beschikbaar = window.innerHeight;
+    var schaal = beschikbaar > 0 && inhoudHoogte > beschikbaar ? beschikbaar / inhoudHoogte : 1;
+    wrap.style.transform = schaal < 1 ? 'scale(' + schaal + ')' : 'none';
+  }
+  window.addEventListener('load', pasIn);
+  window.addEventListener('resize', pasIn);
+  setTimeout(pasIn, 50);
+})();
+</script>
+</body></html>`}
             className="w-full h-full border-0 bg-white"
           />
         </div>

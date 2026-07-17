@@ -1472,6 +1472,15 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
                 versie: APP_VERSIE, datum: APP_VERSIE_DATUM,
                 label: 'Huidige versie', labelKleur: 'bg-green-100 text-green-700',
                 items: [
+                  'AI-Koers presentatie: bug gefixt waarbij typen van feedback (met name spaties) de achtergrondpagina liet verspringen. De pijltoetsnavigatie luistert niet meer mee zolang het feedback-vak open staat.',
+                  'AI-Koers presentatie: pagina\'s die hoger zijn dan het scherm worden nu automatisch verkleind zodat ze altijd volledig zichtbaar zijn, in plaats van er gedeeltelijk buiten te vallen.',
+                ],
+              },
+
+              {
+                versie: 'v2.26', datum: 'Juli 2026',
+                label: null, labelKleur: '',
+                items: [
                   'AI-Koers presentatie: de paginasplitsing gebeurt nu vooraf met een echte HTML-boomstructuur-analyse in plaats van een live tekst-knip. Loste kapotte weergave op vijf van de zestien pagina\'s op.',
                   'AI-Koers presentatie: uitgebreidere uitleg op het startscherm over hoe duimpjes en feedback werken, en een wit kader om de presentatie-inhoud zodat tekst niet meer tot de rand van het scherm liep.',
                 ],
