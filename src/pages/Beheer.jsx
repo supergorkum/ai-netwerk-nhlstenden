@@ -1489,6 +1489,14 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
                 versie: APP_VERSIE, datum: APP_VERSIE_DATUM,
                 label: 'Huidige versie', labelKleur: 'bg-green-100 text-green-700',
                 items: [
+                  'AI-Koers documentpagina: bugfix voor een leeg blauw vlak (opjaag-lus tussen de omslagpagina en de automatische iframe-hoogte), en knop "AI Koers" in de navigatiebalk niet meer roze maar wit met blauwe tekst. Deze twee wijzigingen waren per ongeluk overgeslagen bij de vorige versie doordat een oudere zip nogmaals was gedraaid.',
+                ],
+              },
+
+              {
+                versie: 'v2.37', datum: 'Juli 2026',
+                label: null, labelKleur: '',
+                items: [
                   'AI-Koers PDF vervangen door de definitieve, aangeleverde versie (was eerder zelf gegenereerd via print-to-PDF). Poster en presentatie waren al identiek aan wat live stond.',
                 ],
               },

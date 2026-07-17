@@ -30,6 +30,7 @@ export default function AIKoersDocument() {
 
   const srcDoc = paginas ? `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>${stijl}
 html, body { margin: 0; padding: 0; }
+.cover { min-height: auto !important; }
 </style></head><body>
 ${paginas.join('<div class="page-break"></div>')}
 <script>
@@ -38,7 +39,6 @@ ${paginas.join('<div class="page-break"></div>')}
     window.parent.postMessage({ type: 'ai-koers-hoogte', hoogte: document.body.scrollHeight }, '*')
   }
   window.addEventListener('load', stuurHoogte)
-  window.addEventListener('resize', stuurHoogte)
   setTimeout(stuurHoogte, 150)
   setTimeout(stuurHoogte, 600)
   setTimeout(stuurHoogte, 1500)
