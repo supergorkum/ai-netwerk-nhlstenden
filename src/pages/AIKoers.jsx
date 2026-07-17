@@ -52,7 +52,13 @@ export default function AIKoers() {
   }, [])
 
   const visitorId = useRef(null)
-  useEffect(() => { visitorId.current = haalVisitorId() }, [])
+  useEffect(() => {
+    visitorId.current = haalVisitorId()
+    fetch('/.netlify/functions/ai-koers-feedback', {
+      method: 'POST',
+      body: JSON.stringify({ bezoek: true, visitorId: visitorId.current, rol: rol || undefined }),
+    }).catch(() => {})
+  }, [])
 
   const startPresenteren = () => {
     if (!rol) { setRolVragen(true); return }

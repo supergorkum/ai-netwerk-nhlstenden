@@ -473,6 +473,8 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
   const [aikoersData, setAikoersData] = useState(null)
   const [aikoersLaden, setAikoersLaden] = useState(false)
   const [aikoersFout, setAikoersFout] = useState(null)
+  const [aikoersBezoekers, setAikoersBezoekers] = useState(null)
+  const [aikoersFeedbackgevers, setAikoersFeedbackgevers] = useState(null)
 
   // Haal bij het openen de tijdstempel van de laatste gelukte cloud backup op
   useEffect(() => {
@@ -523,6 +525,8 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
         }
         if (data.error) throw new Error(data.error)
         setAikoersData(data.paginas || [])
+        setAikoersBezoekers(data.aantalBezoekers ?? null)
+        setAikoersFeedbackgevers(data.aantalFeedbackgevers ?? null)
         setAikoersLaden(false)
       })
       .catch(err => {
@@ -1004,6 +1008,11 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
                   <div>
                     <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">AI-Koers presentatie</div>
                     <p className="text-gray-500 text-sm">Duimpjes en feedback per pagina, live opgehaald uit de opslag.</p>
+                    {(aikoersBezoekers !== null || aikoersFeedbackgevers !== null) && (
+                      <p className="text-xs text-gray-400 mt-1">
+                        {aikoersBezoekers ?? 0} bezoeker{aikoersBezoekers === 1 ? '' : 's'} · {aikoersFeedbackgevers ?? 0} gaven feedback
+                      </p>
+                    )}
                   </div>
                   <div className="flex gap-2">
                     <button onClick={laadAikoersFeedback} disabled={aikoersLaden}
@@ -1012,7 +1021,7 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
                     </button>
                     <button onClick={() => window.open('/ai-koers-verslag', '_blank')}
                       className="bg-nhl-blauw hover:bg-nhl-blauw/90 text-white text-xs font-semibold px-3 py-2 rounded-lg">
-                      📄 PDF verslag openen
+                      📄 Rijk rapport openen
                     </button>
                     <button onClick={resetAikoersFeedback}
                       className="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 text-xs font-semibold px-3 py-2 rounded-lg">
@@ -1471,6 +1480,15 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
               {
                 versie: APP_VERSIE, datum: APP_VERSIE_DATUM,
                 label: 'Huidige versie', labelKleur: 'bg-green-100 text-green-700',
+                items: [
+                  'AI-Koers rapport volledig herbouwd: managementsamenvatting, cijferdashboard (bezoekers, feedbackgevers, duimpjes, reacties), opvallende thema\'s, per pagina de kern van inhoud en feedback met sentiment-kleurcodering, objectief berekende aandachtspunten en concrete vervolgstappen. Wordt bij elke opening opnieuw met Claude geanalyseerd op de meest actuele data.',
+                  'AI-Koers: bezoekregistratie los van feedback, zodat het rapport kan tonen hoeveel mensen de presentatie hebben geopend tegenover hoeveel er daadwerkelijk feedback gaven.',
+                ],
+              },
+
+              {
+                versie: 'v2.30', datum: 'Juli 2026',
+                label: null, labelKleur: '',
                 items: [
                   'AI-Koers presentatie: miniaturen in het eindoverzicht zijn nu echt vierkant en ingezoomd, in plaats van uitgerekt langwerpig.',
                   'AI-Koers presentatie: elke pagina heeft nu een herkenbare titel, getoond in het eindoverzicht voor extra duidelijkheid.',
