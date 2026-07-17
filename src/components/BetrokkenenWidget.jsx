@@ -37,7 +37,7 @@ export default function BetrokkenenWidget({ initId, betrokkenenMap, setBetrokken
   const [afdeling, setAfdeling] = useState('')
   const [bezig, setBezig] = useState(false)
 
-  const betrokkenen = betrokkenenMap[initId] || []
+  const betrokkenen = Array.isArray(betrokkenenMap[initId]) ? betrokkenenMap[initId] : []
 
   const versturen = async () => {
     if (!naam.trim()) return

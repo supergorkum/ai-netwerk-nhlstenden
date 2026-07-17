@@ -1489,6 +1489,15 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
                 versie: APP_VERSIE, datum: APP_VERSIE_DATUM,
                 label: 'Huidige versie', labelKleur: 'bg-green-100 text-green-700',
                 items: [
+                  'Bugfix, waarschijnlijk de oorspronkelijke bron: /initiatieven crashte via InzichtenTab.jsx op "trefwoorden?.length", zelfde denkfout als bij "tags" (v2.41): optional chaining beschermt niet tegen een verkeerd type. Dit is het veld dat Nieuws ophalen vult, dus dit sluit aan bij het allereerste signaal. Nu een expliciete Array.isArray-check, en preventief hetzelfde patroon gerepareerd in BetrokkenenWidget.jsx.',
+                ],
+              },
+
+              {
+                versie: 'v2.41', datum: 'Juli 2026',
+                label: null, labelKleur: '',
+                items: [
+
                   'Bugfix, vervolg op v2.40: /initiatieven crashte nog steeds, nu op "tags?.map()". Optional chaining (?.) beschermt alleen tegen null/undefined, niet tegen een verkeerd type zoals een tekst in plaats van een lijst. Ook hier nu een expliciete Array.isArray-check.',
                 ],
               },

@@ -164,7 +164,7 @@ export default function InzichtenTab({ inspiraties, setInspiraties }) {
             </div>
             <div className="font-semibold text-nhl-blauw mb-2 leading-snug text-sm">{b.titel}</div>
             <p className="text-gray-600 text-sm leading-relaxed mb-3">{b.tekst}</p>
-            {b.trefwoorden?.length > 0 && (
+            {Array.isArray(b.trefwoorden) && b.trefwoorden.length > 0 && (
               <div className="flex flex-wrap gap-1 mb-3">
                 {b.trefwoorden.map(t => <span key={t} className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded">{t}</span>)}
               </div>
