@@ -536,6 +536,13 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
     if (actieveTab === 'aikoers-feedback' && aikoersData === null && !aikoersLaden) laadAikoersFeedback()
   }, [actieveTab])
 
+  const resetAikoersFeedback = () => {
+    if (!window.confirm('Alle duimpjes en feedback van de AI-Koers presentatie wissen? Dit kan niet ongedaan worden gemaakt.')) return
+    fetch('/.netlify/functions/ai-koers-feedback', { method: 'DELETE' })
+      .then(() => setAikoersData([]))
+      .catch(() => alert('Reset mislukt, probeer het opnieuw.'))
+  }
+
   const resetAnalytics = () => {
     if (!window.confirm('Alle bezoekersdata wissen? Dit kan niet ongedaan worden gemaakt.')) return
     fetch('/.netlify/functions/storage', {
@@ -1007,6 +1014,10 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
                       className="bg-nhl-blauw hover:bg-nhl-blauw/90 text-white text-xs font-semibold px-3 py-2 rounded-lg">
                       📄 PDF verslag openen
                     </button>
+                    <button onClick={resetAikoersFeedback}
+                      className="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 text-xs font-semibold px-3 py-2 rounded-lg">
+                      🗑️ Reset
+                    </button>
                   </div>
                 </div>
 
@@ -1460,6 +1471,14 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
               {
                 versie: APP_VERSIE, datum: APP_VERSIE_DATUM,
                 label: 'Huidige versie', labelKleur: 'bg-green-100 text-green-700',
+                items: [
+                  'Beheer: reset-knop bij AI Koers Feedback, om alle duimpjes en feedback in één keer te wissen. Handig om vrij te testen en daarna schoon te beginnen voor de echte presentatie.',
+                ],
+              },
+
+              {
+                versie: 'v2.23', datum: 'Juli 2026',
+                label: null, labelKleur: '',
                 items: [
                   'Nieuw: /ai-koers, een publieke presentatiemodus voor de AI-Koers, pagina voor pagina te doorlopen met duimpje omhoog/omlaag en tekstuele feedback per pagina (rol wordt eenmalig gevraagd, geen naam).',
                   'Beheer: nieuwe tab AI Koers Feedback met een live overzicht per pagina en een knop voor een printbaar PDF-verslag (/ai-koers-verslag, met dezelfde beveiliging als Rapport).',

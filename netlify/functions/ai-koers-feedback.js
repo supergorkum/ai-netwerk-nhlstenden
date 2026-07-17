@@ -81,7 +81,16 @@ export default async (req) => {
     return new Response(JSON.stringify({ ok: true, paginas: resultaat }), { headers })
   }
 
-  return new Response(JSON.stringify({ error: 'Alleen GET en POST' }), { status: 405, headers })
+  if (req.method === 'DELETE') {
+    // Reset: alle opgeslagen duimpjes en feedback verwijderen. Bedoeld om
+    // vrij te kunnen testen en daarna schoon te beginnen voor de echte
+    // presentatie. Onomkeerbaar, de UI vraagt hiervoor expliciet bevestiging.
+    const { blobs } = await store.list({ prefix: KEY_PREFIX })
+    await Promise.all(blobs.map(b => store.delete(b.key)))
+    return new Response(JSON.stringify({ ok: true, verwijderd: blobs.length }), { headers })
+  }
+
+  return new Response(JSON.stringify({ error: 'Alleen GET, POST en DELETE' }), { status: 405, headers })
 }
 
 export const config = { path: '/.netlify/functions/ai-koers-feedback' }
