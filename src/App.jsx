@@ -21,6 +21,7 @@ import Beleid from './pages/Beleid'
 import NVAO from './pages/NVAO'
 import Rapport from './pages/Rapport'
 import AIKoers from './pages/AIKoers'
+import AIKoersDocument from './pages/AIKoersDocument'
 import AIKoersVerslag from './pages/AIKoersVerslag'
 import Governance from './pages/Governance'
 import Kader from './pages/Kader'
@@ -221,6 +222,7 @@ function AppInner() {
           <Route path="/nvao" element={<NVAO />} />
           <Route path="/rapport" element={<Rapport pilots={pilots} inspiraties={inspiraties} roadmap={roadmap} />} />
           <Route path="/ai-koers" element={<AIKoers />} />
+          <Route path="/ai-koers-document" element={<AIKoersDocument />} />
           <Route path="/beheer" element={
             <Beheer
               berichten={berichten} setBerichten={setBerichten_}
