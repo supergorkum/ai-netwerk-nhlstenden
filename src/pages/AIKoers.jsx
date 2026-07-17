@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
 import GradientHeader from '../components/GradientHeader'
 
 const DOC_URL = '/ai-koers/paginas.json'
@@ -22,17 +23,20 @@ const ROLLEN = [
 ]
 
 export default function AIKoers() {
+  const navigate = useNavigate()
   const [paginas, setPaginas] = useState(null)
   const [stijl, setStijl] = useState('')
   const [laadFout, setLaadFout] = useState(false)
-  const [modus, setModus] = useState('overzicht') // 'overzicht' | 'presenteren'
+  const [modus, setModus] = useState('overzicht') // 'overzicht' | 'presenteren' | 'afronden'
   const [index, setIndex] = useState(0)
   const [rol, setRol] = useState(() => localStorage.getItem(ROL_KEY) || '')
   const [rolVragen, setRolVragen] = useState(false)
   const [stemPerPagina, setStemPerPagina] = useState({})
+  const [feedbackPerPagina, setFeedbackPerPagina] = useState({})
   const [feedbackOpen, setFeedbackOpen] = useState(false)
   const [feedbackTekst, setFeedbackTekst] = useState('')
   const [feedbackOpgeslagen, setFeedbackOpgeslagen] = useState(false)
+  const [verzonden, setVerzonden] = useState(false)
   const iframeRef = useRef(null)
 
   useEffect(() => {
@@ -88,12 +92,24 @@ export default function AIKoers() {
   const slaFeedbackOp = () => {
     if (!feedbackTekst.trim()) return
     verstuur({ feedbackTekst: feedbackTekst.trim() })
+    setFeedbackPerPagina(prev => ({ ...prev, [index]: feedbackTekst.trim() }))
     setFeedbackOpgeslagen(true)
     setTimeout(() => setFeedbackOpen(false), 1200)
   }
 
-  const volgende = () => setIndex(i => Math.min(i + 1, (paginas?.length || 1) - 1))
+  const volgende = () => {
+    if (index === (paginas?.length || 1) - 1) {
+      setModus('afronden')
+      return
+    }
+    setIndex(i => Math.min(i + 1, (paginas?.length || 1) - 1))
+  }
   const vorige = () => setIndex(i => Math.max(i - 1, 0))
+
+  const rondAf = () => {
+    setVerzonden(true)
+    setTimeout(() => navigate('/'), 1200)
+  }
 
   useEffect(() => {
     if (modus !== 'presenteren') return
@@ -140,22 +156,31 @@ export default function AIKoers() {
           <p className="text-gray-600 text-sm leading-relaxed mb-6 text-center">
             {paginas.length} pagina's. Klik op Presenteren om te beginnen, gebruik daarna de pijltoetsen of de knoppen om te bladeren.
           </p>
-          <div className="bg-white border border-gray-200 rounded-2xl p-6 mb-8 text-left">
-            <div className="font-bold text-nhl-blauw text-sm mb-3">Zo werkt het reageren per pagina</div>
-            <div className="space-y-2.5 text-sm text-gray-600 leading-relaxed">
-              <div className="flex items-start gap-2.5">
-                <span className="text-lg leading-none">👍👎</span>
-                <span>Geef bij elke pagina een duimpje omhoog of omlaag. Je mag van gedachten veranderen, de laatste keuze telt.</span>
-              </div>
-              <div className="flex items-start gap-2.5">
-                <span className="text-lg leading-none">💬</span>
-                <span>Klik op Feedback om een tekstveld te openen, typ je reactie en druk op Opslaan.</span>
-              </div>
-              <div className="flex items-start gap-2.5">
-                <span className="text-lg leading-none">→</span>
-                <span>Klaar met een pagina? Druk op Volgende om door te gaan. Je duimpje en feedback blijven staan, ook als je later teruggaat.</span>
+          <div className="grid sm:grid-cols-3 gap-4 mb-8">
+            <div className="sm:col-span-2 bg-white border border-gray-200 rounded-2xl p-6 text-left">
+              <div className="font-bold text-nhl-blauw text-sm mb-3">Zo werkt het reageren per pagina</div>
+              <div className="space-y-2.5 text-sm text-gray-600 leading-relaxed">
+                <div className="flex items-start gap-2.5">
+                  <span className="text-lg leading-none">👍👎</span>
+                  <span>Geef bij elke pagina een duimpje omhoog of omlaag. Je mag van gedachten veranderen, de laatste keuze telt.</span>
+                </div>
+                <div className="flex items-start gap-2.5">
+                  <span className="text-lg leading-none">💬</span>
+                  <span>Klik op Feedback om een tekstveld te openen, typ je reactie en druk op Opslaan.</span>
+                </div>
+                <div className="flex items-start gap-2.5">
+                  <span className="text-lg leading-none">→</span>
+                  <span>Klaar met een pagina? Druk op Volgende om door te gaan. Je duimpje en feedback blijven staan, ook als je later teruggaat.</span>
+                </div>
               </div>
             </div>
+            <a href="/ai-koers/NHL-Stenden-AI-Koers-Poster-A2-preview.png" download
+              className="group bg-white border border-gray-200 hover:border-nhl-blauw rounded-2xl p-4 text-left transition-colors flex flex-col">
+              <img src="/ai-koers/NHL-Stenden-AI-Koers-Poster-A2-preview.png" alt="AI-Koers poster"
+                className="w-full rounded-lg border border-gray-100 mb-3 object-cover" style={{ aspectRatio: '1587/2245', maxHeight: 160 }} />
+              <div className="text-xs font-semibold text-nhl-blauw group-hover:underline">📌 Liever op papier?</div>
+              <div className="text-xs text-gray-500 mt-1">Download de poster met de koers in één oogopslag.</div>
+            </a>
           </div>
           <div className="text-center">
             <button onClick={startPresenteren}
@@ -185,6 +210,61 @@ export default function AIKoers() {
     )
   }
 
+  if (modus === 'afronden') {
+    return (
+      <div className="min-h-screen pt-16 bg-gray-50">
+        <GradientHeader
+          label="AI-Koers 2026 tot 2030"
+          title="Jouw overzicht"
+          subtitle="Controleer je reacties voordat je afrondt."
+        />
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 py-10">
+          {verzonden ? (
+            <div className="text-center py-12">
+              <div className="text-4xl mb-3">✅</div>
+              <div className="font-bold text-nhl-blauw text-lg mb-1">Opgeslagen, bedankt voor je reacties!</div>
+              <p className="text-gray-500 text-sm">Je gaat zo terug naar de hoofdpagina...</p>
+            </div>
+          ) : (
+            <>
+              <div className="space-y-2 mb-8">
+                {paginas.map((_, i) => {
+                  const stem = stemPerPagina[i]
+                  const tekst = feedbackPerPagina[i]
+                  if (!stem && !tekst) return null
+                  return (
+                    <div key={i} className="bg-white border border-gray-200 rounded-xl p-4 flex items-start gap-3">
+                      <div className="font-bold text-nhl-blauw text-sm flex-shrink-0 w-20">Pagina {i + 1}</div>
+                      <div className="flex-1">
+                        {stem && <span className="text-lg mr-2">{stem === 'up' ? '👍' : '👎'}</span>}
+                        {tekst && <div className="text-sm text-gray-600 mt-1">{tekst}</div>}
+                      </div>
+                    </div>
+                  )
+                })}
+                {Object.keys(stemPerPagina).length === 0 && Object.keys(feedbackPerPagina).length === 0 && (
+                  <div className="text-center text-gray-400 text-sm italic py-6">
+                    Je hebt nog geen duimpje of feedback gegeven. Dat mag, je kunt gewoon afronden.
+                  </div>
+                )}
+              </div>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <button onClick={() => setModus('presenteren')}
+                  className="text-gray-500 hover:text-gray-700 text-sm px-4 py-3">
+                  ← Nog een keer bekijken
+                </button>
+                <button onClick={rondAf}
+                  className="bg-nhl-blauw hover:bg-nhl-blauw/90 text-white font-semibold px-8 py-3 rounded-xl text-base transition-colors">
+                  Verzenden en afronden
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    )
+  }
+
   // Presentatiemodus
   const huidigeStem = stemPerPagina[index]
   return (
@@ -197,22 +277,53 @@ export default function AIKoers() {
             srcDoc={`<!DOCTYPE html><html><head><meta charset="UTF-8"><style>${stijl}
 html, body { margin: 0; padding: 0; overflow: hidden; }
 #ai-koers-wrap { transform-origin: top center; }
+#ai-koers-lensbox {
+  position: fixed; width: 260px; height: 260px; border-radius: 50%;
+  overflow: hidden; border: 3px solid white; box-shadow: 0 6px 24px rgba(0,0,0,0.35);
+  pointer-events: none; display: none; z-index: 9999; background: white;
+}
+#ai-koers-lens-inner { position: absolute; top: 0; left: 0; transform-origin: 0 0; }
 </style></head><body>
 <div id="ai-koers-wrap">${paginas[index]}</div>
+<div id="ai-koers-lensbox"><div id="ai-koers-lens-inner"></div></div>
 <script>
 (function () {
+  var wrap = document.getElementById('ai-koers-wrap');
+  var lensbox = document.getElementById('ai-koers-lensbox');
+  var lensInner = document.getElementById('ai-koers-lens-inner');
+  var huidigeSchaal = 1;
+  var ZOOM = 2.3;
+  var LENSGROOTTE = 260;
+
   function pasIn() {
-    var wrap = document.getElementById('ai-koers-wrap');
     if (!wrap) return;
     wrap.style.transform = 'none';
     var inhoudHoogte = wrap.scrollHeight;
     var beschikbaar = window.innerHeight;
-    var schaal = beschikbaar > 0 && inhoudHoogte > beschikbaar ? beschikbaar / inhoudHoogte : 1;
-    wrap.style.transform = schaal < 1 ? 'scale(' + schaal + ')' : 'none';
+    huidigeSchaal = beschikbaar > 0 && inhoudHoogte > beschikbaar ? beschikbaar / inhoudHoogte : 1;
+    wrap.style.transform = huidigeSchaal < 1 ? 'scale(' + huidigeSchaal + ')' : 'none';
+    lensInner.innerHTML = wrap.innerHTML;
   }
   window.addEventListener('load', pasIn);
   window.addEventListener('resize', pasIn);
   setTimeout(pasIn, 50);
+
+  function toonLens(e) {
+    var breedte = window.innerWidth;
+    var muisX = e.clientX, muisY = e.clientY;
+    var lokaalX = breedte / 2 + (muisX - breedte / 2) / huidigeSchaal;
+    var lokaalY = muisY / huidigeSchaal;
+    var lensSchaal = huidigeSchaal * ZOOM;
+    var verschuifX = LENSGROOTTE / 2 - lokaalX * lensSchaal;
+    var verschuifY = LENSGROOTTE / 2 - lokaalY * lensSchaal;
+
+    lensbox.style.left = (muisX - LENSGROOTTE / 2) + 'px';
+    lensbox.style.top = (muisY - LENSGROOTTE / 2) + 'px';
+    lensbox.style.display = 'block';
+    lensInner.style.transform = 'translate(' + verschuifX + 'px,' + verschuifY + 'px) scale(' + lensSchaal + ')';
+  }
+  document.addEventListener('mousemove', toonLens);
+  document.addEventListener('mouseleave', function () { lensbox.style.display = 'none'; });
 })();
 </script>
 </body></html>`}
@@ -230,9 +341,9 @@ html, body { margin: 0; padding: 0; overflow: hidden; }
             ← Vorige
           </button>
           <span className="text-white/50 text-xs px-2">{index + 1} / {paginas.length}</span>
-          <button onClick={volgende} disabled={index === paginas.length - 1}
-            className="bg-white/10 hover:bg-white/20 disabled:opacity-30 disabled:cursor-not-allowed rounded-lg px-4 py-2 text-sm font-medium">
-            Volgende →
+          <button onClick={volgende}
+            className="bg-white/10 hover:bg-white/20 rounded-lg px-4 py-2 text-sm font-medium">
+            {index === paginas.length - 1 ? 'Afronden →' : 'Volgende →'}
           </button>
         </div>
         <div className="flex items-center gap-2">
