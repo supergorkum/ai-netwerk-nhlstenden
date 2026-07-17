@@ -13,6 +13,13 @@ const SENTIMENT_STIJL = {
 const DATUM = () => new Date().toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' })
 const TIJD = () => new Date().toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' })
 
+function bezigTekst(sec) {
+  if (sec < 8) return 'Duimpjes en feedback verzamelen...'
+  if (sec < 20) return 'Alle pagina\'s doorlezen...'
+  if (sec < 40) return 'Claude schrijft de samenvatting en de duiding per pagina...'
+  return 'Nog even geduld, de analyse rondt bijna af...'
+}
+
 export default function AIKoersVerslag() {
   const [code, setCode] = useState('')
   const [toegang, setToegang] = useState(false)
@@ -26,6 +33,7 @@ export default function AIKoersVerslag() {
   const [status, setStatus] = useState(null) // 'bezig' | 'klaar' | 'fout'
   const [laadFout, setLaadFout] = useState(null)
   const [gestartOp, setGestartOp] = useState(null)
+  const [verstrekenSec, setVerstrekenSec] = useState(0)
   const peilTimer = useRef(null)
 
   const opruimenPeiling = () => {
@@ -63,6 +71,14 @@ export default function AIKoersVerslag() {
     if (toegang) laadRapport(false)
     return opruimenPeiling
   }, [toegang])
+
+  useEffect(() => {
+    if (status !== 'bezig' || !gestartOp) return
+    const interval = setInterval(() => {
+      setVerstrekenSec(Math.round((Date.now() - new Date(gestartOp).getTime()) / 1000))
+    }, 1000)
+    return () => clearInterval(interval)
+  }, [status, gestartOp])
 
   useEffect(() => {
     document.title = 'AI-Koers Feedback Rapport ' + DATUM()
@@ -131,6 +147,20 @@ export default function AIKoersVerslag() {
         .vervolg-item { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 8px; font-size: 9.5pt; color: #374151; line-height: 1.6; }
         .vervolg-nr { flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%; background: #003DA5; color: white; font-size: 8.5pt; font-weight: 700; display: flex; align-items: center; justify-content: center; }
         .leeg { color: #9CA3AF; font-size: 9pt; font-style: italic; padding: 10px 0; }
+        .hartslag-wrap { text-align: center; padding: 30px 0; }
+        .hartslag-track { stroke: #E2E8F0; stroke-width: 3; fill: none; }
+        .hartslag-lijn {
+          stroke: #003DA5; stroke-width: 3; fill: none;
+          stroke-linecap: round; stroke-linejoin: round;
+          stroke-dasharray: 1400; stroke-dashoffset: 1400;
+          animation: hartslag-teken 2.2s linear infinite;
+        }
+        @keyframes hartslag-teken {
+          0% { stroke-dashoffset: 1400; }
+          100% { stroke-dashoffset: 0; }
+        }
+        .hartslag-tekst { font-size: 10pt; font-weight: 600; color: #374151; margin-bottom: 4px; }
+        .hartslag-timer { font-size: 8.5pt; color: #9CA3AF; }
         .verslag-footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid #E5E7EB; font-size: 7.5pt; color: #9CA3AF; }
       `}</style>
 
@@ -154,9 +184,13 @@ export default function AIKoersVerslag() {
         )}
 
         {!laadFout && status === 'bezig' && (
-          <div className="leeg">
-            Bezig met analyseren van alle reacties met AI, dit kan een paar minuten duren...
-            <br />Deze pagina ververst zichzelf automatisch zodra het rapport klaar is.
+          <div className="hartslag-wrap">
+            <svg viewBox="0 0 600 60" width="100%" height="60" style={{ display: 'block', marginBottom: 18 }}>
+              <path className="hartslag-track" d="M0,30 L60,30 L75,10 L90,50 L105,22 L120,30 L220,30 L235,10 L250,50 L265,22 L280,30 L380,30 L395,10 L410,50 L425,22 L440,30 L600,30" />
+              <path className="hartslag-lijn" d="M0,30 L60,30 L75,10 L90,50 L105,22 L120,30 L220,30 L235,10 L250,50 L265,22 L280,30 L380,30 L395,10 L410,50 L425,22 L440,30 L600,30" />
+            </svg>
+            <div className="hartslag-tekst">{bezigTekst(verstrekenSec)}</div>
+            <div className="hartslag-timer">{verstrekenSec}s bezig · ververst zichzelf automatisch</div>
           </div>
         )}
 

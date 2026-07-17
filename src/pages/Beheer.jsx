@@ -1481,6 +1481,14 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
                 versie: APP_VERSIE, datum: APP_VERSIE_DATUM,
                 label: 'Huidige versie', labelKleur: 'bg-green-100 text-green-700',
                 items: [
+                  'AI-Koers rapport: animerende hartslag-lijn met secondenteller en meebewegende statustekst tijdens het genereren, zodat duidelijk is dat er iets gebeurt.',
+                ],
+              },
+
+              {
+                versie: 'v2.32', datum: 'Juli 2026',
+                label: null, labelKleur: '',
+                items: [
                   'AI-Koers rapport: de zware AI-analyse draait nu als achtergrondtaak (tot 15 minuten) in plaats van in een synchrone function-aanroep, die soms vastliep op een tijdslimiet (status 502). De pagina peilt nu elke paar seconden of het rapport klaar is.',
                   'Beheer: knop heet weer gewoon "Rapport openen".',
                 ],
