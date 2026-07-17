@@ -470,6 +470,9 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
   const [analyticsLaden, setAnalyticsLaden] = useState(false)
   const [analyticsFout, setAnalyticsFout] = useState(null)
   const [wijzigingen, setWijzigingen] = useState(null)
+  const [aikoersData, setAikoersData] = useState(null)
+  const [aikoersLaden, setAikoersLaden] = useState(false)
+  const [aikoersFout, setAikoersFout] = useState(null)
 
   // Haal bij het openen de tijdstempel van de laatste gelukte cloud backup op
   useEffect(() => {
@@ -506,6 +509,31 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
   // Bezoekersdata automatisch laden zodra de tab opent, geen aparte knop meer nodig
   useEffect(() => {
     if (actieveTab === 'bezoekers' && analytics === null && !analyticsLaden) laadAnalytics()
+  }, [actieveTab])
+
+  const laadAikoersFeedback = () => {
+    setAikoersLaden(true)
+    setAikoersFout(null)
+    fetch('/.netlify/functions/ai-koers-feedback')
+      .then(async r => {
+        const body = await r.text()
+        let data
+        try { data = JSON.parse(body) } catch {
+          throw new Error(`de feedback-function gaf geen geldige JSON terug (status ${r.status})`)
+        }
+        if (data.error) throw new Error(data.error)
+        setAikoersData(data.paginas || [])
+        setAikoersLaden(false)
+      })
+      .catch(err => {
+        setAikoersFout(err?.message || 'onbekende fout')
+        setAikoersData([])
+        setAikoersLaden(false)
+      })
+  }
+
+  useEffect(() => {
+    if (actieveTab === 'aikoers-feedback' && aikoersData === null && !aikoersLaden) laadAikoersFeedback()
   }, [actieveTab])
 
   const resetAnalytics = () => {
@@ -620,6 +648,7 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
     { id: 'nieuws', label: '📰 Nieuws ophalen', n: null },
     { id: 'backup', label: '☁️ Backup en Restore', n: null },
     { id: 'rapport', label: '📄 Rapport', n: null },
+    { id: 'aikoers-feedback', label: '🗳️ AI Koers Feedback', n: null },
   ]
 
   function TabBalk({ tabs }) {
@@ -960,6 +989,69 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
                     <div>✓ Inzichten uit het netwerk</div>
                   </div>
                 </div>
+              </div>
+            )}
+            {actieveTab === 'aikoers-feedback' && (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">AI-Koers presentatie</div>
+                    <p className="text-gray-500 text-sm">Duimpjes en feedback per pagina, live opgehaald uit de opslag.</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <button onClick={laadAikoersFeedback} disabled={aikoersLaden}
+                      className="btn-ghost text-xs border border-gray-200 px-3 py-2 rounded-lg">
+                      {aikoersLaden ? 'Laden...' : '🔄 Vernieuwen'}
+                    </button>
+                    <button onClick={() => window.open('/ai-koers-verslag', '_blank')}
+                      className="bg-nhl-blauw hover:bg-nhl-blauw/90 text-white text-xs font-semibold px-3 py-2 rounded-lg">
+                      📄 PDF verslag openen
+                    </button>
+                  </div>
+                </div>
+
+                {aikoersFout && <div className="text-red-500 text-xs">Kon niet laden: {aikoersFout}</div>}
+
+                {aikoersData && aikoersData.length === 0 && !aikoersLaden && (
+                  <div className="text-gray-400 text-sm italic py-6 text-center">Nog geen reacties ontvangen.</div>
+                )}
+
+                {aikoersData && aikoersData.length > 0 && (
+                  <div className="space-y-3">
+                    {aikoersData.map(p => {
+                      const totaal = p.omhoog + p.omlaag
+                      const pctOmhoog = totaal > 0 ? Math.round((p.omhoog / totaal) * 100) : 0
+                      return (
+                        <div key={p.paginaIndex} className="border border-gray-200 rounded-xl p-4">
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="font-bold text-nhl-blauw text-sm">Pagina {p.paginaIndex + 1}</div>
+                            <div className="flex items-center gap-3 text-xs font-semibold">
+                              <span className="text-green-600">👍 {p.omhoog}</span>
+                              <span className="text-red-600">👎 {p.omlaag}</span>
+                            </div>
+                          </div>
+                          {totaal > 0 && (
+                            <div className="bg-gray-100 rounded-full h-1.5 overflow-hidden mb-3">
+                              <div className="bg-green-500 h-full" style={{ width: `${pctOmhoog}%` }} />
+                            </div>
+                          )}
+                          {p.feedback.length === 0 ? (
+                            <div className="text-gray-400 text-xs italic">Geen tekstuele feedback op deze pagina.</div>
+                          ) : (
+                            <div className="space-y-1.5">
+                              {p.feedback.map((f, i) => (
+                                <div key={i} className="bg-gray-50 border-l-2 border-nhl-roze rounded px-3 py-2 text-xs text-gray-600">
+                                  <span className="font-semibold text-nhl-roze uppercase text-[10px] mr-2">{f.rol}</span>
+                                  {f.tekst}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
               </div>
             )}
             {actieveTab === 'beta' && (
@@ -1368,6 +1460,15 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
               {
                 versie: APP_VERSIE, datum: APP_VERSIE_DATUM,
                 label: 'Huidige versie', labelKleur: 'bg-green-100 text-green-700',
+                items: [
+                  'Nieuw: /ai-koers, een publieke presentatiemodus voor de AI-Koers, pagina voor pagina te doorlopen met duimpje omhoog/omlaag en tekstuele feedback per pagina (rol wordt eenmalig gevraagd, geen naam).',
+                  'Beheer: nieuwe tab AI Koers Feedback met een live overzicht per pagina en een knop voor een printbaar PDF-verslag (/ai-koers-verslag, met dezelfde beveiliging als Rapport).',
+                ],
+              },
+
+              {
+                versie: 'v2.22', datum: 'Juli 2026',
+                label: null, labelKleur: '',
                 items: [
                   'Fundament: nieuwe sectie "AI-Koers 2026 tot 2030" met de poster, en knoppen om het volledige document te bekijken en de presentatie en poster te downloaden.',
                 ],

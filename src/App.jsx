@@ -20,6 +20,8 @@ import Geletterdheid from './pages/Geletterdheid'
 import Beleid from './pages/Beleid'
 import NVAO from './pages/NVAO'
 import Rapport from './pages/Rapport'
+import AIKoers from './pages/AIKoers'
+import AIKoersVerslag from './pages/AIKoersVerslag'
 import Governance from './pages/Governance'
 import Kader from './pages/Kader'
 import AgenticAI from './pages/AgenticAI'
@@ -186,6 +188,9 @@ function AppInner() {
   if (location.pathname === '/rapport') {
     return <Rapport pilots={pilots} inspiraties={inspiraties} roadmap={roadmap} />
   }
+  if (location.pathname === '/ai-koers-verslag') {
+    return <AIKoersVerslag />
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -215,6 +220,7 @@ function AppInner() {
           <Route path="/wat-levert-het-op" element={<WatLeverHetOp />} />
           <Route path="/nvao" element={<NVAO />} />
           <Route path="/rapport" element={<Rapport pilots={pilots} inspiraties={inspiraties} roadmap={roadmap} />} />
+          <Route path="/ai-koers" element={<AIKoers />} />
           <Route path="/beheer" element={
             <Beheer
               berichten={berichten} setBerichten={setBerichten_}
