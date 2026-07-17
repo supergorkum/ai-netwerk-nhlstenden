@@ -1481,6 +1481,14 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
                 versie: APP_VERSIE, datum: APP_VERSIE_DATUM,
                 label: 'Huidige versie', labelKleur: 'bg-green-100 text-green-700',
                 items: [
+                  '"AI Koers" toegevoegd als eigen, opvallend item in de navigatiebalk (desktop en mobiel), niet weggestopt in een pulldown. Laatste ontbrekende schakel van de AI-Koers presentatiemodus.',
+                ],
+              },
+
+              {
+                versie: 'v2.33', datum: 'Juli 2026',
+                label: null, labelKleur: '',
+                items: [
                   'AI-Koers rapport: animerende hartslag-lijn met secondenteller en meebewegende statustekst tijdens het genereren, zodat duidelijk is dat er iets gebeurt.',
                 ],
               },

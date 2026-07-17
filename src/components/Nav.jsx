@@ -108,6 +108,7 @@ export default function Nav() {
                 setActiveGroep={setActiveGroep}
               />
             ))}
+            <NavLink to="/ai-koers" className={({isActive}) => `flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-colors ${isActive ? 'bg-nhl-roze text-white' : 'text-white bg-nhl-roze/80 hover:bg-nhl-roze'}`}>🎤 AI Koers</NavLink>
             <NavLink to="/over" className={({isActive}) => `flex items-center px-3 py-2 rounded-lg text-xs font-semibold transition-colors ${isActive ? 'bg-white/20 text-white' : 'text-blue-100 hover:text-white hover:bg-white/10'}`}>Over</NavLink>
             <div className="w-px h-5 bg-white/20 mx-2"/>
             <NavLink to="/meld" className="flex items-center gap-1.5 bg-nhl-roze hover:bg-nhl-roze-dark text-white px-4 py-2 rounded-lg text-xs font-bold transition-colors whitespace-nowrap">+ Vraag of idee</NavLink>
@@ -139,6 +140,7 @@ export default function Nav() {
                 )}
               </div>
             ))}
+            <NavLink to="/ai-koers" onClick={() => setMob(false)} className={({isActive}) => `flex items-center gap-2 mx-3 mb-2 px-3 py-2.5 rounded-xl text-sm font-bold transition-colors ${isActive ? 'bg-nhl-roze text-white' : 'bg-nhl-roze/80 text-white'}`}>🎤 AI Koers</NavLink>
             <NavLink to="/over" onClick={() => setMob(false)} className={({isActive}) => `block px-3 py-2.5 text-sm transition-colors ${isActive ? 'text-white font-medium' : 'text-blue-100 hover:text-white'}`}>Over het Netwerk</NavLink>
             <NavLink to="/meld" onClick={() => setMob(false)} className="flex items-center gap-2 mx-3 mt-3 px-4 py-2.5 rounded-xl text-sm bg-nhl-roze text-white font-bold">+ Vraag of idee</NavLink>
           </div>
