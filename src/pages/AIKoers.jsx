@@ -61,9 +61,7 @@ export default function AIKoers() {
   }, [])
 
   const startPresenteren = () => {
-    if (!rol) { setRolVragen(true); return }
-    setModus('presenteren')
-    setIndex(0)
+    setRolVragen(true)
   }
 
   const kiesRol = (r) => {

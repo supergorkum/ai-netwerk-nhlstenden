@@ -101,7 +101,10 @@ export default async (req) => {
     const url = new URL(req.url)
     let doc
     try {
-      const docResp = await fetch(`${url.origin}/ai-koers/paginas.json`)
+      const docResp = await fetch(`${url.origin}/ai-koers/paginas.json?t=${Date.now()}`, {
+        cache: 'no-store',
+        headers: { 'Cache-Control': 'no-cache' },
+      })
       if (!docResp.ok) throw new Error(`status ${docResp.status}`)
       doc = await docResp.json()
     } catch (err) {
