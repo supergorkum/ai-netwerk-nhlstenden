@@ -154,11 +154,20 @@ Geef ALLEEN geldig JSON terug, in dit exacte format, niets ervoor of erna:
   "managementSamenvatting": "3 tot 5 zinnen, het geheel overziend: wat is de algehele ontvangst, wat springt eruit, waar moet de organisatie op letten",
   "opvallendeThemas": ["kort thema 1", "kort thema 2"],
   "vervolgstappen": ["concrete suggestie 1", "concrete suggestie 2"],
+  "perRol": [
+    { "rol": "docent", "inzicht": "1 tot 2 zinnen, wat opvalt in de feedback van deze rol specifiek" }
+  ],
+  "uitgelichteCitaten": [
+    { "paginaIndex": 0, "rol": "docent", "tekst": "het exacte citaat, woordelijk overgenomen uit de gegeven feedback, niet parafraseren of inkorten", "reden": "1 korte zin, waarom dit citaat illustratief is" }
+  ],
   "paginas": [
     { "index": 0, "kernInhoud": "1 zin, waar deze pagina over gaat", "kernFeedback": "1 tot 3 zinnen, de kern van de reacties op deze pagina, concreet gebaseerd op de gegeven feedback", "sentiment": "positief" }
   ]
 }
 sentiment moet een van deze zijn: "positief", "negatief", "gemengd", "neutraal", "geen_feedback".
+rol in perRol en uitgelichteCitaten moet een van deze zijn: "docent", "student", "management", "overig".
+Laat een rol weg uit perRol als er minder dan 2 tekstreacties van die rol zijn: liever geen inzicht dan een inzicht op te weinig data.
+Kies voor uitgelichteCitaten maximaal 4 citaten, waar mogelijk een mix van positief en kritisch, verspreid over verschillende pagina's. Gebruik het EXACTE citaat zoals aangeleverd in de feedback hierboven, woordelijk, nooit herschreven of ingekort. Als er te weinig sterke citaten zijn, geef er minder terug, verzin er geen bij.
 De paginas-array moet precies ${aantalPaginas} items hebben, index 0 tot en met ${aantalPaginas - 1}, in volgorde.`
 
     let analyse
@@ -208,6 +217,16 @@ De paginas-array moet precies ${aantalPaginas} items hebben, index 0 tot en met 
         }
       })
 
+    // Veiligheidscontrole: een "uitgelicht citaat" mag alleen getoond
+    // worden als het woordelijk voorkomt in de daadwerkelijk aangeleverde
+    // feedback. Zo kan een licht herschreven of onbedoeld verzonnen citaat
+    // nooit als letterlijke quote gepresenteerd worden.
+    const alleFeedbackTeksten = new Set()
+    perPaginaVolledig.forEach(p => p.feedback.forEach(f => alleFeedbackTeksten.add(f.tekst)))
+    const geverifieerdeCitaten = (analyse.uitgelichteCitaten || [])
+      .filter(c => c.tekst && alleFeedbackTeksten.has(c.tekst))
+      .slice(0, 4)
+
     const rapport = {
       totalen: {
         omhoog: totaalOmhoog,
@@ -216,10 +235,15 @@ De paginas-array moet precies ${aantalPaginas} items hebben, index 0 tot en met 
         bezoekers: bezoekResult.blobs.length,
         feedbackgevers: feedbackgevers.size,
         aantalPaginas,
+        betrokkenheid: bezoekResult.blobs.length > 0
+          ? Math.round((feedbackgevers.size / bezoekResult.blobs.length) * 100)
+          : null,
       },
       managementSamenvatting: analyse.managementSamenvatting || '',
       opvallendeThemas: analyse.opvallendeThemas || [],
       vervolgstappen: analyse.vervolgstappen || [],
+      perRol: analyse.perRol || [],
+      uitgelichteCitaten: geverifieerdeCitaten,
       paginas: perPaginaVolledig.map(p => {
         const a = (analyse.paginas || []).find(x => x.index === p.index) || {}
         return {

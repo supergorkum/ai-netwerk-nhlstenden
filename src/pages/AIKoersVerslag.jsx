@@ -162,6 +162,21 @@ export default function AIKoersVerslag() {
         .hartslag-tekst { font-size: 10pt; font-weight: 600; color: #374151; margin-bottom: 4px; }
         .hartslag-timer { font-size: 8.5pt; color: #9CA3AF; }
         .verslag-footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid #E5E7EB; font-size: 7.5pt; color: #9CA3AF; }
+        .sentiment-strip { display: flex; gap: 4px; margin-bottom: 4px; }
+        .sentiment-cel { flex: 1; height: 34px; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-size: 7pt; font-weight: 800; color: white; }
+        .sentiment-legenda { display: flex; gap: 14px; font-size: 7.5pt; color: #6B7280; margin-bottom: 4px; flex-wrap: wrap; }
+        .sentiment-legenda-item { display: flex; align-items: center; gap: 4px; }
+        .sentiment-legenda-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+        .betrokken-blok { background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 12px; padding: 14px 18px; margin-top: 12px; }
+        .betrokken-tekst { font-size: 9pt; color: #374151; margin-bottom: 8px; }
+        .betrokken-bar-track { background: #E2E8F0; border-radius: 6px; height: 10px; overflow: hidden; }
+        .betrokken-bar { height: 100%; background: #003DA5; border-radius: 6px; }
+        .citaat-blok { background: #FAF5FF; border-left: 4px solid #7C3AED; border-radius: 8px; padding: 16px 20px; margin-bottom: 12px; }
+        .citaat-tekst { font-size: 11pt; font-style: italic; color: #4C1D95; line-height: 1.6; margin-bottom: 8px; }
+        .citaat-bron { font-size: 8pt; color: #7C3AED; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
+        .rol-blok { background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 14px 18px; margin-bottom: 10px; }
+        .rol-naam { font-size: 9pt; font-weight: 800; color: #06215C; margin-bottom: 4px; }
+        .rol-inzicht { font-size: 9pt; color: #4B5563; line-height: 1.6; }
       `}</style>
 
       <div className="no-print">
@@ -204,6 +219,26 @@ export default function AIKoersVerslag() {
               {rapport.managementSamenvatting || 'Nog geen samenvatting beschikbaar.'}
             </div>
 
+            {/* Sentiment-overzicht: alle paginas in een oogopslag */}
+            <div className="sectie-titel">Sentiment per pagina, in een oogopslag</div>
+            <div className="sentiment-strip">
+              {rapport.paginas.map(p => {
+                const s = SENTIMENT_STIJL[p.sentiment] || SENTIMENT_STIJL.neutraal
+                return (
+                  <div key={p.index} className="sentiment-cel" style={{ background: s.kleur }} title={`${p.titel}: ${s.label}`}>
+                    {p.index + 1}
+                  </div>
+                )
+              })}
+            </div>
+            <div className="sentiment-legenda">
+              {Object.entries(SENTIMENT_STIJL).filter(([k]) => k !== 'geen_feedback').map(([k, s]) => (
+                <div key={k} className="sentiment-legenda-item">
+                  <span className="sentiment-legenda-dot" style={{ background: s.kleur }} />{s.label}
+                </div>
+              ))}
+            </div>
+
             {/* Dashboard */}
             <div className="sectie-titel">In cijfers</div>
             <div className="stat-rij">
@@ -213,6 +248,16 @@ export default function AIKoersVerslag() {
               <div className="stat-box"><div className="stat-num">👎 {rapport.totalen.omlaag}</div><div className="stat-lbl">Duimpjes omlaag</div></div>
               <div className="stat-box"><div className="stat-num">{rapport.totalen.feedbackreacties}</div><div className="stat-lbl">Tekstreacties</div></div>
             </div>
+            {rapport.totalen.betrokkenheid !== null && (
+              <div className="betrokken-blok">
+                <div className="betrokken-tekst">
+                  <strong>{rapport.totalen.betrokkenheid}%</strong> van de bezoekers gaf een duimpje of feedback ({rapport.totalen.feedbackgevers} van de {rapport.totalen.bezoekers})
+                </div>
+                <div className="betrokken-bar-track">
+                  <div className="betrokken-bar" style={{ width: `${rapport.totalen.betrokkenheid}%` }} />
+                </div>
+              </div>
+            )}
 
             {/* Opvallende thema's */}
             {rapport.opvallendeThemas?.length > 0 && (
@@ -221,6 +266,32 @@ export default function AIKoersVerslag() {
                 <div>
                   {rapport.opvallendeThemas.map((t, i) => <span key={i} className="thema-chip">{t}</span>)}
                 </div>
+              </>
+            )}
+
+            {/* Uitgelichte citaten */}
+            {rapport.uitgelichteCitaten?.length > 0 && (
+              <>
+                <div className="sectie-titel">Uitgelicht: wat mensen echt zeiden</div>
+                {rapport.uitgelichteCitaten.map((c, i) => (
+                  <div key={i} className="citaat-blok">
+                    <div className="citaat-tekst">"{c.tekst}"</div>
+                    <div className="citaat-bron">{ROL_LABEL[c.rol] || c.rol} · pagina {c.paginaIndex + 1}</div>
+                  </div>
+                ))}
+              </>
+            )}
+
+            {/* Inzicht per rol */}
+            {rapport.perRol?.length > 0 && (
+              <>
+                <div className="sectie-titel">Wat valt op per rol</div>
+                {rapport.perRol.map((r, i) => (
+                  <div key={i} className="rol-blok">
+                    <div className="rol-naam">{ROL_LABEL[r.rol] || r.rol}</div>
+                    <div className="rol-inzicht">{r.inzicht}</div>
+                  </div>
+                ))}
               </>
             )}
 

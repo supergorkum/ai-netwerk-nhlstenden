@@ -1489,6 +1489,16 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
                 versie: APP_VERSIE, datum: APP_VERSIE_DATUM,
                 label: 'Huidige versie', labelKleur: 'bg-green-100 text-green-700',
                 items: [
+                  'AI-Koers rapport flink verrijkt: sentiment-overzicht van alle paginas in een oogopslag, betrokkenheidsindicator, uitgelichte (geverifieerde) citaten uit de feedback, en inzicht per rol (docent/student/management/overig).',
+                  'AI-Koers documentpagina: klein versielabel toegevoegd ("Versie v0.4d").',
+                ],
+              },
+
+              {
+                versie: 'v2.38', datum: 'Juli 2026',
+                label: null, labelKleur: '',
+                items: [
+
                   'AI-Koers documentpagina: bugfix voor een leeg blauw vlak (opjaag-lus tussen de omslagpagina en de automatische iframe-hoogte), en knop "AI Koers" in de navigatiebalk niet meer roze maar wit met blauwe tekst. Deze twee wijzigingen waren per ongeluk overgeslagen bij de vorige versie doordat een oudere zip nogmaals was gedraaid.',
                 ],
               },
