@@ -55,7 +55,7 @@ ${paginas.join('<div class="page-break"></div>')}
       />
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-10">
-        <div className="text-center text-xs text-gray-400 font-medium mb-4">Versie v0.4d · concept · juli 2026</div>
+        <div className="text-center text-xs text-gray-400 font-medium mb-4">Versie 0.4d · consultatieversie · september 2026</div>
 
         {/* Drie downloadkaarten */}
         <div className="grid sm:grid-cols-3 gap-4 mb-10">

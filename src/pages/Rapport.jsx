@@ -345,7 +345,7 @@ export default function Rapport({ pilots: pilotsProp, inspiraties: inspiratiesPr
           <div className="lead">Het AI-Netwerk staat niet op zichzelf. Het is geworteld in de AI-Koers, verbonden aan nationale en regionale netwerken en ingekaderd door wet- en regelgeving.</div>
 
           <h3>Bestuurlijk kader</h3>
-          <p>Het AI-Netwerk is een initiatief van het Transitieprogramma Digitalisering van NHL Stenden. De Stuurgroep Digitalisering vormt het bestuurlijke dak. De Kwartiermaker Digitale Samenhang brengt samenhang in de digitale vraagstukken die de instelling raken, waaronder AI. De NHL Stenden AI-Koers v0.1 vormt het inhoudelijke kader: drie kernovertuigingen en zes koerslijnen die richting geven aan alle AI-activiteiten.</p>
+          <p>Het AI-Netwerk is een initiatief van het Transitieprogramma Digitalisering van NHL Stenden. De Stuurgroep Transitieprogramma vormt het bestuurlijke dak. De Kwartiermaker Digitale Samenhang brengt samenhang in de digitale vraagstukken die de instelling raken, waaronder AI. De NHL Stenden AI-Koers v0.4d vormt het inhoudelijke kader: zes uitgangspunten en zes koerslijnen die richting geven aan alle AI-activiteiten.</p>
 
           <h3>Wettelijk en normatief kader</h3>
           <p>NHL Stenden werkt binnen de kaders van de Algemene Verordening Gegevensbescherming en de EU AI Act. De AI Act verplicht organisaties om AI-toepassingen te classificeren naar risiconiveau en passende maatregelen te treffen. NHL Stenden hanteert een risicogestuurde aanpak: nieuwe AI-toepassingen worden gevalideerd via een interne AI-risicoscan, en de verplichtingen uit de AI Act zijn het vertrekpunt van de roadmap in dit rapport.</p>
@@ -354,7 +354,7 @@ export default function Rapport({ pilots: pilotsProp, inspiraties: inspiratiesPr
           <p>Via <strong>SURF</strong> participeert NHL Stenden in de AI-Hub en Denktank en heeft de hogeschool toegang tot veilige, AVG-conforme infrastructuur inclusief GPT-NL. Via <strong>Npuls</strong> wordt gewerkt aan AI-geletterdheid en docentprofessionalisering. Regionaal werkt NHL Stenden samen met Frisius MC, Firda en de RUG aan een Friese AI-propositie, en sluit de instelling aan bij Programma Bach voor digitale autonomie en soevereiniteit.</p>
 
           <div className="card-grid">
-            <div className="card"><div className="card-title">🏛️ Bestuurlijk kader</div><div className="card-body">Transitieprogramma Digitalisering · Stuurgroep Digitalisering · AI-Koers v0.1 · Kwartiermaker Digitale Samenhang</div></div>
+            <div className="card"><div className="card-title">🏛️ Bestuurlijk kader</div><div className="card-body">Transitieprogramma Digitalisering · Stuurgroep Digitalisering · AI-Koers v0.4d · Kwartiermaker Digitale Samenhang</div></div>
             <div className="card"><div className="card-title">⚖️ Wettelijk kader</div><div className="card-body">AVG · EU AI Act · AI-risicoscan voor nieuwe toepassingen · risicogestuurde aanpak</div></div>
             <div className="card"><div className="card-title">🤝 Nationaal netwerk</div><div className="card-body">SURF AI-Hub · GPT-NL · Npuls · Vereniging Hogescholen</div></div>
             <div className="card"><div className="card-title">🌍 Regionaal netwerk</div><div className="card-body">Frisius MC · Firda · RUG · Friese AI-propositie · Programma Bach · AI-Fabriek Groningen</div></div>
@@ -570,10 +570,10 @@ export default function Rapport({ pilots: pilotsProp, inspiraties: inspiratiesPr
           <div className="lead">Het AI-Netwerk is geen project dat ooit klaar is. Het is een continue organisatievorm die meegroeit met de instelling, de technologie en de samenleving.</div>
 
           <h3>Besturingsstructuur</h3>
-          <p>De <strong>Stuurgroep Digitalisering</strong> vormt het bestuurlijke kader: zij stelt de kaders, bewaakt de voortgang en neemt besluiten over richting en middelen. De <strong>Kwartiermaker Digitale Samenhang</strong> verzorgt de dagelijkse aansturing en rapporteert aan de stuurgroep. Het <strong>kernteam AI-Netwerk</strong> heeft de operationele verantwoordelijkheid voor het platform en de netwerkorganisatie, ondersteund door solution partners voor AVG, koppelingen en het AI-applicatielandschap.</p>
+          <p>De <strong>Stuurgroep Transitieprogramma</strong> vormt het bestuurlijke kader: zij stelt de kaders, bewaakt de voortgang en neemt besluiten over richting en middelen. De <strong>Kwartiermaker Digitale Samenhang</strong> verzorgt de dagelijkse aansturing en rapporteert aan de stuurgroep. Het <strong>kernteam AI-Netwerk</strong> heeft de operationele verantwoordelijkheid voor het platform en de netwerkorganisatie, ondersteund door solution partners voor AVG, koppelingen en het AI-applicatielandschap.</p>
 
           <div className="card-grid" style={{marginBottom:'24px'}}>
-            <div className="card card-dark"><div className="card-title">Stuurgroep Digitalisering</div><div className="card-body">Bestuurlijke opdrachtgever. Stelt kaders, bewaakt voortgang, neemt besluiten over richting en middelen. Rapportage elk kwartaal.</div></div>
+            <div className="card card-dark"><div className="card-title">Stuurgroep Transitieprogramma</div><div className="card-body">Bestuurlijke opdrachtgever. Stelt kaders, bewaakt voortgang, neemt besluiten over richting en middelen. Rapportage elk kwartaal.</div></div>
             <div className="card"><div className="card-title">Kwartiermaker Digitale Samenhang</div><div className="card-body">Dagelijkse aansturing van het AI-Netwerk. Verbindt strategie en uitvoering. Rapporteert aan de stuurgroep en is extern aanspreekpunt.</div></div>
             <div className="card"><div className="card-title">Kernteam AI-Netwerk</div><div className="card-body">Kwartiermaker, Informatiemanager en ICT Analist. Operationele verantwoordelijkheid voor het platform en de netwerkorganisatie.</div></div>
             <div className="card"><div className="card-title">Techniek en Infrastructuur</div><div className="card-body">Solution partners voor veilige AI-integratie. Expertise op AVG, API-koppelingen, security en het AI-applicatielandschap.</div></div>
@@ -716,7 +716,7 @@ export default function Rapport({ pilots: pilotsProp, inspiraties: inspiratiesPr
             <div style={{fontSize:'28pt',marginBottom:'14px'}}>🤖</div>
             <div style={{fontSize:'16pt',fontWeight:800,marginBottom:'6px'}}>AI-Netwerk NHL Stenden</div>
             <div style={{color:'rgba(255,255,255,0.65)',fontSize:'10pt',marginBottom:'16px'}}>ai-netwerk-nhlstenden.netlify.app</div>
-            <div style={{color:'rgba(255,255,255,0.45)',fontSize:'8.5pt'}}>Stand van zaken op {DATUM()} · rapportversie {APP_VERSIE} · in lijn met de AI-Koers v0.1.</div>
+            <div style={{color:'rgba(255,255,255,0.45)',fontSize:'8.5pt'}}>Stand van zaken op {DATUM()} · rapportversie {APP_VERSIE} · in lijn met de AI-Koers v0.4d.</div>
           </div>
         </div>
 

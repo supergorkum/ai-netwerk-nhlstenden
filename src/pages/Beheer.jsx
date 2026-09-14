@@ -1489,6 +1489,20 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
                 versie: APP_VERSIE, datum: APP_VERSIE_DATUM,
                 label: 'Huidige versie', labelKleur: 'bg-green-100 text-green-700',
                 items: [
+                  'AI-Koers geactualiseerd naar versie 0.4d: nieuw koersdocument (PDF), opnieuw opgebouwde presentatiepaginas en nieuwe paginaminiaturen. De versielabels op de documentpagina en bij het vijflagenmodel staan nu op "0.4d, consultatieversie september 2026".',
+                  'Governance: het onderdeel medezeggenschap is van de site gehaald. Rapportage wordt benoemd als jaarrapportage aan het College van Bestuur.',
+                  'Governance uitgebreid met wie waarvoor gaat (centraal, decentraal, vakeigenaren, infrastructuur), het Programma AI met zes koerslijnen plus de dragende lijn governance, compliance en sandboxes, de Sandbox van NHL Stenden en de route naar vaststelling.',
+                  'Correctie: de nationale AI regulatory sandbox van AP en RDI moet uiterlijk 2 augustus 2027 open zijn, niet augustus 2026. Aangepast bij de initiatieven, de linkjes en de governance-roadmap.',
+                  'Naamgeving gelijkgetrokken: Stuurgroep Transitieprogramma in plaats van Stuurgroep Digitalisering. In het rapport verwijst het inhoudelijke kader nu naar AI-Koers v0.4d in plaats van v0.1.',
+                  'Agenda: SURF Summit van 7 oktober 2026 toegevoegd. Documentatie: het koersdocument v0.4d is als download opgenomen.',
+                  'Intranetlink in de linkjes wees naar een adres dat niet meer bestaat; nu naar de juiste SharePoint-omgeving.',
+                ],
+              },
+
+              {
+                versie: 'v2.46', datum: 'Juli 2026',
+                label: null, labelKleur: '',
+                items: [
                   'Belangrijke bugfix: het AI-Koers rapport toonde na Vernieuwen soms nog verouderde informatie, doordat de achtergrondtaak paginas.json ophaalde zonder de cache te doorbreken. Nu met een tijdstempel en no-cache headers, zodat altijd de actuele versie wordt gebruikt.',
                   'NHL Stenden logo toegevoegd aan de kop van het AI-Koers rapport.',
                   'De rolvraag (docent/student/management/overig) wordt nu altijd getoond bij het starten van een presentatie, in plaats van overgeslagen te worden als er al een rol was onthouden.',

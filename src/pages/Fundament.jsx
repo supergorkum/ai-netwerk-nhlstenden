@@ -335,7 +335,7 @@ export default function Fundament() {
                   🖼️ Download poster (A2)
                 </a>
               </div>
-              <p className="text-xs text-gray-400 mt-4">Concept v0.4, juli 2026</p>
+              <p className="text-xs text-gray-400 mt-4">Versie 0.4d, consultatieversie september 2026</p>
             </div>
           </div>
         </div>

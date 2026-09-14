@@ -205,6 +205,7 @@ export const INIT_PILOTS = [
 ]
 
 export const INIT_DOCS = [
+  { id: 16, titel: 'NHL Stenden AI-Koers 2026 tot 2030 (v0.4d)', categorie: 'strategie', spoor: null, type: 'pdf', datum: 'September 2026', omschrijving: 'De consultatieversie van de AI-Koers: manifest, omgevingsanalyse, vertrekpunt, zes koerslijnen met keuzes en indicatoren, experimenteerruimte, governance en tijdlijn.', icon: '🧭', bestand: '/ai-koers/NHL-Stenden-AI-Koers.pdf' },
   { id: 1, titel: 'AI Kompas NHL Stenden', categorie: 'strategie', spoor: null, type: 'pdf', datum: 'Juni 2026', omschrijving: 'Strategisch overzicht van de AI-architectuur en het vijflagenmodel.', icon: '📄', bestand: '/docs/NHL_Stenden_AI_Compass Definitief.pdf' },
   { id: 2, titel: 'AI Whitepaper NHL Stenden v9', categorie: 'strategie', spoor: null, type: 'pdf', datum: 'April 2026', omschrijving: 'Whitepaper over de strategische AI-koers van NHL Stenden. Uitgewerkte visie op verantwoorde AI-inzet.', icon: '📄', bestand: '/docs/whitepaper_AI_koers_NHL_Stenden_v09.pdf' },
   { id: 3, titel: 'Analyse AI-gebruik NHL Stenden', categorie: 'strategie', spoor: null, type: 'pdf', datum: 'April 2026', omschrijving: 'Analyse van huidig AI-gebruik binnen NHL Stenden. Inzicht in welke tools worden ingezet en door wie.', icon: '📊', bestand: '/docs/Analyse_AI_Gebruik_NHL_Stenden.pdf' },
@@ -236,6 +237,18 @@ export const INIT_EVENEMENTEN = [
     kleur: '#1E3A8A',
   },
   {
+    id: 3,
+    naam: 'SURF Summit 2026 - Richting geven aan groei',
+    locatie: 'Leerhotel Het Klooster, Amersfoort',
+    datum: '2026-10-07',
+    startTijd: '16:00',
+    eindTijd: '20:00',
+    omschrijving: 'Jaarlijkse bijeenkomst voor bestuurders en directeuren van de SURF-leden. Hier wordt de actieagenda van de Denktank Digitale Transitie 2026 gepresenteerd.',
+    organisator: 'SURF',
+    sporen: [3],
+    kleur: '#7C3AED',
+  },
+  {
     id: 2,
     naam: 'SURF Denktank - AI in Onderwijs',
     locatie: 'SURF Utrecht',
@@ -250,9 +263,9 @@ export const INIT_EVENEMENTEN = [
 ]
 
 export const INIT_LINKJES = [
-  { id: 1, titel: 'Intranet NHL Stenden', url: 'https://nhlstenden.sharepoint.com', omschrijving: 'Het centrale intranet voor medewerkers.', intern: true, categorie: 'intranet', spoor: null, laag: null, trefwoorden: ['Intranet', 'Medewerkers'], toegevoegdDoor: 'Kernteam AI-HUB', datum: 'Juni 2026' },
+  { id: 1, titel: 'Intranet NHL Stenden', url: 'https://newuniversity.sharepoint.com/sites/intranet', omschrijving: 'Het centrale intranet voor medewerkers.', intern: true, categorie: 'intranet', spoor: null, laag: null, trefwoorden: ['Intranet', 'Medewerkers'], toegevoegdDoor: 'Kernteam AI-HUB', datum: 'Juni 2026' },
   { id: 2, titel: 'SURF AI-HUB', url: 'https://www.surf.nl/themas/artificial-intelligence/ai-in-het-onderwijs', omschrijving: 'SURF pagina over AI in het onderwijs: tools, beleid, praktijkvoorbeelden en richtlijnen voor hoger onderwijs.', categorie: 'extern', spoor: 3, laag: 3, trefwoorden: ['SURF', 'AI', 'Soevereiniteit'], toegevoegdDoor: 'Kernteam AI-HUB', datum: 'Juni 2026' },
-  { id: 3, titel: 'RDI - AI Regulatory Sandbox', url: 'https://www.rdi.nl', omschrijving: 'Rijksinspectie Digitale Infrastructuur. Beheerder van de Nederlandse AI Regulatory Sandbox, operationeel augustus 2026.', categorie: 'extern', spoor: 3, laag: 4, trefwoorden: ['AI Act', 'Compliance', 'Overheid'], toegevoegdDoor: 'Kernteam AI-Netwerk', datum: 'Juni 2026' },
+  { id: 3, titel: 'RDI - AI Regulatory Sandbox', url: 'https://www.rdi.nl', omschrijving: 'Rijksinspectie Digitale Infrastructuur. Beheerders van de Nederlandse AI Regulatory Sandbox, die uiterlijk 2 augustus 2027 open moet zijn.', categorie: 'extern', spoor: 3, laag: 4, trefwoorden: ['AI Act', 'Compliance', 'Overheid'], toegevoegdDoor: 'Kernteam AI-Netwerk', datum: 'Juni 2026' },
   { id: 4, titel: 'Autoriteit Persoonsgegevens - AI', url: 'https://www.autoriteitpersoonsgegevens.nl', omschrijving: 'AP co-beheert de Nederlandse Regulatory Sandbox. Informatie over DPIA, AVG en AI-toepassingen met persoonsgegevens.', categorie: 'extern', spoor: 3, laag: 4, trefwoorden: ['Privacy', 'AVG', 'DPIA'], toegevoegdDoor: 'Kernteam AI-Netwerk', datum: 'Juni 2026' },
   { id: 5, titel: 'Npuls Expeditie AI', url: 'https://npuls.nl', omschrijving: 'Nationaal programma van mbo, hbo, wo en SURF voor AI in het onderwijs. Bundelt initiatieven rond AI in toetsing, curriculum en docentprofessionalisering.', categorie: 'extern', spoor: 1, laag: 5, trefwoorden: ['Nationaal', 'Onderwijs', 'Samenwerking'], toegevoegdDoor: 'Kernteam AI-Netwerk', datum: 'Juni 2026' },
   { id: 6, titel: 'Programma Bach - Universiteit van het Noorden', url: 'https://www.uvan.nl', omschrijving: 'Nationaal onderwijsversterkingsprogramma voor digitale autonomie en soevereiniteit. Geinitieerd vanuit Noord-Nederland, nationaal opschaalbaar.', categorie: 'extern', spoor: 6, laag: 3, trefwoorden: ['Soevereiniteit', 'Bach', 'Onderwijs'], toegevoegdDoor: 'Kernteam AI-Netwerk', datum: 'Juni 2026' },

@@ -131,7 +131,7 @@ export const initiatieven = [
   { id: 17, naam: 'Ethisch waardenkompas', omschrijving: 'NHL Stenden ethisch waardenkompas voor AI-gebruik. Gereed voor bestuurlijke agendering. Na vaststelling: vertaling naar handelingsperspectief voor medewerkers en studenten.', laag: 4, spoor: 3, status: 'in-ontwikkeling', type: 'intern', tags: ['Ethiek', 'Waarden', 'Governance'], ambities: [], impactInschatting: 'hoog' },
   { id: 18, naam: 'ARDA AI-modules', omschrijving: 'AI-modules ingericht binnen ARDA voor medewerkers en studenten. Livegang begin 2026. Onderdeel van het AI-geletterdheidsplan conform het AP-stappenplan.', laag: 5, spoor: 4, status: 'actief', type: 'intern', tags: ['ARDA', 'Professionalisering', 'Geletterdheid'], ambities: ['studiesucces'], impactInschatting: 'hoog' },
   { id: 19, naam: 'LibGuides AI-ondersteuning', omschrijving: 'Bibliotheek ontwikkelde LibGuides voor AI-ondersteuning van studenten en medewerkers. Praktische wegwijzer voor verantwoord AI-gebruik bij onderzoek en onderwijs.', laag: 5, spoor: 4, status: 'actief', type: 'intern', tags: ['Bibliotheek', 'Ondersteuning', 'Informatie'], ambities: [], impactInschatting: 'gemiddeld' },
-  { id: 20, naam: 'AI Regulatory Sandbox', omschrijving: 'Juridisch begeleidingstraject van RDI en AP voor NHL Stenden als aanbieder van hoog-risico AI-systemen. Relevant zodra NHL Stenden zelf AI bouwt voor selectie, beoordeling of begeleiding van studenten. Operationeel augustus 2026.', laag: 4, spoor: 3, status: 'in-ontwikkeling', type: 'extern', tags: ['AI Act', 'Hoog-risico', 'Compliance', 'RDI'], ambities: [], impactInschatting: 'hoog' , link: 'https://www.autoriteitpersoonsgegevens.nl/actueel/toezicht-op-ai-wordt-concreet-sleutelrol-voor-de-ap-en-de-rdi'},
+  { id: 20, naam: 'AI Regulatory Sandbox', omschrijving: 'Juridisch begeleidingstraject van RDI en AP voor NHL Stenden als aanbieder van hoog-risico AI-systemen. Relevant zodra NHL Stenden zelf AI bouwt voor selectie, beoordeling of begeleiding van studenten. De nationale sandbox van AP en RDI moet uiterlijk 2 augustus 2027 open zijn.', laag: 4, spoor: 3, status: 'in-ontwikkeling', type: 'extern', tags: ['AI Act', 'Hoog-risico', 'Compliance', 'RDI'], ambities: [], impactInschatting: 'hoog' , link: 'https://www.autoriteitpersoonsgegevens.nl/actueel/toezicht-op-ai-wordt-concreet-sleutelrol-voor-de-ap-en-de-rdi'},
   { id: 21, naam: 'Programma Bach', omschrijving: 'Nationaal onderwijsversterkingsprogramma voor digitale autonomie en soevereiniteit. Geinitieerd vanuit de Universiteit van het Noorden. Vier programmalijnen, investering 94 miljoen euro in 5 jaar.', laag: 3, spoor: 6, status: 'in-ontwikkeling', type: 'extern', tags: ['Soevereiniteit', 'Onderwijs', 'Nationaal', 'Bach'], ambities: [], impactInschatting: 'hoog' , link: 'https://universiteitvanhetnoorden.nl/programmas/'},
   { id: 22, naam: 'Friese AI-propositie', omschrijving: 'Regionale samenwerking tussen Frisius MC, NHL Stenden en Firda voor een Friese AI-propositie. Acht propositierichtingen voor zorg, onderwijs, maakindustrie en geletterdheid.', laag: 5, spoor: 5, status: 'in-ontwikkeling', type: 'extern', tags: ['Friesland', 'Regio', 'Samenwerking', 'Frisius'], ambities: [], impactInschatting: 'hoog' },
   { id: 23, naam: 'Vision Technology opschaling', omschrijving: 'Fryslaan heeft meer dan 20 jaar expertise in Vision Technology. NHL Stenden zet in op opschaling naar nieuwe sectoren: maritiem, recycling, zorg en landbouw. In samenwerking met RUG en bedrijfsleven.', laag: 5, spoor: 5, status: 'actief', type: 'intern', tags: ['Computer Vision', 'Innovatie', 'Regio', 'Werkveld'], ambities: [], impactInschatting: 'hoog' },
@@ -161,7 +161,7 @@ export const AI_ACT_ITEMS = [
 // te passen zodra de structuur definitief wordt ingevuld.
 // ============================================================
 export const OVERLEG_STRUCTUUR = [
-  { id: 'stuurgroep', naam: 'Stuurgroep Digitalisering', frequentie: 'Per kwartaal', focus: 'Kaders, voortgang en besluiten over richting en middelen', ambitie: 'Bewaakt de globale kernambitie: AI die aantoonbaar bijdraagt aan de doelen van NHL Stenden.', spoor: null },
+  { id: 'stuurgroep', naam: 'Stuurgroep Transitieprogramma', frequentie: 'Per kwartaal', focus: 'Kaders, voortgang en besluiten over richting en middelen', ambitie: 'Bewaakt de globale kernambitie: AI die aantoonbaar bijdraagt aan de doelen van NHL Stenden.', spoor: null },
   { id: 'kernteam', naam: 'Kernteam AI-Netwerk', frequentie: 'Maandelijks', focus: 'Voortgang, knelpunten en operationele besluiten', ambitie: 'Bewaakt de werking van het AI-Netwerk: effectief samenwerken tussen de overleggen en samen doelen bereiken.', spoor: null },
   { id: 'thema-1', naam: 'Thema-overleg AI & Leren', frequentie: 'Maandelijks', focus: 'Initiatieven en ontwikkelingen binnen de koerslijn', spoor: 1 },
   { id: 'thema-2', naam: 'Thema-overleg AI & Werken', frequentie: 'Maandelijks', focus: 'Initiatieven en ontwikkelingen binnen de koerslijn', spoor: 2 },
@@ -227,7 +227,7 @@ export const initiatief_types = ['intern', 'extern', 'surf']
 // Centraal versienummer: dit is de enige plek waar de versie wordt bijgehouden.
 // Elke functionele wijziging hoort dit nummer op te hogen en een regel toe te voegen
 // aan de changelog in Beheer.jsx. Patch-scripts doen dit voortaan zelf.
-export const APP_VERSIE = 'v2.46'
-export const APP_VERSIE_DATUM = 'Juli 2026'
+export const APP_VERSIE = 'v2.47'
+export const APP_VERSIE_DATUM = 'September 2026'
 
 export const BEHEER_CODE = 'aihub2026'
