@@ -6,14 +6,17 @@ export default async (req, context) => {
   try {
     const bezoek = await req.json()
     const base = new URL(req.url).origin
-    const getRes = await fetch(`${base}/.netlify/functions/storage?key=analytics-bezoeken`)
+    // De site staat achter het sitewachtwoord van Netlify; zonder het cookie
+    // van de bezoeker krijgt deze aanroep naar de eigen site een 401.
+    const cookie = req.headers.get('cookie') || ''
+    const getRes = await fetch(`${base}/.netlify/functions/storage?key=analytics-bezoeken`, { headers: { cookie } })
     const getData = await getRes.json()
     let bestaand = []
     try { bestaand = JSON.parse(getData.value || '[]') } catch {}
     const nieuw = [...bestaand, bezoek].slice(-500)
     await fetch(`${base}/.netlify/functions/storage`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', cookie },
       body: JSON.stringify({ key: 'analytics-bezoeken', value: JSON.stringify(nieuw) }),
     })
     return new Response(JSON.stringify({ ok: true }), { status: 200, headers })

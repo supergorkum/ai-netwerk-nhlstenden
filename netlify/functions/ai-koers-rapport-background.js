@@ -103,7 +103,8 @@ export default async (req) => {
     try {
       const docResp = await fetch(`${url.origin}/ai-koers/paginas.json?t=${Date.now()}`, {
         cache: 'no-store',
-        headers: { 'Cache-Control': 'no-cache' },
+        // Cookie van de bezoeker mee: de site staat achter het sitewachtwoord.
+        headers: { 'Cache-Control': 'no-cache', cookie: req.headers.get('cookie') || '' },
       })
       if (!docResp.ok) throw new Error(`status ${docResp.status}`)
       doc = await docResp.json()

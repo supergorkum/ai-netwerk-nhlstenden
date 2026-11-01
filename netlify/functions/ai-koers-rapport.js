@@ -58,7 +58,23 @@ export default async (req) => {
   // Achtergrondtaak triggeren. Niet awaiten op het resultaat, alleen dat
   // de aanroep zelf is verstuurd; Netlify geeft de achtergrondtaak meteen
   // een 202 terug en laat hem daarna los doorlopen.
-  fetch(`${url.origin}/.netlify/functions/ai-koers-rapport-background`, { method: 'POST' }).catch(() => {})
+  // De hele site staat achter het sitewachtwoord van Netlify. Een aanroep van
+  // deze function naar de eigen site krijgt zonder het cookie van de bezoeker
+  // een 401. Daarom gaat dat cookie mee (alleen naar dezelfde site).
+  // Wel awaiten: een achtergrondfunctie antwoordt meteen met 202, en zonder
+  // await kan de aanroep wegvallen zodra deze function klaar is.
+  try {
+    const r = await fetch(`${url.origin}/.netlify/functions/ai-koers-rapport-background`, {
+      method: 'POST',
+      headers: { cookie: req.headers.get('cookie') || '' },
+    })
+    if (r.status >= 400) throw new Error(`achtergrondtaak gaf status ${r.status}`)
+  } catch (err) {
+    console.error('ai-koers-rapport: starten mislukt', err.message)
+    const fout = { status: 'fout', foutOp: new Date().toISOString(), foutmelding: `Starten mislukt: ${err.message}` }
+    await store.set(STATUS_KEY, JSON.stringify(fout))
+    return new Response(JSON.stringify(fout), { headers })
+  }
 
   return new Response(JSON.stringify(nieuweStatus), { headers })
 }

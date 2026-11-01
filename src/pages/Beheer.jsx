@@ -1491,6 +1491,15 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
                 versie: APP_VERSIE, datum: APP_VERSIE_DATUM,
                 label: 'Huidige versie', labelKleur: 'bg-green-100 text-green-700',
                 items: [
+                  'Vernieuwen van het AI-Koers-feedbackrapport werkt weer. Sinds de site achter een wachtwoord staat, kwam de achtergrondtaak niet meer op gang en bleef het oude rapport staan.',
+                  'Het bijhouden van bezoeken werkt weer; het liep op hetzelfde probleem vast.',
+                ],
+              },
+
+              {
+                versie: 'v2.51', datum: 'November 2026',
+                label: null, labelKleur: '',
+                items: [
                   'De AI-hulp gebruikt nieuwere modellen. Het nieuws ophalen beoordeelt berichten met Claude Haiku 5.5, het AI-Koers-feedbackrapport wordt geschreven met Claude Opus 5.5.',
                   'Lukt een AI-beoordeling niet, of weigert het model, dan staat de reden voortaan in het functielog van Netlify.',
                 ],
