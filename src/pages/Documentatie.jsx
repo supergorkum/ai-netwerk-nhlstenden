@@ -26,8 +26,10 @@ function DocAuthWall({ doc, onSuccess, onCancel }) {
   const [poging, setPoging] = React.useState('')
   const [fout, setFout] = React.useState(false)
   const probeer = () => {
-    if (poging === 'nhlstenden2026') { onSuccess() }
-    else { setFout(true); setPoging('') }
+    // Demo (besluit van Edgar, 1 november 2026): de hele site staat achter het
+    // sitewachtwoord van Netlify, dus dit scherm laat iedereen door, ook met een
+    // leeg veld. Niet terugzetten tenzij Edgar erom vraagt.
+    onSuccess()
   }
   return (
     <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center px-4">
@@ -35,23 +37,23 @@ function DocAuthWall({ doc, onSuccess, onCancel }) {
         <div className="flex items-center gap-3 mb-5">
           <div className="w-12 h-12 rounded-xl bg-nhl-blauw/10 flex items-center justify-center text-2xl">&#128272;</div>
           <div>
-            <div className="font-bold text-nhl-blauw text-base">Beveiligd document</div>
+            <div className="font-bold text-nhl-blauw text-base">Document downloaden</div>
             <div className="text-gray-400 text-xs">{doc && doc.titel}</div>
           </div>
         </div>
-        <p className="text-gray-600 text-sm leading-relaxed mb-2">Dit document is versleuteld en uitsluitend beschikbaar voor geautoriseerde medewerkers van NHL Stenden.</p>
-        <p className="text-gray-400 text-xs leading-relaxed mb-6">Voer de toegangscode in om het document te downloaden. Neem bij vragen contact op met de beheerder van het AI-Netwerk via het contactformulier.</p>
+        <p className="text-gray-600 text-sm leading-relaxed mb-2">Dit document is bedoeld voor medewerkers van NHL Stenden.</p>
+        <p className="text-gray-400 text-xs leading-relaxed mb-6">Het AI-Netwerk staat achter één sitewachtwoord. In deze demo kom je hier zonder code verder.</p>
         <div className="space-y-3">
           <input type="password" value={poging}
             onChange={function(e) { setPoging(e.target.value); setFout(false) }}
             onKeyDown={function(e) { if (e.key === 'Enter') probeer() }}
-            placeholder="Voer toegangscode in" autoFocus
+            placeholder="Code (niet nodig in deze demo)" autoFocus
             className="w-full border rounded-xl px-4 py-3 text-sm outline-none border-gray-200 focus:border-nhl-blauw transition-colors" />
           {fout && <p className="text-red-500 text-xs">Onjuiste toegangscode. Neem contact op als je hulp nodig hebt.</p>}
           <button onClick={probeer} className="w-full bg-nhl-blauw hover:bg-nhl-blauw/90 text-white font-semibold py-3 rounded-xl text-sm transition-colors">Toegang verkrijgen</button>
           <button onClick={onCancel} className="w-full text-gray-400 hover:text-gray-600 text-sm py-1 transition-colors">Annuleren</button>
         </div>
-        <p className="text-center text-gray-300 text-xs mt-5 pt-4 border-t border-gray-100">&#128274; Beveiligde verbinding - NHL Stenden AI-Netwerk - 2026</p>
+        <p className="text-center text-gray-300 text-xs mt-5 pt-4 border-t border-gray-100">NHL Stenden AI-Netwerk - 2026</p>
       </div>
     </div>
   )

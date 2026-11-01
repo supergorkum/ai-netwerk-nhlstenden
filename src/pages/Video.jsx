@@ -1,6 +1,6 @@
 import GradientHeader from '../components/GradientHeader'
 import { useState, useCallback } from 'react'
-import { sporen, BEHEER_CODE } from '../data'
+import { sporen } from '../data'
 
 function getYouTubeId(url) {
   if (!url) return null
@@ -86,8 +86,10 @@ export default function Video({ videos, setVideos, actiefVideoId, setActiefVideo
   }
 
   const loginBeheer = () => {
-    if (beheerCode === BEHEER_CODE) { setBeheerIn(true); setBeheerFout('') }
-    else setBeheerFout('Onjuiste beheercode.')
+    // Demo (besluit van Edgar, 1 november 2026): de hele site staat achter het
+    // sitewachtwoord van Netlify, dus dit scherm laat iedereen door, ook met een
+    // leeg veld. Niet terugzetten tenzij Edgar erom vraagt.
+    setBeheerIn(true); setBeheerFout('')
   }
 
   const keurGoed = (id) => {
@@ -364,7 +366,7 @@ export default function Video({ videos, setVideos, actiefVideoId, setActiefVideo
               <div className="p-6">
                 <input type="password" value={beheerCode} onChange={e => setBeheerCode(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && loginBeheer()}
-                  placeholder="Beheercode..."
+                  placeholder="Code (niet nodig in deze demo)"
                   className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-nhl-blauw" />
                 {beheerFout && <div className="text-red-500 text-xs mb-3">{beheerFout}</div>}
                 <button onClick={loginBeheer} className="btn-primary w-full">Inloggen</button>

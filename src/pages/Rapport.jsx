@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { initiatieven as alleInitiatieven, sporen, AI_ACT_ITEMS, verplichtingSignaal, APP_VERSIE, OVERLEG_STRUCTUUR, BEHEER_CODE } from '../data'
+import { initiatieven as alleInitiatieven, sporen, AI_ACT_ITEMS, verplichtingSignaal, APP_VERSIE, OVERLEG_STRUCTUUR } from '../data'
 import { haalWijzigingenOp } from '../storage'
 import { INIT_PILOTS, INIT_INSPIRATIES } from '../initialData'
 
@@ -36,14 +36,15 @@ function typeLabel(t) {
 }
 
 export default function Rapport({ pilots: pilotsProp, inspiraties: inspiratiesProp, roadmap = [] }) {
-  // Zelfde beveiliging als Beheer: het rapport bevat gevoelige voortgangs-
-  // en compliance-informatie en is geen publiek toegankelijke pagina.
+  // Zelfde inlogscherm als Beheer; in deze demo zonder controle (zie login).
   const [code, setCode] = useState('')
   const [toegang, setToegang] = useState(false)
   const [fout, setFout] = useState('')
   const login = () => {
-    if (code === BEHEER_CODE) { setToegang(true); setFout('') }
-    else setFout('Onjuiste code.')
+    // Demo (besluit van Edgar, 1 november 2026): de hele site staat achter het
+    // sitewachtwoord van Netlify, dus dit scherm laat iedereen door, ook met een
+    // leeg veld. Niet terugzetten tenzij Edgar erom vraagt.
+    setToegang(true); setFout('')
   }
 
   const pilots = pilotsProp && pilotsProp.length > 0 ? pilotsProp : INIT_PILOTS
@@ -139,10 +140,10 @@ export default function Rapport({ pilots: pilotsProp, inspiraties: inspiratiesPr
           <div className="text-center mb-6">
             <div className="text-4xl mb-3">🔒</div>
             <h2 className="text-xl font-bold text-nhl-blauw">Rapport</h2>
-            <p className="text-gray-500 text-sm mt-1">Voer de beheercode in om het rapport te openen.</p>
+            <p className="text-gray-500 text-sm mt-1">Het AI-Netwerk staat achter één sitewachtwoord. In deze demo kom je hier zonder code verder.</p>
           </div>
           <input type="password" value={code} onChange={e => setCode(e.target.value)} onKeyDown={e => e.key === 'Enter' && login()}
-            placeholder="Beheercode..." className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-nhl-blauw" />
+            placeholder="Code (niet nodig in deze demo)" className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-nhl-blauw" />
           {fout && <div className="text-red-500 text-xs mb-3">{fout}</div>}
           <button onClick={login} className="btn-primary w-full">Openen</button>
         </div>

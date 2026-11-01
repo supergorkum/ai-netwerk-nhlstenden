@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { initiatieven as initData, sporen, lagen, BEHEER_CODE, APP_VERSIE, APP_VERSIE_DATUM } from '../data'
+import { initiatieven as initData, sporen, lagen, APP_VERSIE, APP_VERSIE_DATUM } from '../data'
 import { exportJSON, importJSON, logWijziging, haalWijzigingenOp } from '../storage'
 
 const NIEUWS_URL = '/.netlify/functions/nieuws-ophalen'
@@ -592,8 +592,10 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
   }
 
   const login = () => {
-    if (code === BEHEER_CODE) { setToegang(true); setFout('') }
-    else setFout('Onjuiste code.')
+    // Demo (besluit van Edgar, 1 november 2026): de hele site staat achter het
+    // sitewachtwoord van Netlify, dus dit scherm laat iedereen door, ook met een
+    // leeg veld. Niet terugzetten tenzij Edgar erom vraagt.
+    setToegang(true); setFout('')
   }
 
   const slaInitiatiefOp = (gewijzigd) => {
@@ -634,10 +636,10 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
           <div className="text-center mb-6">
             <div className="text-4xl mb-3">🔐</div>
             <h2 className="text-xl font-bold text-nhl-blauw">Beheeromgeving</h2>
-            <p className="text-gray-500 text-sm mt-1">Voer de beheercode in.</p>
+            <p className="text-gray-500 text-sm mt-1">Het AI-Netwerk staat achter één sitewachtwoord. In deze demo kom je hier zonder code verder.</p>
           </div>
           <input type="password" value={code} onChange={e => setCode(e.target.value)} onKeyDown={e => e.key === 'Enter' && login()}
-            placeholder="Beheercode..." className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-nhl-blauw" />
+            placeholder="Code (niet nodig in deze demo)" className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-nhl-blauw" />
           {fout && <div className="text-red-500 text-xs mb-3">{fout}</div>}
           <button onClick={login} className="btn-primary w-full">Inloggen</button>
         </div>
@@ -1488,6 +1490,15 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
               {
                 versie: APP_VERSIE, datum: APP_VERSIE_DATUM,
                 label: 'Huidige versie', labelKleur: 'bg-green-100 text-green-700',
+                items: [
+                  'Beheer, het rapport, het AI-Koers-verslag, het videobeheer en de download van documenten vragen geen code meer. Het inlogscherm blijft staan, maar de knop laat iedereen door, ook met een leeg veld. De hele site staat al achter één sitewachtwoord.',
+                  'De teksten op die schermen zeggen dat nu ook. De melding "Onjuiste code" verschijnt niet meer.',
+                ],
+              },
+
+              {
+                versie: 'v2.49', datum: 'November 2026',
+                label: null, labelKleur: '',
                 items: [
                   'Onderaan elke pagina staat in de footer, naast het versienummer, in kleine letters "onderhoud: Claude Code · 2026".',
                 ],
