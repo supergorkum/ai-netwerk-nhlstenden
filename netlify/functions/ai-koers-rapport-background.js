@@ -181,19 +181,37 @@ De paginas-array moet precies ${aantalPaginas} items hebben, index 0 tot en met 
           'Content-Type': 'application/json',
           'x-api-key': apiKey,
           'anthropic-version': '2023-06-01',
+          // Bij een weigering probeert de API het vanzelf op een ander model.
+          'anthropic-beta': 'server-side-fallback-2026-07-01',
         },
+        // Claude Opus 5.5 (1 november 2026). Dit model denkt altijd eerst na;
+        // effort laag houdt de duur kort en het denken telt mee in max_tokens.
+        // Geen temperature, top_p of top_k: die geven bij dit model een fout.
         body: JSON.stringify({
-          model: 'claude-sonnet-4-6',
-          max_tokens: 4000,
+          model: 'claude-opus-5-5',
+          max_tokens: 4000 + 4000,
+          output_config: { effort: 'low' },
+          fallbacks: 'default',
           messages: [{ role: 'user', content: prompt }],
         }),
         signal: AbortSignal.timeout(120000),
       })
-      if (!r.ok) throw new Error(`Anthropic API gaf status ${r.status}`)
+      if (!r.ok) {
+        const fouttekst = (await r.text()).slice(0, 300)
+        console.error('ai-koers-rapport: Anthropic API gaf status', r.status, fouttekst)
+        throw new Error(`Anthropic API gaf status ${r.status}`)
+      }
       const data = await r.json()
-      const tekst = data.content?.[0]?.text || ''
+      if (data.stop_reason === 'refusal') {
+        console.error('ai-koers-rapport: weigering', data.stop_details?.category, data.stop_details?.explanation)
+        throw new Error('Het model weigerde de analyse')
+      }
+      if (data.stop_reason === 'max_tokens') console.error('ai-koers-rapport: max_tokens bereikt, antwoord mogelijk afgekapt')
+      // Bij Opus 5.5 staat er eerst een thinking-blok; pak het tekstblok.
+      const tekst = (data.content || []).find(b => b.type === 'text')?.text || ''
       analyse = JSON.parse(tekst.replace(/```json|```/g, '').trim())
     } catch (err) {
+      console.error('ai-koers-rapport: analyse mislukt', err.message)
       await schrijfStatus({ status: 'fout', foutOp: new Date().toISOString(), foutmelding: `Analyse mislukt: ${err.message}` })
       return
     }

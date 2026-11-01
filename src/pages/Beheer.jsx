@@ -1491,6 +1491,15 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
                 versie: APP_VERSIE, datum: APP_VERSIE_DATUM,
                 label: 'Huidige versie', labelKleur: 'bg-green-100 text-green-700',
                 items: [
+                  'De AI-hulp gebruikt nieuwere modellen. Het nieuws ophalen beoordeelt berichten met Claude Haiku 5.5, het AI-Koers-feedbackrapport wordt geschreven met Claude Opus 5.5.',
+                  'Lukt een AI-beoordeling niet, of weigert het model, dan staat de reden voortaan in het functielog van Netlify.',
+                ],
+              },
+
+              {
+                versie: 'v2.50', datum: 'November 2026',
+                label: null, labelKleur: '',
+                items: [
                   'Beheer, het rapport, het AI-Koers-verslag, het videobeheer en de download van documenten vragen geen code meer. Het inlogscherm blijft staan, maar de knop laat iedereen door, ook met een leeg veld. De hele site staat al achter één sitewachtwoord.',
                   'De teksten op die schermen zeggen dat nu ook. De melding "Onjuiste code" verschijnt niet meer.',
                 ],

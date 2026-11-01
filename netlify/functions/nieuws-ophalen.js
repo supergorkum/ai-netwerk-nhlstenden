@@ -65,8 +65,13 @@ async function beoordeelItem(item, feed, apiKey) {
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: 150,
+        // Claude Haiku 5.5 (1 november 2026): de huidige Haiku. Bewust geen Opus:
+        // tot 12 beoordelingen lopen tegelijk met 5 seconden per stuk, en Opus
+        // denkt altijd eerst na. Denken uit en effort laag houdt dit snel.
+        model: 'claude-haiku-5-5',
+        max_tokens: 400,
+        thinking: { type: 'disabled' },
+        output_config: { effort: 'low' },
         messages: [{
           role: 'user',
           content: `Relevant voor het AI-Netwerk van NHL Stenden Hogeschool (AI in hoger onderwijs, AI Act en compliance, digitale soevereiniteit, digitalisering onderwijs)?\n\nTitel: ${item.titel}\nBeschrijving: ${item.beschrijving.slice(0, 150)}\n\nThema's: 1=AI & Leren (onderwijs, didactiek, studenten), 2=AI & Werken (bedrijfsvoering, medewerkers, organisatie), 3=AI & Verantwoordelijkheid (AI Act, compliance, governance, ethiek, soevereiniteit, privacy), 4=AI-Geletterdheid (vaardigheden, bewustzijn, training), 5=AI & Werkveld (regionale samenwerking, praktijkgericht), 6=AI & Onderzoek (wetenschap, lectoraten)\n\nActuele AI Act verplichtingen van NHL Stenden: ${AI_ACT_CONTEXT}\nGeeft dit artikel aanleiding tot opvolging van een van deze verplichtingen (bijvoorbeeld een wijziging, aanscherping, uitstel of nieuwe uitleg)? Zo ja, benoem het id in aiActKoppeling, anders null.\n\nJSON alleen:\n{"relevant":true/false,"samenvatting":"max 1 zin Nederlands","doelgroep":"docenten/studenten/management/algemeen","spoor":1/2/3/4/5/6,"aiActSignaal":true/false,"aiActKoppeling":"aa1"/null}`
@@ -74,9 +79,16 @@ async function beoordeelItem(item, feed, apiKey) {
       }),
       signal: AbortSignal.timeout(5000),
     })
-    if (!r.ok) return null
+    if (!r.ok) {
+      console.error('nieuws-ophalen: Anthropic API gaf status', r.status, (await r.text()).slice(0, 300))
+      return null
+    }
     const data = await r.json()
-    const tekst = data.content?.[0]?.text || ''
+    if (data.stop_reason === 'refusal') {
+      console.error('nieuws-ophalen: weigering', data.stop_details?.category, item.titel)
+      return null
+    }
+    const tekst = (data.content || []).find(b => b.type === 'text')?.text || ''
     let b
     try { b = JSON.parse(tekst.replace(/```[\w]*|```/g, '').trim()) } catch { return null }
     if (!b.relevant || !b.samenvatting) return null
@@ -105,7 +117,10 @@ async function beoordeelItem(item, feed, apiKey) {
       aiActSignaal: b.aiActSignaal === true,
       aiActKoppeling: b.aiActKoppeling || null,
     }
-  } catch { return null }
+  } catch (err) {
+    console.error('nieuws-ophalen: beoordeling mislukt', err?.message)
+    return null
+  }
 }
 
 export default async (req) => {
