@@ -18,4 +18,9 @@ export default defineConfig([
       parserOptions: { ecmaFeatures: { jsx: true } },
     },
   },
+  {
+    // Netlify Functions en scripts draaien in Node, niet in de browser.
+    files: ['netlify/**/*.{js,mjs}', 'scripts/**/*.mjs'],
+    languageOptions: { globals: globals.node },
+  },
 ])

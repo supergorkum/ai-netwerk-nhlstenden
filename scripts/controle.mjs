@@ -15,21 +15,26 @@
 //    hoort APP_VERSIE mee te veranderen, want elke zichtbare wijziging krijgt
 //    een versie;
 // 3. de bouwmap buiten Google Drive wordt bijgewerkt (scripts/bouwmap.mjs);
-// 4. eslint, alleen als het in de bouwmap is geinstalleerd. Op 1 november 2026
-//    staat eslint niet in package.json (eslint.config.js wel), dus deze stap
-//    meldt dat en slaat over;
+// 4. eslint: niet meer fouten en waarschuwingen dan het ijkpunt (de oude
+//    code heeft er veel; nieuwe mogen er niet bij);
 // 5. vite build slaagt;
 // 6. scripts/check-versie.sh als hulpmiddel voor het oog: treffers worden
 //    getoond maar houden niets tegen (documentversies als "Versie 0.4d" en
 //    "AI-beleid v2.0" zijn terecht).
 //
-// Valt een van 1, 2, 3 of 5 om, dan gaat de push niet door. Netlify bouwt
+// Valt een van 1 tot en met 5 om, dan gaat de push niet door. Netlify bouwt
 // daarna zelf nog een keer; mislukt dat, dan blijft de vorige versie live.
 
 import { execFileSync, spawnSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import { REPO, BOUW, synchroniseer, afhankelijkheden } from "./bouwmap.mjs";
+
+// Het ijkpunt van 1 november 2026 (eslint 9 net toegevoegd): 149 fouten en 9
+// waarschuwingen in oude code, vooral ongebruikte variabelen (no-unused-vars).
+// Meer mag niet; worden het er minder, verlaag de getallen dan in dezelfde commit.
+const LINT_MAX_FOUTEN = 149;
+const LINT_MAX_WAARSCHUWINGEN = 9;
 
 const PUSH = process.argv.includes("--push");
 const SNEL = process.argv.includes("--snel");
@@ -95,12 +100,29 @@ function pushInhoud() {
 function lint() {
   console.log("4. eslint");
   if (!fs.existsSync(path.join(BOUW, "node_modules/eslint/bin/eslint.js"))) {
-    meld("eslint staat niet in package.json; niet gecontroleerd");
+    fouten.push("eslint ontbreekt in de bouwmap; draai npm run bouwmap");
     return;
   }
-  const r = spawnSync(process.execPath, ["node_modules/eslint/bin/eslint.js", "src", "netlify"], { cwd: BOUW, maxBuffer: 256 * 1024 * 1024 });
-  if (r.status !== 0) fouten.push("eslint vond fouten:\n      " + r.stdout.toString().trim().split("\n").slice(-15).join("\n      "));
-  else meld("geen fouten");
+  const r = spawnSync(process.execPath, ["node_modules/eslint/bin/eslint.js", "src", "netlify", "-f", "json"], { cwd: BOUW, maxBuffer: 256 * 1024 * 1024 });
+  let rapport;
+  try {
+    rapport = JSON.parse(r.stdout.toString());
+  } catch {
+    fouten.push("eslint gaf geen leesbaar antwoord: " + (r.stderr.toString().slice(0, 300) || "onbekend"));
+    return;
+  }
+  let fout = 0;
+  let waarsch = 0;
+  const regels = {};
+  for (const f of rapport) {
+    fout += f.errorCount;
+    waarsch += f.warningCount;
+    for (const m of f.messages) if (m.severity === 2) regels[m.ruleId] = (regels[m.ruleId] || 0) + 1;
+  }
+  meld(fout + " fouten (ijkpunt " + LINT_MAX_FOUTEN + "), " + waarsch + " waarschuwingen (ijkpunt " + LINT_MAX_WAARSCHUWINGEN + ")");
+  if (fout > LINT_MAX_FOUTEN) fouten.push("eslint geeft " + fout + " fouten, meer dan het ijkpunt " + LINT_MAX_FOUTEN + ". Er is iets bijgekomen: " + JSON.stringify(regels));
+  if (waarsch > LINT_MAX_WAARSCHUWINGEN) fouten.push("eslint geeft " + waarsch + " waarschuwingen, meer dan het ijkpunt " + LINT_MAX_WAARSCHUWINGEN + ". Er is iets bijgekomen.");
+  if (fout < LINT_MAX_FOUTEN || waarsch < LINT_MAX_WAARSCHUWINGEN) meld("minder dan het ijkpunt: verlaag de ijkpunten in scripts/controle.mjs naar " + fout + " en " + waarsch);
 }
 
 function bouw() {
