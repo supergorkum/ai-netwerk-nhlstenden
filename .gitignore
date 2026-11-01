@@ -22,3 +22,11 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Claude Code-overstap (1 november 2026)
+.env
+.env.*
+.sleutels/
+.overstap/
+.claude/settings.local.json
+.netlify
