@@ -227,7 +227,7 @@ export const initiatief_types = ['intern', 'extern', 'surf']
 // Centraal versienummer: dit is de enige plek waar de versie wordt bijgehouden.
 // Elke functionele wijziging hoort dit nummer op te hogen en een regel toe te voegen
 // aan de changelog in Beheer.jsx. Patch-scripts doen dit voortaan zelf.
-export const APP_VERSIE = 'v2.52'
+export const APP_VERSIE = 'v2.53'
 export const APP_VERSIE_DATUM = 'November 2026'
 
 // Onderhoudsregel (afspraak van 1 november 2026): staat in kleine letters bij het

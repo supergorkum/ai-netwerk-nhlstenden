@@ -1491,6 +1491,14 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
                 versie: APP_VERSIE, datum: APP_VERSIE_DATUM,
                 label: 'Huidige versie', labelKleur: 'bg-green-100 text-green-700',
                 items: [
+                  'Vernieuwen van het AI-Koers-feedbackrapport start nog maar één keer: een peiling direct na de start kon de oude status lezen en een tweede run beginnen.',
+                ],
+              },
+
+              {
+                versie: 'v2.52', datum: 'November 2026',
+                label: null, labelKleur: '',
+                items: [
                   'Vernieuwen van het AI-Koers-feedbackrapport werkt weer. Sinds de site achter een wachtwoord staat, kwam de achtergrondtaak niet meer op gang en bleef het oude rapport staan.',
                   'Het bijhouden van bezoeken werkt weer; het liep op hetzelfde probleem vast.',
                 ],

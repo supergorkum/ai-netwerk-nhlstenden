@@ -36,7 +36,9 @@ export default async (req) => {
     return new Response(JSON.stringify({ error: 'Alleen GET' }), { status: 405, headers })
   }
 
-  const store = getStore(STORE_NAAM)
+  // Sterke consistentie: anders kan een peiling vlak na een start nog de oude
+  // status lezen, die als vastgelopen zien en een tweede achtergrondtaak starten.
+  const store = getStore({ name: STORE_NAAM, consistency: 'strong' })
   const url = new URL(req.url)
   const vernieuw = url.searchParams.get('vernieuw') === '1'
 
