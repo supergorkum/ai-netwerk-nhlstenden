@@ -10,7 +10,7 @@
 // 1. APP_VERSIE in src/data.js en de changelog in src/pages/Beheer.jsx
 //    horen bij elkaar: de bovenste entry is de enige met versie: APP_VERSIE,
 //    de entry eronder heeft een letterlijk, lager nummer. De onderhoudsregel
-//    staat in data.js en wordt op de startpagina getoond;
+//    staat in data.js en wordt op de startpagina en in de footer getoond;
 // 2. bij een push: raakt de push src/, public/, netlify/ of index.html, dan
 //    hoort APP_VERSIE mee te veranderen, want elke zichtbare wijziging krijgt
 //    een versie;
@@ -70,7 +70,10 @@ function inhoud() {
 
   const regel = (data.match(/export const ONDERHOUD_REGEL = '([^']+)'/) || [])[1];
   if (!regel) fouten.push("ONDERHOUD_REGEL ontbreekt in src/data.js");
-  else if (!/ONDERHOUD_REGEL/.test(lees("src/pages/Start.jsx"))) fouten.push("de startpagina toont ONDERHOUD_REGEL niet meer");
+  else {
+    if (!/ONDERHOUD_REGEL/.test(lees("src/pages/Start.jsx"))) fouten.push("de startpagina toont ONDERHOUD_REGEL niet meer");
+    if (!/\{ONDERHOUD_REGEL\}/.test(lees("src/components/Footer.jsx"))) fouten.push("de footer toont ONDERHOUD_REGEL niet meer");
+  }
 
   meld("live na publicatie: " + versie + " (" + datum + "), vorige entry " + (vorige || "onbekend"));
 }
