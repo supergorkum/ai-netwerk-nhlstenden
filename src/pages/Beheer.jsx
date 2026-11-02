@@ -1491,6 +1491,14 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
                 versie: APP_VERSIE, datum: APP_VERSIE_DATUM,
                 label: 'Huidige versie', labelKleur: 'bg-green-100 text-green-700',
                 items: [
+                  'Toegang loopt nu via de portfolio van A.I. 2 Business. Wie daar is ingelogd en op deze demo klikt, komt direct binnen, zonder apart wachtwoord. Een losse link stuurt eerst naar het inlogscherm van de portfolio.',
+                ],
+              },
+
+              {
+                versie: 'v2.53', datum: 'November 2026',
+                label: null, labelKleur: '',
+                items: [
                   'Vernieuwen van het AI-Koers-feedbackrapport start nog maar één keer: een peiling direct na de start kon de oude status lezen en een tweede run beginnen.',
                 ],
               },
