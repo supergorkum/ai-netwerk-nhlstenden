@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { initiatieven as initData, sporen, lagen, APP_VERSIE, APP_VERSIE_DATUM } from '../data'
 import { exportJSON, importJSON, logWijziging, haalWijzigingenOp } from '../storage'
+import { beheerWachtwoordKlopt } from '../beheerSlot'
 
 const NIEUWS_URL = '/.netlify/functions/nieuws-ophalen'
 const REFRESH_KEY = 'aihub-laatste-refresh'
@@ -462,6 +463,7 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
   const [code, setCode] = useState('')
   const [toegang, setToegang] = useState(false)
   const [fout, setFout] = useState('')
+  const [bezig, setBezig] = useState(false)
   const [cloudStatus, setCloudStatus] = useState('idle')
   const [cloudTijdstempel, setCloudTijdstempel] = useState(null)
   const [changelogOpen, setChangelogOpen] = useState(false)
@@ -591,11 +593,16 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
     setTimeout(() => setCloudStatus('idle'), 3000)
   }
 
-  const login = () => {
-    // Demo (besluit van Edgar, 1 november 2026): de hele site staat achter het
-    // sitewachtwoord van Netlify, dus dit scherm laat iedereen door, ook met een
-    // leeg veld. Niet terugzetten tenzij Edgar erom vraagt.
-    setToegang(true); setFout('')
+  // Beheer vraagt het beheerwachtwoord (verzoek van Edgar, 2 november 2026).
+  // De controle staat in src/beheerSlot.js; knop en Enter gebruiken allebei login.
+  const login = async () => {
+    if (bezig) return
+    setBezig(true)
+    const klopt = await beheerWachtwoordKlopt(code).catch(() => false)
+    setBezig(false)
+    setCode('')
+    if (klopt) { setToegang(true); setFout('') }
+    else setFout('Wachtwoord onjuist. Probeer opnieuw.')
   }
 
   const slaInitiatiefOp = (gewijzigd) => {
@@ -636,12 +643,14 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
           <div className="text-center mb-6">
             <div className="text-4xl mb-3">🔐</div>
             <h2 className="text-xl font-bold text-nhl-blauw">Beheeromgeving</h2>
-            <p className="text-gray-500 text-sm mt-1">Het AI-Netwerk staat achter één sitewachtwoord. In deze demo kom je hier zonder code verder.</p>
+            <p className="text-gray-500 text-sm mt-1">Beheer vraagt een apart wachtwoord.</p>
           </div>
-          <input type="password" value={code} onChange={e => setCode(e.target.value)} onKeyDown={e => e.key === 'Enter' && login()}
-            placeholder="Code (niet nodig in deze demo)" className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-nhl-blauw" />
+          <input type="password" value={code} onChange={e => { setCode(e.target.value); setFout('') }} onKeyDown={e => e.key === 'Enter' && login()}
+            placeholder="Wachtwoord" autoFocus disabled={bezig} className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-nhl-blauw" />
           {fout && <div className="text-red-500 text-xs mb-3">{fout}</div>}
-          <button onClick={login} className="btn-primary w-full">Inloggen</button>
+          <button onClick={login} disabled={bezig} className="btn-primary w-full disabled:opacity-60">{bezig ? 'Even controleren...' : 'Toegang'}</button>
+          <a href="/" className="block text-center text-gray-400 hover:text-gray-600 text-sm mt-3">← Terug naar de site</a>
+          <p className="text-center text-gray-300 text-[11px] mt-4 leading-relaxed">In de code staat alleen een gezouten hash van het wachtwoord. De controle gebeurt in de browser.</p>
         </div>
       </div>
     )
@@ -1490,6 +1499,15 @@ export default function Beheer({ berichten, setBerichten, videos, setVideos, act
               {
                 versie: APP_VERSIE, datum: APP_VERSIE_DATUM,
                 label: 'Huidige versie', labelKleur: 'bg-green-100 text-green-700',
+                items: [
+                  'Beheer en het videobeheer vragen weer een wachtwoord. Een fout wachtwoord of een leeg veld geeft een melding; de knop Toegang en Enter werken allebei. In de code staat alleen een gezouten hash van het wachtwoord, en de controle gebeurt in de browser.',
+                  'Het rapport, het AI-Koers-verslag en de downloads blijven zonder code. De teksten op die schermen noemen nu de toegang via de portfolio van A.I. 2 Business in plaats van het oude sitewachtwoord.',
+                ],
+              },
+
+              {
+                versie: 'v2.54', datum: 'November 2026',
+                label: null, labelKleur: '',
                 items: [
                   'Toegang loopt nu via de portfolio van A.I. 2 Business. Wie daar is ingelogd en op deze demo klikt, komt direct binnen, zonder apart wachtwoord. Een losse link stuurt eerst naar het inlogscherm van de portfolio.',
                 ],

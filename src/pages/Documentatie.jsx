@@ -26,9 +26,10 @@ function DocAuthWall({ doc, onSuccess, onCancel }) {
   const [poging, setPoging] = React.useState('')
   const [fout, setFout] = React.useState(false)
   const probeer = () => {
-    // Demo (besluit van Edgar, 1 november 2026): de hele site staat achter het
-    // sitewachtwoord van Netlify, dus dit scherm laat iedereen door, ook met een
-    // leeg veld. Niet terugzetten tenzij Edgar erom vraagt.
+    // Demo (besluit van Edgar, 1 november 2026): de hele site opent alleen met
+    // een doorgangspas van de portfolio (A2B-poort, sinds v2.54), dus dit scherm
+    // laat iedereen door, ook met een leeg veld. Niet terugzetten tenzij Edgar
+    // erom vraagt. Alleen Beheer en videobeheer vragen het beheerwachtwoord.
     onSuccess()
   }
   return (
@@ -42,7 +43,7 @@ function DocAuthWall({ doc, onSuccess, onCancel }) {
           </div>
         </div>
         <p className="text-gray-600 text-sm leading-relaxed mb-2">Dit document is bedoeld voor medewerkers van NHL Stenden.</p>
-        <p className="text-gray-400 text-xs leading-relaxed mb-6">Het AI-Netwerk staat achter één sitewachtwoord. In deze demo kom je hier zonder code verder.</p>
+        <p className="text-gray-400 text-xs leading-relaxed mb-6">Het AI-Netwerk opent alleen via de portfolio van A.I. 2 Business. In deze demo kom je hier zonder code verder.</p>
         <div className="space-y-3">
           <input type="password" value={poging}
             onChange={function(e) { setPoging(e.target.value); setFout(false) }}

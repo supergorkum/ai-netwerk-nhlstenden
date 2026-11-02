@@ -20,9 +20,12 @@
 // 5. vite build slaagt;
 // 6. scripts/check-versie.sh als hulpmiddel voor het oog: treffers worden
 //    getoond maar houden niets tegen (documentversies als "Versie 0.4d" en
-//    "AI-beleid v2.0" zijn terecht).
+//    "AI-beleid v2.0" zijn terecht);
+// 7. geen waarde uit .sleutels/*.env (het beheerwachtwoord, oude codes) in
+//    een bestand dat git meeneemt of in de gebouwde site. Alleen aantallen
+//    worden getoond, nooit de waarde of de regel.
 //
-// Valt een van 1 tot en met 5 om, dan gaat de push niet door. Netlify bouwt
+// Valt een van 1 tot en met 5 of 7 om, dan gaat de push niet door. Netlify bouwt
 // daarna zelf nog een keer; mislukt dat, dan blijft de vorige versie live.
 
 import { execFileSync, spawnSync } from "node:child_process";
@@ -146,6 +149,59 @@ function losseVersies() {
   for (const l of regels) meld("  " + l.replace(/^\.\//, "").slice(0, 140));
 }
 
+// Waarden uit .sleutels/*.env (KEY=waarde). Korter dan 6 tekens telt niet mee:
+// dat geeft alleen loos alarm.
+function sleutelwaarden() {
+  const map = path.join(REPO, ".sleutels");
+  if (!fs.existsSync(map)) return [];
+  const uit = [];
+  for (const naam of fs.readdirSync(map)) {
+    if (!naam.endsWith(".env")) continue;
+    for (const regel of fs.readFileSync(path.join(map, naam), "utf8").split("\n")) {
+      const m = regel.match(/^([A-Z0-9_]+)=(.+)$/);
+      if (m && m[2].trim().length >= 6) uit.push({ naam: m[1], waarde: Buffer.from(m[2].trim()) });
+    }
+  }
+  return uit;
+}
+
+function zoekSleutels(stap, basis, bestanden, waar) {
+  console.log(stap);
+  const waarden = sleutelwaarden();
+  if (!waarden.length) return meld("geen .sleutels/*.env gevonden; niets te zoeken");
+  let treffers = 0;
+  for (const rel of bestanden) {
+    let buf;
+    try {
+      buf = fs.readFileSync(path.join(basis, rel));
+    } catch {
+      continue;
+    }
+    for (const w of waarden) {
+      if (buf.includes(w.waarde)) {
+        treffers++;
+        fouten.push("de waarde van " + w.naam + " uit .sleutels/ staat in " + waar + ": " + rel);
+      }
+    }
+  }
+  meld(treffers + " treffer(s) in " + bestanden.length + " bestanden (" + waarden.length + " waarden gezocht)");
+}
+
+function gitBestanden() {
+  return execFileSync("git", ["ls-files", "-co", "--exclude-standard", "-z"], { cwd: REPO, maxBuffer: 64 * 1024 * 1024 })
+    .toString("utf8").split("\0").filter(Boolean);
+}
+
+function distBestanden(map, rel = "", uit = []) {
+  if (!fs.existsSync(map)) return uit;
+  for (const d of fs.readdirSync(map, { withFileTypes: true })) {
+    const r = rel ? rel + "/" + d.name : d.name;
+    if (d.isDirectory()) distBestanden(path.join(map, d.name), r, uit);
+    else if (/\.(html|js|css|json|txt|svg|map)$/i.test(d.name)) uit.push(r);
+  }
+  return uit;
+}
+
 console.log("Controle AI-Netwerk" + (PUSH ? " (voor de push)" : ""));
 try {
   inhoud();
@@ -158,6 +214,8 @@ try {
     bouw();
   }
   losseVersies();
+  zoekSleutels("7. Sleutels in git", REPO, gitBestanden(), "een bestand dat git meeneemt");
+  if (!SNEL) zoekSleutels("8. Sleutels in de gebouwde site", path.join(BOUW, "dist"), distBestanden(path.join(BOUW, "dist")), "de gebouwde site");
 } catch (e) {
   fouten.push(e.ainetwerk ? e.message : "onverwachte fout: " + (e.stack || e.message || e));
 }

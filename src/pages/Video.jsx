@@ -1,6 +1,7 @@
 import GradientHeader from '../components/GradientHeader'
 import { useState, useCallback } from 'react'
 import { sporen } from '../data'
+import { beheerWachtwoordKlopt } from '../beheerSlot'
 
 function getYouTubeId(url) {
   if (!url) return null
@@ -21,6 +22,7 @@ export default function Video({ videos, setVideos, actiefVideoId, setActiefVideo
   const [beheerCode, setBeheerCode] = useState('')
   const [beheerIn, setBeheerIn] = useState(false)
   const [beheerFout, setBeheerFout] = useState('')
+  const [beheerBezig, setBeheerBezig] = useState(false)
   const [form, setForm] = useState({ url: '', titel: '', omschrijving: '', trefwoorden: '', spoor: '', ingediendDoor: '' })
   const [formFout, setFormFout] = useState('')
   const [meldVerstuurd, setMeldVerstuurd] = useState(false)
@@ -85,11 +87,16 @@ export default function Video({ videos, setVideos, actiefVideoId, setActiefVideo
     setFormFout('')
   }
 
-  const loginBeheer = () => {
-    // Demo (besluit van Edgar, 1 november 2026): de hele site staat achter het
-    // sitewachtwoord van Netlify, dus dit scherm laat iedereen door, ook met een
-    // leeg veld. Niet terugzetten tenzij Edgar erom vraagt.
-    setBeheerIn(true); setBeheerFout('')
+  // Videobeheer vraagt het beheerwachtwoord, net als Beheer (verzoek van Edgar,
+  // 2 november 2026). De controle staat in src/beheerSlot.js.
+  const loginBeheer = async () => {
+    if (beheerBezig) return
+    setBeheerBezig(true)
+    const klopt = await beheerWachtwoordKlopt(beheerCode).catch(() => false)
+    setBeheerBezig(false)
+    setBeheerCode('')
+    if (klopt) { setBeheerIn(true); setBeheerFout('') }
+    else setBeheerFout('Wachtwoord onjuist. Probeer opnieuw.')
   }
 
   const keurGoed = (id) => {
@@ -364,12 +371,13 @@ export default function Video({ videos, setVideos, actiefVideoId, setActiefVideo
             </div>
             {!beheerIn ? (
               <div className="p-6">
-                <input type="password" value={beheerCode} onChange={e => setBeheerCode(e.target.value)}
+                <p className="text-gray-500 text-sm mb-3">Videobeheer vraagt het beheerwachtwoord.</p>
+                <input type="password" value={beheerCode} onChange={e => { setBeheerCode(e.target.value); setBeheerFout('') }}
                   onKeyDown={e => e.key === 'Enter' && loginBeheer()}
-                  placeholder="Code (niet nodig in deze demo)"
+                  placeholder="Wachtwoord" autoFocus disabled={beheerBezig}
                   className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-nhl-blauw" />
                 {beheerFout && <div className="text-red-500 text-xs mb-3">{beheerFout}</div>}
-                <button onClick={loginBeheer} className="btn-primary w-full">Inloggen</button>
+                <button onClick={loginBeheer} disabled={beheerBezig} className="btn-primary w-full disabled:opacity-60">{beheerBezig ? 'Even controleren...' : 'Toegang'}</button>
               </div>
             ) : (
               <div className="p-6">
